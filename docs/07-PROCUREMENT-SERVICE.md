@@ -29,6 +29,104 @@ Procurement Service quản lý quy trình mua hàng từ Purchase Requisition (P
 
 ## PROCUREMENT WORKFLOW
 
+### Complete Purchase Process
+
+```mermaid
+graph TB
+    Start([Material Need]) --> CreatePR[Create Purchase Requisition]
+    CreatePR --> CheckAmount{Total Amount?}
+    
+    CheckAmount -->|< 10M VND| AutoApprove[Auto-Approved]
+    CheckAmount -->|10M - 50M| DeptMgr[Department Manager Approval]
+    CheckAmount -->|50M - 200M| ProcMgr[Procurement Manager Approval]
+    CheckAmount -->|> 200M| CFO[CFO/Director Approval]
+    
+    DeptMgr --> Approved1{Approved?}
+    ProcMgr --> Approved2{Approved?}
+    CFO --> Approved3{Approved?}
+    
+    Approved1 -->|No| Rejected[PR Rejected]
+    Approved2 -->|No| Rejected
+    Approved3 -->|No| Rejected
+    
+    Approved1 -->|Yes| CheckRFQ
+    Approved2 -->|Yes| CheckRFQ
+    Approved3 -->|Yes| CheckRFQ
+    AutoApprove --> CheckRFQ
+    
+    CheckRFQ{Need RFQ?} -->|Yes| SendRFQ[Send RFQ to Suppliers]
+    SendRFQ --> ReceiveQuotes[Receive Quotations]
+    ReceiveQuotes --> CompareQuotes[Compare & Select Supplier]
+    CompareQuotes --> CreatePO
+    
+    CheckRFQ -->|No| CreatePO[Create Purchase Order]
+    
+    CreatePO --> SendPOToSupplier[Send PO to Supplier]
+    SendPOToSupplier --> SupplierConfirm[Supplier Confirms]
+    SupplierConfirm --> WaitDelivery[Wait for Delivery]
+    
+    WaitDelivery --> GoodsReceived{Goods Received?}
+    GoodsReceived -->|Yes| WMSCreateGRN[WMS: Create GRN]
+    WMSCreateGRN --> QCInspection[QC Inspection]
+    
+    QCInspection -->|Pass| UpdatePO[Update PO: Received Qty]
+    QCInspection -->|Fail| NCR[Create NCR]
+    NCR --> ContactSupplier[Contact Supplier]
+    
+    UpdatePO --> CheckComplete{Fully Received?}
+    CheckComplete -->|Yes| ClosePO[Close PO]
+    CheckComplete -->|No| PartialReceived[Partially Received]
+    PartialReceived --> WaitDelivery
+    
+    ClosePO --> End([Process Complete])
+    Rejected --> End
+
+    style CreatePR fill:#e1f5ff
+    style CreatePO fill:#fff3e0
+    style WMSCreateGRN fill:#e8f5e9
+    style ClosePO fill:#f3e5f5
+```
+
+### Approval Workflow Detail
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant ProcSvc as Procurement Service
+    participant AuthSvc as Auth Service
+    participant NotifSvc as Notification Service
+    participant Approver
+
+    User->>ProcSvc: Create PR
+    ProcSvc->>ProcSvc: Calculate total amount
+    
+    alt Amount < 10M VND
+        ProcSvc->>ProcSvc: Auto-approve
+        ProcSvc->>User: PR Approved
+    else Amount >= 10M VND
+        ProcSvc->>AuthSvc: Get approver by role & amount
+        AuthSvc-->>ProcSvc: Approver info
+        ProcSvc->>NotifSvc: Send approval request
+        NotifSvc->>Approver: Email + in-app notification
+        
+        Approver->>ProcSvc: Review PR
+        
+        alt Approver Approves
+            Approver->>ProcSvc: Approve PR
+            ProcSvc->>NotifSvc: Notify requester
+            NotifSvc->>User: PR Approved
+        else Approver Rejects
+            Approver->>ProcSvc: Reject PR (with reason)
+            ProcSvc->>NotifSvc: Notify requester
+            NotifSvc->>User: PR Rejected
+        end
+    end
+```
+
+---
+
+## PROCUREMENT WORKFLOW
+
 ```mermaid
 graph LR
     A[Material Need] --> B[Create PR]
