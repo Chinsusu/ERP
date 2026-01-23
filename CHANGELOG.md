@@ -57,3 +57,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Event publishing/subscription patterns
 - Permission requirements per service
 - Service dependency mapping with Mermaid diagram
+
+### Phase 2 Completed - 2026-01-23
+
+**Added:**
+- 03-AUTH-SERVICE.md - Complete authentication & authorization documentation
+  - JWT access & refresh token flows with sequence diagrams
+  - RBAC permission system (format: service:resource:action)
+  - User-role and role-permission management
+  - Account security (bcrypt, lockout, token rotation)
+  - Redis caching strategy for permissions
+  - Comprehensive API endpoints and gRPC methods
+  
+- 04-USER-SERVICE.md - User & department management
+  - Employee information management
+  - Department hierarchy (tree structure)
+  - User preferences and avatar handling
+  - Employment status tracking
+  - Emergency contact management
+  
+- 05-MASTER-DATA-SERVICE.md - Materials & products master data
+  - Material management with INCI names & CAS numbers
+  - Product master data with cosmetic licenses
+  - Category hierarchy for materials and products
+  - Units of measure with conversion logic
+  - Material-supplier approved lists
+  - Allergen tracking and storage requirements
+  
+- 13-API-GATEWAY.md - API Gateway implementation
+  - Complete middleware chain (CORS, logging, rate limiting, auth)
+  - Routing configuration for all 15 services
+  - Circuit breaker pattern for fault tolerance
+  - Rate limiting strategy (100 req/min per user)
+  - Permission-based route protection
+  - Error handling and monitoring metrics
