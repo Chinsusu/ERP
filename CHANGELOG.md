@@ -34,3 +34,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Initial Release
 - Project initialization
 - Documentation framework setup
+
+## [Unreleased] - 2026-01-23
+
+### Added
+- 02-SERVICE-SPECIFICATIONS.md - Comprehensive specifications for all 15 microservices
+  - API Gateway routing and middleware configuration
+  - Auth Service with JWT and RBAC implementation
+  - User Service with department management
+  - Master Data Service for materials and products (with INCI, CAS numbers)
+  - Supplier Service with certification tracking (GMP, ISO, Organic)
+  - Procurement Service with PR/PO workflows
+  - WMS Service with lot management and FEFO logic
+  - Manufacturing Service with BOM versioning, work orders, and QC
+  - Sales Service with customer and order management
+  - Summary of remaining services (Marketing, Finance, Reporting, Notification, AI, File)
+
+### Documentation
+- Detailed database schemas for each service
+- REST API endpoints with HTTP methods
+- gRPC internal communication methods
+- Event publishing/subscription patterns
+- Permission requirements per service
+- Service dependency mapping with Mermaid diagram
