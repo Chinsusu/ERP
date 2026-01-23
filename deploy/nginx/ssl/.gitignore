@@ -1,0 +1,14 @@
+# .gitignore placeholder
+# SSL certificates will be placed here for HTTPS configuration
+#
+# To use HTTPS:
+# 1. Obtain SSL certificate and private key
+# 2. Place them in this directory as:
+#    - certificate.crt
+#    - private.key
+# 3. Uncomment the HTTPS server block in nginx.conf
+# 4. Restart nginx: docker-compose restart nginx
+
+*.crt
+*.key
+*.pem

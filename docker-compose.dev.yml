@@ -1,0 +1,84 @@
+version: '3.9'
+
+# Development overrides for docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_LOG_STATEMENT=all
+    
+  redis:
+    ports:
+      - "6379:6379"
+    command: redis-server --loglevel debug
+  
+  nats:
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+  
+  minio:
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+  
+  prometheus:
+    ports:
+      - "9090:9090"
+  
+  grafana:
+    ports:
+      - "3001:3000"
+  
+  loki:
+    ports:
+      - "3100:3100"
+  
+  jaeger:
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+  
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/api-gateway:/app
+      - /app/vendor
+    environment:
+      - LOG_LEVEL=debug
+      - GIN_MODE=debug
+    ports:
+      - "8080:8080"
+  
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/auth-service:/app
+      - /app/vendor
+    environment:
+      - LOG_LEVEL=debug
+      - GIN_MODE=debug
+    ports:
+      - "8081:8081"
+      - "9081:9081"
+  
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/user-service:/app
+      - /app/vendor
+    environment:
+      - LOG_LEVEL=debug
+      - GIN_MODE=debug
+    ports:
+      - "8082:8082"
+      - "9082:9082"

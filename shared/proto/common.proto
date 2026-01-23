@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/erp-cosmetics/shared/proto/common;common";
+
+import "google/protobuf/timestamp.proto";
+
+// Empty message for RPCs that don't need parameters
+message Empty {}
+
+// StandardResponse is a common response structure
+message StandardResponse {
+  bool success = 1;
+  string message = 2;
+  map<string, string> metadata = 3;
+}
+
+// PaginationRequest is for paginated queries
+message PaginationRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string sort_by = 3;
+  string sort_order = 4; // "asc" or "desc"
+}
+
+// PaginationResponse contains pagination metadata
+message PaginationResponse {
+  int32 page = 1;
+  int32 page_size = 2;
+  int64 total_items = 3;
+  int32 total_pages = 4;
+}
+
+// TimeRange for date filtering
+message TimeRange {
+  google.protobuf.Timestamp start = 1;
+  google.protobuf.Timestamp end = 2;
+}
+
+// UserContext contains user information from JWT
+message UserContext {
+  string user_id = 1;
+  string email = 2;
+  repeated string role_ids = 3;
+}
+
+// Address is a reusable address structure
+message Address {
+  string id = 1;
+  string address_line_1 = 2;
+  string address_line_2 = 3;
+  string city = 4;
+  string state_province = 5;
+  string postal_code = 6;
+  string country = 7;
+}
+
+// Contact information
+message Contact {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string phone = 4;
+  string position = 5;
+  bool is_primary = 6;
+}

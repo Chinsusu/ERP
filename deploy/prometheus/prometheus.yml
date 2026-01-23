@@ -1,0 +1,121 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'erp-cosmetics'
+    environment: 'production'
+
+# Alertmanager configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# Load rules once and periodically evaluate them
+# rule_files:
+#   - "alerts/*.yml"
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # API Gateway
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway:8080']
+    metrics_path: '/metrics'
+
+  # Auth Service
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['auth-service:8081']
+    metrics_path: '/metrics'
+
+  # User Service
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['user-service:8082']
+    metrics_path: '/metrics'
+
+  # Master Data Service
+  - job_name: 'master-data-service'
+    static_configs:
+      - targets: ['master-data-service:8083']
+    metrics_path: '/metrics'
+
+  # Supplier Service
+  - job_name: 'supplier-service'
+    static_configs:
+      - targets: ['supplier-service:8084']
+    metrics_path: '/metrics'
+
+  # Procurement Service
+  - job_name: 'procurement-service'
+    static_configs:
+      - targets: ['procurement-service:8085']
+    metrics_path: '/metrics'
+
+  # WMS Service
+  - job_name: 'wms-service'
+    static_configs:
+      - targets: ['wms-service:8086']
+    metrics_path: '/metrics'
+
+  # Manufacturing Service
+  - job_name: 'manufacturing-service'
+    static_configs:
+      - targets: ['manufacturing-service:8087']
+    metrics_path: '/metrics'
+
+  # Sales Service
+  - job_name: 'sales-service'
+    static_configs:
+      - targets: ['sales-service:8088']
+    metrics_path: '/metrics'
+
+  # Marketing Service
+  - job_name: 'marketing-service'
+    static_configs:
+      - targets: ['marketing-service:8089']
+    metrics_path: '/metrics'
+
+  # Notification Service
+  - job_name: 'notification-service'
+    static_configs:
+      - targets: ['notification-service:8090']
+    metrics_path: '/metrics'
+
+  # File Service
+  - job_name: 'file-service'
+    static_configs:
+      - targets: ['file-service:8091']
+    metrics_path: '/metrics'
+
+  # Reporting Service
+  - job_name: 'reporting-service'
+    static_configs:
+      - targets: ['reporting-service:8092']
+    metrics_path: '/metrics'
+
+  # AI Service
+  - job_name: 'ai-service'
+    static_configs:
+      - targets: ['ai-service:8093']
+    metrics_path: '/metrics'
+
+  # PostgreSQL Exporter (if added later)
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+
+  # Redis Exporter (if added later)
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+
+  # NATS Exporter (if added later)
+  # - job_name: 'nats'
+  #   static_configs:
+  #     - targets: ['nats:8222']
