@@ -348,3 +348,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - gRPC service implementation
 - Integration with Auth Service
 
+
+## [0.4.0] - 2026-01-24
+
+### Added - User Service Complete & Tested
+
+**Implementation Complete (39 files, ~2,500 LOC)**
+- Full microservice for user and department management
+- Following Auth Service template architecture
+
+**Database Layer**
+- 3 tables: departments (hierarchical), users, user_profiles
+- Materialized path pattern for efficient tree queries
+- Employee code auto-generation: EMP{YYYYMMDD}{sequence}
+- Seed data: 8 departments (EXEC, IT, HR, FIN, OPS, MFG, WH, QC)
+- Seed data: Admin user matching Auth Service
+
+**Domain Layer**
+- User entity with validation and business logic
+- Department entity with path computation
+- UserProfile entity for extended information
+- 3 repository interfaces
+
+**Infrastructure Layer**
+- PostgreSQL repositories with tree building
+- Auth Service gRPC client (placeholder)
+- NATS event publisher
+
+**Use Case Layer**
+- User: CreateUser, GetUser, ListUsers
+- Department: CreateDepartment, GetDepartmentTree
+
+**HTTP API (6 endpoints)**
+- GET /api/v1/users - List with pagination
+- POST /api/v1/users - Create user
+- GET /api/v1/users/:id - Get user
+- GET /api/v1/departments - Get tree
+- POST /api/v1/departments - Create
+- GET /health, /ready - Health checks
+
+**Testing Results**
+- ✅ Health check: PASS
+- ✅ Get departments: PASS (8 departments returned)
+- ✅ Create user: PASS (employee code auto-generated)
+- ✅ List users: PASS (2 users displayed)
+
+### Fixed
+- Removed unused imports in user_repo.go and create_user.go
+- Fixed compile errors for successful deployment
+
+### Infrastructure
+- Restarted PostgreSQL, Redis, NATS containers
+- Created user_db database
+- Ran all migrations successfully
+

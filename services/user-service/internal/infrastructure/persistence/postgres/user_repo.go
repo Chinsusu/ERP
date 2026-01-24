@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/erp-cosmetics/user-service/internal/domain/entity"
 	"github.com/erp-cosmetics/user-service/internal/domain/repository"

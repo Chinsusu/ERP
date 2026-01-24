@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/erp-cosmetics/user-service/internal/domain/entity"
