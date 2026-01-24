@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stock Transfers**: Move stock between locations
 - **Scheduler**: Daily expiry checks, hourly low stock alerts
 - **gRPC Proto**: Ready for inter-service communication
+- **Inventory Count**: Full physical inventory workflow (Draft → In Progress → Completed)
+- **gRPC Server**: Complete gRPC server implementation for inter-service communication
+- **Unit Tests**: 24 tests covering Lot FEFO, Stock operations, GRN/GI workflows
 
 **New Endpoints**:
 - POST /api/v1/goods-issue - Create goods issue (FEFO)
@@ -22,6 +25,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - POST /api/v1/adjustments - Create stock adjustment
 - POST /api/v1/transfers - Transfer stock between locations
 - GET /api/v1/stock/availability/:material_id - Check availability
+- POST /api/v1/inventory-counts - Create inventory count
+- GET /api/v1/inventory-counts - List inventory counts
+- GET /api/v1/inventory-counts/:id - Get inventory count
+- PATCH /api/v1/inventory-counts/:id/start - Start counting
+- POST /api/v1/inventory-counts/:id/record - Record count
+- PATCH /api/v1/inventory-counts/:id/complete - Complete and apply variance
+
+**gRPC Methods**:
+- CheckStockAvailability, ReserveStock, ReleaseReservation
+- IssueStock (FEFO), GetLotInfo, GetLotsByMaterial, ReceiveStock
 
 ---
 
