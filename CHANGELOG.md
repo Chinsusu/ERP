@@ -7,6 +7,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Sales Service (Phase 4.1) - COMMERCIAL
+
+**Implementation Complete (~50 files, ~4,500 LOC)**
+- First service in Phase 4: Commercial Operations
+- Customer management with credit limit control
+- Quotation workflow with convert-to-order
+- Sales Order lifecycle (DRAFT → CONFIRMED → SHIPPED → DELIVERED)
+- Shipment tracking with carrier integration
+- Return processing workflow
+
+**Database Layer (22 migration files, 11 tables)**
+- `customer_groups` - Pricing tiers (VIP, Gold, Silver, etc.)
+- `customers` - Customer master with credit_limit, current_balance
+- `customer_contacts`, `customer_addresses` - CRM data
+- `quotations`, `quotation_line_items` - Sales quotations
+- `sales_orders`, `so_line_items` - Orders with shipped_quantity tracking
+- `shipments` - Delivery tracking
+- `returns`, `return_line_items` - Sales returns
+
+**Sales Order Lifecycle**
+```
+DRAFT → CONFIRMED → PROCESSING → PARTIALLY_SHIPPED → SHIPPED → DELIVERED
+                                                           ↓
+                                                     CANCELLED
+```
+
+**Credit Limit Control**
+```go
+// Automatic credit check on order confirmation
+if !customer.CanPlaceOrder(orderAmount) {
+    return ErrInsufficientCredit
+}
+// current_balance updated on confirm, released on cancel
+```
+
+**API Endpoints (25+ total)**
+- Customers: POST/GET/PUT/DELETE /customers, GET /:id/credit-check
+- Quotations: POST/GET /quotations, PATCH /:id/send, POST /:id/convert-to-order
+- Sales Orders: POST/GET /sales-orders, PATCH /:id/confirm|ship|deliver|cancel
+- Shipments: POST/GET /shipments, PATCH /:id/ship|deliver
+
+**Events Published**
+- `sales.customer.created`
+- `sales.quotation.sent`
+- `sales.order.created`, `sales.order.confirmed` (→ WMS reserves stock)
+- `sales.order.shipped`, `sales.order.delivered`
+- `sales.order.cancelled` (→ WMS releases reservations)
+- `sales.return.created`
+
+**Integration Points**
+- WMS subscribes to `sales.order.confirmed` for stock reservation
+- WMS subscribes to `sales.order.cancelled` to release reservations
+- Manufacturing triggered via `sales.order.confirmed` for MTO items
+
+---
 ### Added - WMS Extended Features
 - **Goods Issue with FEFO**: Issue stock automatically using First Expired First Out logic
 - **Stock Reservations**: Reserve stock for sales orders, work orders
