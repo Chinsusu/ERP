@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-01-24
+
+### Added - API Gateway Complete
+
+**Implementation Complete (17 files)**
+- Single entry point for all ERP services on port 8080
+- Dynamic routing to 15 backend services
+
+**Middleware Chain**
+- RequestID: UUID generation and propagation
+- CORS: Cross-origin request handling
+- Logger: Structured request/response logging
+- Recovery: Panic handling
+- RateLimiter: Redis-based sliding window (100/min user, 30/min IP)
+- Auth: JWT validation with blacklist check
+- CircuitBreaker: Fault tolerance (5 failures → 30s open)
+
+**Proxy Layer**
+- Reverse proxy with header enrichment
+- Service registry with health checking
+- X-User-ID, X-Request-ID header injection
+
+**Routes Configured**
+- Auth, User, Master Data, Supplier, Procurement
+- WMS, Manufacturing, Sales, Marketing
+- Notifications, Files, Reports
+
+**Health Endpoints**
+- GET /health - Aggregate service health
+- GET /ready, /live - Kubernetes probes
+- GET /health/:service - Individual service status
+
+### Ports
+- HTTP: 8080
+
 ## [0.5.0] - 2026-01-24
 
 ### Added - Master Data Service Complete
