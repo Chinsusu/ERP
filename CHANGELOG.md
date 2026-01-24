@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - WMS Extended Features
+- **Goods Issue with FEFO**: Issue stock automatically using First Expired First Out logic
+- **Stock Reservations**: Reserve stock for sales orders, work orders
+- **Stock Adjustments**: Cycle count, damage, expiry corrections
+- **Stock Transfers**: Move stock between locations
+- **Scheduler**: Daily expiry checks, hourly low stock alerts
+- **gRPC Proto**: Ready for inter-service communication
+
+**New Endpoints**:
+- POST /api/v1/goods-issue - Create goods issue (FEFO)
+- POST /api/v1/reservations - Reserve stock
+- DELETE /api/v1/reservations/:id - Release reservation
+- POST /api/v1/adjustments - Create stock adjustment
+- POST /api/v1/transfers - Transfer stock between locations
+- GET /api/v1/stock/availability/:material_id - Check availability
+
+---
+
 ## [0.9.0] - 2026-01-24
 
 ### Added - WMS Service Complete (Phase 2.3) - CRITICAL SERVICE

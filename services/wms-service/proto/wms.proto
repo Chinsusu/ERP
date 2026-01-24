@@ -1,0 +1,155 @@
+syntax = "proto3";
+
+package wms.v1;
+
+option go_package = "github.com/erp-cosmetics/wms-service/internal/delivery/grpc/pb";
+
+import "google/protobuf/timestamp.proto";
+
+// WMS Service for inter-service communication
+service WMSService {
+    // Stock Operations
+    rpc CheckStockAvailability(CheckStockRequest) returns (StockAvailabilityResponse);
+    rpc ReserveStock(ReserveStockRequest) returns (ReserveStockResponse);
+    rpc ReleaseReservation(ReleaseReservationRequest) returns (ReleaseReservationResponse);
+    rpc IssueStock(IssueStockRequest) returns (IssueStockResponse);
+    
+    // Lot Information
+    rpc GetLotInfo(GetLotRequest) returns (LotInfoResponse);
+    rpc GetLotsByMaterial(GetLotsByMaterialRequest) returns (LotsResponse);
+    
+    // Receive Stock (from Procurement)
+    rpc ReceiveStock(ReceiveStockRequest) returns (ReceiveStockResponse);
+}
+
+// Common types
+message MaterialQuantity {
+    string material_id = 1;
+    double quantity = 2;
+    string unit_id = 3;
+}
+
+message LotInfo {
+    string lot_id = 1;
+    string lot_number = 2;
+    string material_id = 3;
+    google.protobuf.Timestamp expiry_date = 4;
+    string qc_status = 5;
+    string status = 6;
+    double available_quantity = 7;
+}
+
+message LotIssued {
+    string lot_id = 1;
+    string lot_number = 2;
+    double quantity = 3;
+    google.protobuf.Timestamp expiry_date = 4;
+    string location_id = 5;
+}
+
+// Check Stock Availability
+message CheckStockRequest {
+    string material_id = 1;
+    double requested_quantity = 2;
+}
+
+message StockAvailabilityResponse {
+    string material_id = 1;
+    double total_quantity = 2;
+    double reserved_quantity = 3;
+    double available_quantity = 4;
+    bool is_available = 5;
+    double shortage_quantity = 6;
+}
+
+// Reserve Stock
+message ReserveStockRequest {
+    string material_id = 1;
+    double quantity = 2;
+    string unit_id = 3;
+    string reservation_type = 4; // SALES_ORDER, WORK_ORDER, TRANSFER
+    string reference_id = 5;
+    string reference_number = 6;
+}
+
+message ReserveStockResponse {
+    string reservation_id = 1;
+    double reserved_quantity = 2;
+    bool success = 3;
+    string message = 4;
+}
+
+// Release Reservation
+message ReleaseReservationRequest {
+    string reservation_id = 1;
+}
+
+message ReleaseReservationResponse {
+    bool success = 1;
+}
+
+// Issue Stock (FEFO)
+message IssueStockRequest {
+    string warehouse_id = 1;
+    string reference_type = 2; // WORK_ORDER, SALES_ORDER
+    string reference_id = 3;
+    string reference_number = 4;
+    repeated MaterialQuantity items = 5;
+    string issued_by = 6;
+}
+
+message IssueStockResponse {
+    string issue_number = 1;
+    repeated IssueLineItem line_items = 2;
+    bool success = 3;
+    string message = 4;
+}
+
+message IssueLineItem {
+    string material_id = 1;
+    double issued_quantity = 2;
+    repeated LotIssued lots_used = 3; // FEFO details
+}
+
+// Get Lot Info
+message GetLotRequest {
+    string lot_id = 1;
+}
+
+message LotInfoResponse {
+    LotInfo lot = 1;
+}
+
+// Get Lots by Material
+message GetLotsByMaterialRequest {
+    string material_id = 1;
+    bool available_only = 2;
+}
+
+message LotsResponse {
+    repeated LotInfo lots = 1;
+}
+
+// Receive Stock
+message ReceiveStockRequest {
+    string grn_id = 1;
+    string po_id = 2;
+    string warehouse_id = 3;
+    repeated ReceiveLineItem items = 4;
+    string received_by = 5;
+}
+
+message ReceiveLineItem {
+    string material_id = 1;
+    double quantity = 2;
+    string unit_id = 3;
+    string supplier_lot_number = 4;
+    google.protobuf.Timestamp expiry_date = 5;
+    string location_id = 6;
+}
+
+message ReceiveStockResponse {
+    string grn_number = 1;
+    repeated string lot_numbers = 2;
+    bool success = 3;
+}

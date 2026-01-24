@@ -15,8 +15,12 @@ import (
 	"github.com/erp-cosmetics/wms-service/internal/domain/entity"
 	"github.com/erp-cosmetics/wms-service/internal/infrastructure/event"
 	"github.com/erp-cosmetics/wms-service/internal/infrastructure/persistence/postgres"
+	"github.com/erp-cosmetics/wms-service/internal/infrastructure/scheduler"
+	adjustment_uc "github.com/erp-cosmetics/wms-service/internal/usecase/adjustment"
 	grn_uc "github.com/erp-cosmetics/wms-service/internal/usecase/grn"
+	issue_uc "github.com/erp-cosmetics/wms-service/internal/usecase/issue"
 	lot_uc "github.com/erp-cosmetics/wms-service/internal/usecase/lot"
+	reservation_uc "github.com/erp-cosmetics/wms-service/internal/usecase/reservation"
 	stock_uc "github.com/erp-cosmetics/wms-service/internal/usecase/stock"
 	warehouse_uc "github.com/erp-cosmetics/wms-service/internal/usecase/warehouse"
 	"github.com/erp-cosmetics/shared/pkg/database"
@@ -89,6 +93,7 @@ func main() {
 	lotRepo := postgres.NewLotRepository(db)
 	stockRepo := postgres.NewStockRepository(db)
 	grnRepo := postgres.NewGRNRepository(db)
+	issueRepo := postgres.NewGoodsIssueRepository(db)
 
 	// Initialize event publisher
 	eventPub := event.NewPublisher(natsClient, log)
@@ -117,15 +122,55 @@ func main() {
 	getGRNUC := grn_uc.NewGetGRNUseCase(grnRepo)
 	listGRNsUC := grn_uc.NewListGRNsUseCase(grnRepo)
 
+	// Initialize Goods Issue use cases
+	createIssueUC := issue_uc.NewCreateGoodsIssueUseCase(issueRepo, stockRepo, eventPub)
+	getIssueUC := issue_uc.NewGetGoodsIssueUseCase(issueRepo)
+	listIssuesUC := issue_uc.NewListGoodsIssuesUseCase(issueRepo)
+
+	// Initialize Reservation use cases
+	createReservationUC := reservation_uc.NewCreateReservationUseCase(stockRepo, eventPub)
+	releaseReservationUC2 := reservation_uc.NewReleaseReservationUseCase(stockRepo)
+	checkAvailabilityUC := reservation_uc.NewCheckAvailabilityUseCase(stockRepo)
+
+	// Initialize Adjustment use cases
+	createAdjustmentUC := adjustment_uc.NewCreateAdjustmentUseCase(stockRepo)
+	transferStockUC := adjustment_uc.NewTransferStockUseCase(stockRepo)
+
 	// Initialize handlers
 	warehouseHandler := handler.NewWarehouseHandler(listWarehousesUC, getWarehouseUC, getZonesUC, getLocationsUC)
 	stockHandler := handler.NewStockHandler(getStockUC, issueStockFEFOUC, reserveStockUC, releaseReservationUC)
 	lotHandler := handler.NewLotHandler(getLotUC, listLotsUC, getExpiringLotsUC, getLotMovementsUC)
 	grnHandler := handler.NewGRNHandler(createGRNUC, completeGRNUC, getGRNUC, listGRNsUC)
+	issueHandler := handler.NewGoodsIssueHandler(createIssueUC, getIssueUC, listIssuesUC)
+	reservationHandler := handler.NewReservationHandler(createReservationUC, releaseReservationUC2, checkAvailabilityUC)
+	adjustmentHandler := handler.NewAdjustmentHandler(createAdjustmentUC, transferStockUC)
 	healthHandler := handler.NewHealthHandler()
 
 	// Setup router
-	r := router.SetupRouter(warehouseHandler, stockHandler, lotHandler, grnHandler, healthHandler)
+	r := router.SetupRouter(
+		warehouseHandler,
+		stockHandler,
+		lotHandler,
+		grnHandler,
+		issueHandler,
+		reservationHandler,
+		adjustmentHandler,
+		healthHandler,
+	)
+
+	// Start scheduler for expiry alerts
+	lowStockInterval, _ := time.ParseDuration(cfg.LowStockCheckInterval)
+	if lowStockInterval == 0 {
+		lowStockInterval = 1 * time.Hour
+	}
+	schedulerConfig := &scheduler.Config{
+		ExpiryCheckInterval:   24 * time.Hour,
+		LowStockCheckInterval: lowStockInterval,
+		ExpiryAlertDays:       []int{90, 30, 7},
+		LowStockThreshold:     100,
+	}
+	wmsScheduler := scheduler.NewScheduler(lotRepo, stockRepo, eventPub, log, schedulerConfig)
+	wmsScheduler.Start()
 
 	// Start HTTP server
 	srv := &http.Server{
@@ -145,6 +190,9 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Info("Shutting down server...")
+
+	// Stop scheduler
+	wmsScheduler.Stop()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()

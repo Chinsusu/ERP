@@ -11,6 +11,9 @@ func SetupRouter(
 	stockHandler *handler.StockHandler,
 	lotHandler *handler.LotHandler,
 	grnHandler *handler.GRNHandler,
+	issueHandler *handler.GoodsIssueHandler,
+	reservationHandler *handler.ReservationHandler,
+	adjustmentHandler *handler.AdjustmentHandler,
 	healthHandler *handler.HealthHandler,
 ) *gin.Engine {
 	r := gin.New()
@@ -46,6 +49,7 @@ func SetupRouter(
 			stock.GET("/by-material/:id", stockHandler.GetStockByMaterial)
 			stock.GET("/expiring", stockHandler.GetExpiringStock)
 			stock.GET("/low-stock", stockHandler.GetLowStock)
+			stock.GET("/availability/:material_id", reservationHandler.CheckAvailability)
 		}
 
 		// Lot endpoints
@@ -65,15 +69,32 @@ func SetupRouter(
 			grn.PATCH("/:id/complete", grnHandler.CompleteGRN)
 		}
 
-		// TODO: Add these endpoints in next iteration
 		// Goods Issue endpoints
-		// goodsIssue := v1.Group("/goods-issue")
-		// Reserve endpoints
-		// reserve := v1.Group("/reserve")
+		goodsIssue := v1.Group("/goods-issue")
+		{
+			goodsIssue.POST("", issueHandler.CreateGoodsIssue)
+			goodsIssue.GET("", issueHandler.ListGoodsIssues)
+			goodsIssue.GET("/:id", issueHandler.GetGoodsIssue)
+		}
+
+		// Reservation endpoints
+		reservations := v1.Group("/reservations")
+		{
+			reservations.POST("", reservationHandler.CreateReservation)
+			reservations.DELETE("/:id", reservationHandler.ReleaseReservation)
+		}
+
 		// Adjustment endpoints
-		// adjustment := v1.Group("/adjustment")
+		adjustments := v1.Group("/adjustments")
+		{
+			adjustments.POST("", adjustmentHandler.CreateAdjustment)
+		}
+
 		// Transfer endpoints
-		// transfer := v1.Group("/transfer")
+		transfers := v1.Group("/transfers")
+		{
+			transfers.POST("", adjustmentHandler.TransferStock)
+		}
 	}
 
 	return r
