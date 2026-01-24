@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS gi_line_items CASCADE;

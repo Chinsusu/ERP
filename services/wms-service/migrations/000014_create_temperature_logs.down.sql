@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS temperature_logs CASCADE;

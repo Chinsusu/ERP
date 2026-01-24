@@ -7,6 +7,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-01-24
+
+### Added - WMS Service Complete (Phase 2.3) - CRITICAL SERVICE
+
+**Implementation Complete (~65 files, ~4,500 LOC)**
+- The most critical service for cosmetics ERP
+- FEFO (First Expired First Out) logic for cosmetics industry
+- Full lot traceability from supplier → warehouse → production
+- Cold storage monitoring support (2-8°C)
+
+**Database Layer (30 migration files)**
+- 14 tables: warehouses, zones, locations, lots, stock, stock_movements, stock_reservations, grns, grn_line_items, goods_issues, gi_line_items, stock_adjustments, inventory_counts, temperature_logs
+- Comprehensive seed data: 3 warehouses, 9 zones, 15 locations
+- Indexes optimized for FEFO queries (expiry_date ASC)
+
+**Domain Layer (9 entities)**
+- Lot entity with expiry tracking: DaysUntilExpiry(), IsExpired(), IsExpiringSoon()
+- Stock entity with availability: GetAvailableQuantity(), Reserve(), Issue()
+- FEFO support: LotIssued struct tracks which lots were used
+- GRN workflow: DRAFT → QC → COMPLETED with quarantine zone
+- Zone types: RECEIVING, QUARANTINE, STORAGE, COLD, PICKING, SHIPPING
+
+**FEFO Logic (Core Feature)**
+```go
+// Issues stock from earliest expiring lots first
+func GetAvailableStockFEFO(materialID) → sorted by lots.expiry_date ASC
+func IssueStockFEFO(materialID, quantity) → []LotIssued
+```
+
+**API Endpoints (20+ total)**
+- GET /api/v1/warehouses - List warehouses with zones
+- GET /api/v1/warehouses/:id/zones - Get zones in warehouse
+- GET /api/v1/zones/:id/locations - Get locations in zone
+- GET /api/v1/stock - Query stock with filters
+- GET /api/v1/stock/by-material/:id - Stock by material with summary
+- GET /api/v1/stock/expiring?days=90 - **Expiring stock (FEFO)**
+- GET /api/v1/stock/low-stock - Low stock alerts
+- GET /api/v1/lots - List lots with status/QC filters
+- GET /api/v1/lots/:id - Get lot details
+- GET /api/v1/lots/:id/movements - **Lot traceability**
+- POST /api/v1/grn - Create GRN (from PO)
+- GET /api/v1/grn - List GRNs
+- GET /api/v1/grn/:id - Get GRN with line items
+- PATCH /api/v1/grn/:id/complete - Complete GRN after QC
+
+**Events Published**
+- wms.grn.created, wms.grn.completed
+- wms.stock.received, wms.stock.issued
+- wms.stock.reserved, wms.stock.low_stock_alert
+- wms.lot.expiring_soon, wms.lot.expired
+
+**Cosmetics-Specific Features**
+- FEFO: First Expired First Out (not FIFO)
+- Lot Traceability: Track materials from supplier to production
+- Quarantine Zone: All goods pass QC before storage
+- Cold Storage: Temperature monitoring for sensitive materials
+- Expiry Alerts: 90, 30, 7 days configurable thresholds
+
+### Ports
+- HTTP: 8086
+- gRPC: 9086 (planned)
+- Database: wms_db
+
+---
+
 ## [0.8.0] - 2026-01-24
 
 ### Added - Procurement Service Complete (Phase 2.2)
