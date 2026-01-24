@@ -2,13 +2,13 @@
 
 **Updated**: January 24, 2026  
 **Repository**: https://github.com/Chinsusu/ERP  
-**Status**: 6 Services Implemented (Phase 1 Core + Phase 2 Supply Chain)
+**Status**: 7 Services Implemented (Phase 1 Core + Phase 2 Supply Chain Complete)
 
 ---
 
 ## Executive Summary
 
-Complete ERP system for cosmetics manufacturing with Clean Architecture, microservices pattern, and event-driven design. Phase 2 (Supply Chain) now complete with Supplier and Procurement services.
+Complete ERP system for cosmetics manufacturing with Clean Architecture, microservices pattern, and event-driven design. Phase 2 (Supply Chain) now complete with Supplier, Procurement, and WMS services.
 
 | Component | Files | Status |
 |-----------|-------|--------|
@@ -20,8 +20,9 @@ Complete ERP system for cosmetics manufacturing with Clean Architecture, microse
 | **Master Data Service** | 47 files | ✅ Built |
 | **Supplier Service** | 40 files | ✅ Running |
 | **Procurement Service** | 35 files | ✅ Running |
+| **WMS Service** | 80 files | ✅ **NEW** |
 
-**Total**: ~260+ files, ~22,000+ LOC
+**Total**: ~340+ files, ~28,500+ LOC
 
 ---
 
@@ -129,6 +130,23 @@ Purchase Requisitions and Purchase Orders management.
 | **gRPC** | GetPO, GetPOsBySupplier, UpdatePOReceivedQty (WMS integration) |
 | **Subscribers** | wms.grn.completed, supplier.blocked |
 
+### 7. WMS Service (Port 8086) ✅ NEW - CRITICAL
+Warehouse Management with FEFO logic for cosmetics industry.
+
+| Component | Details |
+|-----------|---------|
+| **Tables** | 14 (warehouses, zones, locations, lots, stock, movements, reservations, GRN, goods issue, inventory counts, temperature logs) |
+| **Endpoints** | 25+ (warehouses, stock, lots, GRN, goods issue, reservations, adjustments, transfers, inventory counts) |
+| **FEFO Logic** | First Expired First Out - critical for cosmetics |
+| **Lot Traceability** | Full tracking from supplier → warehouse → production |
+| **QC Workflow** | Quarantine → QC Pass/Fail → Storage Zone |
+| **Cold Storage** | Temperature monitoring (2-8°C) |
+| **gRPC Methods** | CheckStockAvailability, ReserveStock, ReleaseReservation, IssueStock (FEFO), GetLotInfo, ReceiveStock |
+| **Events Published** | grn.created, stock.received, stock.issued, lot.expiring_soon, stock.low |
+| **Event Subscribers** | procurement.po.received, sales.order.confirmed/cancelled, manufacturing.wo.started |
+| **Scheduler** | Daily expiry checks, hourly low stock alerts |
+| **Unit Tests** | 24 tests (Lot, Stock, GRN, GI, Reservation workflows) |
+
 ---
 
 ## Infrastructure Stack
@@ -225,9 +243,9 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 | Auth | 8081 | 9081 | auth_db | ✅ Complete |
 | User | 8082 | 9082 | user_db | ✅ Complete |
 | Master Data | 8083 | 9083 | master_data_db | ✅ Complete |
-| **Supplier** | **8084** | **9084** | **supplier_db** | ✅ **NEW** |
-| **Procurement** | **8085** | **9085** | **procurement_db** | ✅ **NEW** |
-| WMS | 8086 | 9086 | wms_db | 📋 Planned |
+| **Supplier** | **8084** | **9084** | **supplier_db** | ✅ Running |
+| **Procurement** | **8085** | **9085** | **procurement_db** | ✅ Running |
+| **WMS** | **8086** | **9086** | **wms_db** | ✅ **NEW** |
 | Manufacturing | 8087 | 9087 | manufacturing_db | 📋 Planned |
 | Sales | 8088 | 9088 | sales_db | 📋 Planned |
 | Marketing | 8089 | 9089 | marketing_db | 📋 Planned |
@@ -241,15 +259,16 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 
 | Version | Description |
 |---------|-------------|
-| **v0.8.0** | **Procurement Service - complete** |
-| **v0.7.0** | **Supplier Service - complete** |
+| **v0.9.0** | **WMS Service - complete (CRITICAL)** |
+| v0.8.0 | Procurement Service - complete |
+| v0.7.0 | Supplier Service - complete |
 | v0.6.0 | API Gateway - complete |
 | v0.5.0 | Master Data Service - complete |
 | v0.4.0 | User Service - complete |
 | v0.2.0 | Auth Service - complete |
 | v0.1.0 | Infrastructure setup |
 
-**Latest Commit**: `47e9d87`
+**Latest Commit**: `3f93bd9`
 
 ---
 
@@ -258,8 +277,8 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 | Phase | Services | Status |
 |-------|----------|--------|
 | **Phase 1: Core** | API Gateway, Auth, User, Master Data | ✅ Complete |
-| **Phase 2: Supply Chain** | Supplier, Procurement | ✅ Complete |
-| **Phase 3: Operations** | WMS, Manufacturing | 📋 Next |
+| **Phase 2: Supply Chain** | Supplier, Procurement, **WMS** | ✅ **Complete** |
+| **Phase 3: Operations** | Manufacturing | 📋 Next |
 | **Phase 4: Commercial** | Sales, Marketing | 📋 Planned |
 | **Phase 5: Support** | Notifications, Files, Reporting | 📋 Planned |
 
@@ -268,13 +287,11 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 ## Next Steps (Phase 3)
 
 ### Ready to Implement
-- [ ] WMS Service (warehouse, inventory, lots, FEFO, GRN)
 - [ ] Manufacturing Service (BOM, work orders, production, QC)
 
 ### Integration Points
-- WMS subscribes to `procurement.po.confirmed`
-- WMS publishes `wms.grn.completed` → Procurement updates received qty
 - Manufacturing subscribes to `wms.materials.available`
+- Manufacturing publishes `manufacturing.wo.completed` → WMS receives finished goods
 
 ---
 
@@ -282,14 +299,15 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 
 | Metric | Value |
 |--------|-------|
-| Total Files | 260+ |
-| Lines of Code | ~22,000+ |
-| Services | 6 complete, 9 planned |
-| Database Tables | 32 active |
-| API Endpoints | 65+ |
-| NATS Events | 20+ defined |
+| Total Files | 340+ |
+| Lines of Code | ~28,500+ |
+| Services | 7 complete, 8 planned |
+| Database Tables | 46 active |
+| API Endpoints | 90+ |
+| NATS Events | 30+ defined |
+| Unit Tests | 24+ |
 
 ---
 
 **Repository**: https://github.com/Chinsusu/ERP  
-**Updated**: 2026-01-24T06:25:00Z
+**Updated**: 2026-01-24T15:16:00Z
