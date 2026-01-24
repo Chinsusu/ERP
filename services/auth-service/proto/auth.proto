@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/erp-cosmetics/auth-service/proto;authpb";
+
+import "google/protobuf/timestamp.proto";
+
+// AuthService provides authentication and authorization services
+service AuthService {
+  // ValidateToken verifies a JWT token and returns user infor
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+  
+  // GetUserPermissions retrieves all permissions for a user
+  rpc GetUserPermissions(GetUserPermissionsRequest) returns (GetUserPermissionsResponse);
+  
+  // CheckPermission checks if a user has a specific permission
+  rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse);
+}
+
+// ValidateToken
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool valid = 1;
+  string user_id = 2;
+  string email = 3;
+  repeated string role_ids = 4;
+  google.protobuf.Timestamp expires_at = 5;
+}
+
+// GetUserPermissions
+message GetUserPermissionsRequest {
+  string user_id = 1;
+}
+
+message GetUserPermissionsResponse {
+  repeated Permission permissions = 1;
+}
+
+message Permission {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  string service = 4;
+  string resource = 5;
+  string action = 6;
+}
+
+// CheckPermission
+message CheckPermissionRequest {
+  string user_id = 1;
+  string permission_code = 2;
+}
+
+message CheckPermissionResponse {
+  bool allowed = 1;
+}

@@ -6,6 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.2.0] - 2026-01-24
+
+### Added - Auth Service Template (Complete & Tested)
+
+**Core Implementation (50 files, ~3,500 LOC)**
+- Complete authentication microservice serving as template for all 15 services
+- Clean Architecture: Domain → UseCase → Delivery → Infrastructure layers
+
+**Database Layer (18 files)**
+- 9 database migrations with up/down SQL scripts
+- 8 tables: roles, permissions, role_permissions, user_credentials, user_roles, refresh_tokens, sessions, password_reset_tokens
+- Seed data: 5 default roles (Super Admin, Admin, Manager, Staff, Viewer)
+- Seed data: 42 default permissions covering 8 services
+- Default admin user: admin@company.vn (bcrypt hashed)
+
+**Security Features**
+- JWT tokens: Access (15min) + Refresh (7 days) with token rotation
+- Password security: Bcrypt hashing (cost 12)
+- Account protection: Lockout after 5 failed attempts (30 minutes)
+- RBAC: Permission format service:resource:action with wildcard support
+
+**Testing Results**
+- ✅ Health check, Login, Refresh token, Logout - All PASS
+- ✅ Database: 8 tables migrated, seed data loaded
+- ✅ Infrastructure: PostgreSQL, Redis, NATS all connected
+
+### Fixed
+- Viper configuration: Added explicit environment variable binding
+- Logger usage: Fixed zap.Field usage in main.go
+- Database config: Fixed NowFunc field name in GORM config
+
 
 ### Infrastructure Implementation - 2026-01-23
 

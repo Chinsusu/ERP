@@ -33,7 +33,7 @@ func NewDefaultConfig(dsn string) *Config {
 func Connect(cfg *Config) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{
 		Logger: logger.Default.LogMode(cfg.LogLevel),
-		Now Func: func() time.Time {
+		NowFunc: func() time.Time {
 			return time.Now().UTC()
 		},
 	})

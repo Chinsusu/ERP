@@ -71,6 +71,24 @@ func Load() (*Config, error) {
 	// Ignore error if config file doesn't exist
 	_ = v.ReadInConfig()
 
+	// Bind environment variables explicitly
+	v.BindEnv("SERVICE_NAME")
+	v.BindEnv("DB_HOST")
+	v.BindEnv("DB_PORT")
+	v.BindEnv("DB_USER")
+	v.BindEnv("DB_PASSWORD")
+	v.BindEnv("DB_NAME")
+	v.BindEnv("DB_SSL_MODE")
+	v.BindEnv("REDIS_HOST")
+	v.BindEnv("REDIS_PORT")
+	v.BindEnv("REDIS_PASSWORD")
+	v.BindEnv("NATS_URL")
+	v.BindEnv("JWT_SECRET")
+	v.BindEnv("JWT_ACCESS_TOKEN_EXPIRE")
+	v.BindEnv("JWT_REFRESH_TOKEN_EXPIRE")
+	v.BindEnv("LOG_LEVEL")
+	v.BindEnv("LOG_FORMAT")
+
 	var cfg Config
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
