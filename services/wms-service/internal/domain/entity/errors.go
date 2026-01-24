@@ -15,4 +15,5 @@ var (
 	ErrInvalidQuantity   = errors.New("invalid quantity")
 	ErrReservationFailed = errors.New("reservation failed")
 	ErrColdStorageAlert  = errors.New("cold storage temperature out of range")
+	ErrPendingItems      = errors.New("pending items exist")
 )

@@ -14,6 +14,7 @@ func SetupRouter(
 	issueHandler *handler.GoodsIssueHandler,
 	reservationHandler *handler.ReservationHandler,
 	adjustmentHandler *handler.AdjustmentHandler,
+	inventoryCountHandler *handler.InventoryCountHandler,
 	healthHandler *handler.HealthHandler,
 ) *gin.Engine {
 	r := gin.New()
@@ -94,6 +95,17 @@ func SetupRouter(
 		transfers := v1.Group("/transfers")
 		{
 			transfers.POST("", adjustmentHandler.TransferStock)
+		}
+
+		// Inventory Count endpoints
+		inventoryCounts := v1.Group("/inventory-counts")
+		{
+			inventoryCounts.POST("", inventoryCountHandler.CreateInventoryCount)
+			inventoryCounts.GET("", inventoryCountHandler.ListInventoryCounts)
+			inventoryCounts.GET("/:id", inventoryCountHandler.GetInventoryCount)
+			inventoryCounts.PATCH("/:id/start", inventoryCountHandler.StartInventoryCount)
+			inventoryCounts.POST("/:id/record", inventoryCountHandler.RecordCount)
+			inventoryCounts.PATCH("/:id/complete", inventoryCountHandler.CompleteInventoryCount)
 		}
 	}
 

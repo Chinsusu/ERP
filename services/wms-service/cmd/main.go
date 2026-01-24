@@ -18,6 +18,7 @@ import (
 	"github.com/erp-cosmetics/wms-service/internal/infrastructure/scheduler"
 	adjustment_uc "github.com/erp-cosmetics/wms-service/internal/usecase/adjustment"
 	grn_uc "github.com/erp-cosmetics/wms-service/internal/usecase/grn"
+	inventory_uc "github.com/erp-cosmetics/wms-service/internal/usecase/inventory"
 	issue_uc "github.com/erp-cosmetics/wms-service/internal/usecase/issue"
 	lot_uc "github.com/erp-cosmetics/wms-service/internal/usecase/lot"
 	reservation_uc "github.com/erp-cosmetics/wms-service/internal/usecase/reservation"
@@ -71,6 +72,8 @@ func main() {
 		&entity.GRNLineItem{},
 		&entity.GoodsIssue{},
 		&entity.GILineItem{},
+		&entity.InventoryCount{},
+		&entity.InventoryCountLineItem{},
 	)
 	if err != nil {
 		log.Warn("Auto-migration warning", zap.Error(err))
@@ -94,6 +97,7 @@ func main() {
 	stockRepo := postgres.NewStockRepository(db)
 	grnRepo := postgres.NewGRNRepository(db)
 	issueRepo := postgres.NewGoodsIssueRepository(db)
+	inventoryCountRepo := postgres.NewInventoryCountRepository(db)
 
 	// Initialize event publisher
 	eventPub := event.NewPublisher(natsClient, log)
@@ -136,6 +140,14 @@ func main() {
 	createAdjustmentUC := adjustment_uc.NewCreateAdjustmentUseCase(stockRepo)
 	transferStockUC := adjustment_uc.NewTransferStockUseCase(stockRepo)
 
+	// Initialize Inventory Count use cases
+	createInventoryCountUC := inventory_uc.NewCreateInventoryCountUseCase(inventoryCountRepo, stockRepo, locationRepo)
+	startInventoryCountUC := inventory_uc.NewStartInventoryCountUseCase(inventoryCountRepo)
+	recordCountUC := inventory_uc.NewRecordCountUseCase(inventoryCountRepo)
+	completeInventoryCountUC := inventory_uc.NewCompleteInventoryCountUseCase(inventoryCountRepo, stockRepo)
+	getInventoryCountUC := inventory_uc.NewGetInventoryCountUseCase(inventoryCountRepo)
+	listInventoryCountsUC := inventory_uc.NewListInventoryCountsUseCase(inventoryCountRepo)
+
 	// Initialize handlers
 	warehouseHandler := handler.NewWarehouseHandler(listWarehousesUC, getWarehouseUC, getZonesUC, getLocationsUC)
 	stockHandler := handler.NewStockHandler(getStockUC, issueStockFEFOUC, reserveStockUC, releaseReservationUC)
@@ -144,6 +156,10 @@ func main() {
 	issueHandler := handler.NewGoodsIssueHandler(createIssueUC, getIssueUC, listIssuesUC)
 	reservationHandler := handler.NewReservationHandler(createReservationUC, releaseReservationUC2, checkAvailabilityUC)
 	adjustmentHandler := handler.NewAdjustmentHandler(createAdjustmentUC, transferStockUC)
+	inventoryCountHandler := handler.NewInventoryCountHandler(
+		createInventoryCountUC, startInventoryCountUC, recordCountUC,
+		completeInventoryCountUC, getInventoryCountUC, listInventoryCountsUC,
+	)
 	healthHandler := handler.NewHealthHandler()
 
 	// Setup router
@@ -155,6 +171,7 @@ func main() {
 		issueHandler,
 		reservationHandler,
 		adjustmentHandler,
+		inventoryCountHandler,
 		healthHandler,
 	)
 
