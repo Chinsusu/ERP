@@ -7,7 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Marketing Service (Phase 4.2) - COMMERCIAL
+
+**Implementation Complete (~40 files, ~4,000 LOC)**
+- KOL/Influencer database with tier classification (MEGA/MACRO/MICRO/NANO)
+- Campaign management with budget and ROI tracking
+- Sample request workflow (DRAFT → APPROVED → SHIPPED → DELIVERED)
+- KOL post tracking with engagement metrics
+- Sample shipment tracking
+
+**Database Layer (18 migration files, 8 tables)**
+- `kol_tiers` - Tier classification
+- `kols` - KOL master with social media handles
+- `campaigns` - Marketing campaigns with performance metrics
+- `kol_collaborations` - KOL-Campaign relationships
+- `sample_requests`, `sample_items`, `sample_shipments` - Sample workflow
+- `kol_posts` - Content tracking
+
+**API Endpoints (24 total)**
+- KOL Tiers: GET /kol-tiers
+- KOLs: GET/POST/PUT/DELETE /kols, GET /:id/posts
+- Campaigns: GET/POST/PUT /campaigns, PATCH /:id/launch, GET /:id/performance
+- Samples: GET/POST /samples/requests, PATCH /:id/approve, PATCH /:id/ship
+
+**Events Published**
+- `marketing.campaign.created`, `marketing.campaign.launched`
+- `marketing.sample_request.created`, `marketing.sample_request.approved`
+- `marketing.sample.shipped`, `marketing.kol_post.recorded`
+
+---
+
 ### Added - Sales Service (Phase 4.1) - COMMERCIAL
+
 
 **Implementation Complete (~50 files, ~4,500 LOC)**
 - First service in Phase 4: Commercial Operations
