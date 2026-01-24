@@ -2,7 +2,7 @@
 
 **Updated**: January 24, 2026  
 **Repository**: https://github.com/Chinsusu/ERP  
-**Status**: 7 Services Implemented (Phase 1 Core + Phase 2 Supply Chain Complete)
+**Status**: 8 Services Implemented (Phase 1 Core + Phase 2 Supply Chain + Phase 3 Operations)
 
 ---
 
@@ -20,9 +20,10 @@ Complete ERP system for cosmetics manufacturing with Clean Architecture, microse
 | **Master Data Service** | 47 files | ✅ Built |
 | **Supplier Service** | 40 files | ✅ Running |
 | **Procurement Service** | 35 files | ✅ Running |
-| **WMS Service** | 80 files | ✅ **NEW** |
+| **WMS Service** | 80 files | ✅ Running |
+| **Manufacturing Service** | 54 files | ✅ **NEW** |
 
-**Total**: ~340+ files, ~28,500+ LOC
+**Total**: ~390+ files, ~33,200+ LOC
 
 ---
 
@@ -146,6 +147,23 @@ Warehouse Management with FEFO logic for cosmetics industry.
 | **Event Subscribers** | procurement.po.received, sales.order.confirmed/cancelled, manufacturing.wo.started |
 | **Scheduler** | Daily expiry checks, hourly low stock alerts |
 | **Unit Tests** | 24 tests (Lot, Stock, GRN, GI, Reservation workflows) |
+
+---
+
+## Phase 3: Operations 🚧
+
+### 8. Manufacturing Service (Port 8087) ✅ NEW
+BOM, Work Orders, QC, NCR, and Traceability.
+
+| Component | Details |
+|-----------|---------|
+| **Tables** | 11 (boms, bom_line_items, bom_versions, work_orders, wo_line_items, wo_material_issues, qc_checkpoints, qc_inspections, qc_inspection_items, ncrs, batch_traceability) |
+| **Endpoints** | 25+ (BOM CRUD/approve, WO lifecycle, QC, NCR, Traceability) |
+| **BOM Security** | AES-256-GCM encryption for formula_details |
+| **WO Lifecycle** | PLANNED → RELEASED → IN_PROGRESS → QC_PENDING → COMPLETED |
+| **QC Types** | IQC (Incoming), IPQC (In-Process), FQC (Final) |
+| **Traceability** | Forward (material→products) and Backward (product→materials) |
+| **Events** | bom.created/approved, wo.created/started/completed, qc.passed/failed, ncr.created |
 
 ---
 

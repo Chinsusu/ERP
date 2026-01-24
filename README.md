@@ -1,378 +1,196 @@
-# HỆ THỐNG ERP MỸ PHẨM - MICROSERVICES ARCHITECTURE
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/golang-migrate/migrate/ci.yaml?branch=master)](https://github.com/golang-migrate/migrate/actions/workflows/ci.yaml?query=branch%3Amaster)
+[![GoDoc](https://pkg.go.dev/badge/github.com/golang-migrate/migrate)](https://pkg.go.dev/github.com/golang-migrate/migrate/v4)
+[![Coverage Status](https://img.shields.io/coveralls/github/golang-migrate/migrate/master.svg)](https://coveralls.io/github/golang-migrate/migrate?branch=master)
+[![packagecloud.io](https://img.shields.io/badge/deb-packagecloud.io-844fec.svg)](https://packagecloud.io/golang-migrate/migrate?filter=debs)
+[![Docker Pulls](https://img.shields.io/docker/pulls/migrate/migrate.svg)](https://hub.docker.com/r/migrate/migrate/)
+![Supported Go Versions](https://img.shields.io/badge/Go-1.20%2C%201.21-lightgrey.svg)
+[![GitHub Release](https://img.shields.io/github/release/golang-migrate/migrate.svg)](https://github.com/golang-migrate/migrate/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/golang-migrate/migrate/v4)](https://goreportcard.com/report/github.com/golang-migrate/migrate/v4)
 
-## TỔNG QUAN DỰ ÁN
+# migrate
 
-Hệ thống ERP toàn diện cho công ty sản xuất mỹ phẩm thiên nhiên tại Việt Nam, được xây dựng theo kiến trúc Microservices với khả năng hoạt động offline, phù hợp cho môi trường on-premise.
+__Database migrations written in Go. Use as [CLI](#cli-usage) or import as [library](#use-in-your-go-project).__
 
-### Đặc điểm chính
+* Migrate reads migrations from [sources](#migration-sources)
+   and applies them in correct order to a [database](#databases).
+* Drivers are "dumb", migrate glues everything together and makes sure the logic is bulletproof.
+   (Keeps the drivers lightweight, too.)
+* Database drivers don't assume things or try to correct user input. When in doubt, fail.
 
-- **Quy mô**: ~100 nhân viên concurrent
-- **Sản phẩm**: Serum, kem dưỡng, dầu gội, sữa tắm từ nguyên liệu thiên nhiên
-- **SKU**: 10,000 - 50,000 sản phẩm
-- **Transactions**: 100,000 - 500,000 giao dịch/tháng
-- **Deployment**: On-premise với khả năng offline
-- **AI/ML**: Tích hợp Ollama cho dự báo và phân tích
+Forked from [mattes/migrate](https://github.com/mattes/migrate)
 
-### Đặc thù ngành mỹ phẩm
+## Databases
 
-✅ **Truy xuất nguồn gốc (Traceability)**: Theo dõi từ nguyên liệu → thành phẩm → khách hàng  
-✅ **BOM bảo mật**: Công thức sản phẩm với phân quyền chặt chẽ  
-✅ **FEFO Logic**: First Expired First Out - ưu tiên hàng sắp hết hạn  
-✅ **GMP Compliance**: Quy trình sản xuất theo chuẩn GMP  
-✅ **Quản lý chứng nhận**: Theo dõi GMP, ISO, Organic, Ecocert  
-✅ **Cold Storage**: Giám sát nhiệt độ 2-8°C cho nguyên liệu đặc biệt  
-✅ **KOL Marketing**: Quản lý sample gửi cho KOL/Influencer
+Database drivers run migrations. [Add a new database?](database/driver.go)
 
-## KIẾN TRÚC HỆ THỐNG
+* [PostgreSQL](database/postgres)
+* [PGX v4](database/pgx)
+* [PGX v5](database/pgx/v5)
+* [Redshift](database/redshift)
+* [Ql](database/ql)
+* [Cassandra / ScyllaDB](database/cassandra)
+* [SQLite](database/sqlite)
+* [SQLite3](database/sqlite3) ([todo #165](https://github.com/mattes/migrate/issues/165))
+* [SQLCipher](database/sqlcipher)
+* [MySQL / MariaDB](database/mysql)
+* [Neo4j](database/neo4j)
+* [MongoDB](database/mongodb)
+* [CrateDB](database/crate) ([todo #170](https://github.com/mattes/migrate/issues/170))
+* [Shell](database/shell) ([todo #171](https://github.com/mattes/migrate/issues/171))
+* [Google Cloud Spanner](database/spanner)
+* [CockroachDB](database/cockroachdb)
+* [YugabyteDB](database/yugabytedb)
+* [ClickHouse](database/clickhouse)
+* [Firebird](database/firebird)
+* [MS SQL Server](database/sqlserver)
+* [RQLite](database/rqlite)
 
-### Tech Stack
+### Database URLs
 
-**Backend (Microservices)**
-- Go 1.22+ với Gin framework
-- GORM + PostgreSQL (mỗi service có database riêng)
-- Redis (cache & session)
-- NATS/RabbitMQ (message queue)
-- gRPC (internal communication)
+Database connection strings are specified via URLs. The URL format is driver dependent but generally has the form: `dbdriver://username:password@host:port/dbname?param1=true&param2=false`
 
-**Frontend**
-- Vue 3 + TypeScript
-- PrimeVue UI Framework
-- Pinia (state management)
-- Axios (HTTP client)
+Any [reserved URL characters](https://en.wikipedia.org/wiki/Percent-encoding#Percent-encoding_reserved_characters) need to be escaped. Note, the `%` character also [needs to be escaped](https://en.wikipedia.org/wiki/Percent-encoding#Percent-encoding_the_percent_character)
 
-**Infrastructure**
-- Docker + Docker Compose
-- Nginx (reverse proxy)
-- MinIO (object storage)
-- Ollama (AI/LLM local)
+Explicitly, the following characters need to be escaped:
+`!`, `#`, `$`, `%`, `&`, `'`, `(`, `)`, `*`, `+`, `,`, `/`, `:`, `;`, `=`, `?`, `@`, `[`, `]`
 
-**Monitoring**
-- Prometheus + Grafana
-- Loki (logs)
-- Jaeger (distributed tracing)
-
-### Danh sách Services
-
-| # | Service | Mô tả |
-|---|---------|-------|
-| 1 | API Gateway | Routing, authentication, rate limiting |
-| 2 | Auth Service | JWT authentication & RBAC authorization |
-| 3 | User Service | Quản lý user, department, employee |
-| 4 | Master Data Service | Materials, products, categories, UoM |
-| 5 | Supplier Service | Quản lý nhà cung cấp, chứng nhận, ASL |
-| 6 | Procurement Service | PR, PO, RFQ workflow |
-| 7 | WMS Service | Warehouse, stock, lot, FEFO, GRN/GI |
-| 8 | Manufacturing Service | BOM, work order, QC, traceability |
-| 9 | Sales Service | Customer, quotation, sales order |
-| 10 | Marketing Service | Campaign, KOL, sample tracking |
-| 11 | Finance Service | AP, AR, basic accounting |
-| 12 | Reporting Service | Reports, dashboards, analytics |
-| 13 | Notification Service | Email, push, alerts |
-| 14 | AI Service | Forecasting, demand planning |
-| 15 | File Service | Document & image storage (MinIO) |
-
-## MỤC LỤC TÀI LIỆU
-
-### Core Architecture
-- [01 - Kiến trúc hệ thống](./docs/01-ARCHITECTURE.md)
-- [02 - Chi tiết các Services](./docs/02-SERVICE-SPECIFICATIONS.md)
-- [13 - API Gateway](./docs/13-API-GATEWAY.md)
-- [14 - Event Catalog](./docs/14-EVENT-CATALOG.md)
-
-### Core Services
-- [03 - Auth Service](./docs/03-AUTH-SERVICE.md)
-- [04 - User Service](./docs/04-USER-SERVICE.md)
-- [05 - Master Data Service](./docs/05-MASTER-DATA-SERVICE.md)
-
-### Supply Chain Services
-- [06 - Supplier Service](./docs/06-SUPPLIER-SERVICE.md)
-- [07 - Procurement Service](./docs/07-PROCUREMENT-SERVICE.md)
-- [08 - WMS Service](./docs/08-WMS-SERVICE.md)
-
-### Production & Sales
-- [09 - Manufacturing Service](./docs/09-MANUFACTURING-SERVICE.md)
-- [10 - Sales Service](./docs/10-SALES-SERVICE.md)
-- [11 - Marketing Service](./docs/11-MARKETING-SERVICE.md)
-
-### Supporting Services
-- [12 - Notification Service](./docs/12-NOTIFICATION-SERVICE.md)
-
-### Database & Deployment
-- [15 - Database Schemas](./docs/15-DATABASE-SCHEMAS.md)
-- [16 - Deployment Guide](./docs/16-DEPLOYMENT.md)
-
-### Planning
-- [17 - Implementation Roadmap](./docs/17-IMPLEMENTATION-ROADMAP.md)
-- [18 - Glossary](./docs/18-GLOSSARY.md)
-
-## QUICK START
-
-### Prerequisites
+It's easiest to always run the URL parts of your DB connection URL (e.g. username, password, etc) through an URL encoder. See the example Python snippets below:
 
 ```bash
-# Cài đặt Docker & Docker Compose
-docker --version  # >= 24.0
-docker compose version  # >= 2.20
-
-# Cài đặt Go (cho development)
-go version  # >= 1.22
-
-# Cài đặt Node.js (cho frontend)
-node --version  # >= 18.0
-npm --version   # >= 9.0
+$ python3 -c 'import urllib.parse; print(urllib.parse.quote(input("String to encode: "), ""))'
+String to encode: FAKEpassword!#$%&'()*+,/:;=?@[]
+FAKEpassword%21%23%24%25%26%27%28%29%2A%2B%2C%2F%3A%3B%3D%3F%40%5B%5D
+$ python2 -c 'import urllib; print urllib.quote(raw_input("String to encode: "), "")'
+String to encode: FAKEpassword!#$%&'()*+,/:;=?@[]
+FAKEpassword%21%23%24%25%26%27%28%29%2A%2B%2C%2F%3A%3B%3D%3F%40%5B%5D
+$
 ```
 
-### Development Setup
+## Migration Sources
+
+Source drivers read migrations from local or remote sources. [Add a new source?](source/driver.go)
+
+* [Filesystem](source/file) - read from filesystem
+* [io/fs](source/iofs) - read from a Go [io/fs](https://pkg.go.dev/io/fs#FS)
+* [Go-Bindata](source/go_bindata) - read from embedded binary data ([jteeuwen/go-bindata](https://github.com/jteeuwen/go-bindata))
+* [pkger](source/pkger) - read from embedded binary data ([markbates/pkger](https://github.com/markbates/pkger))
+* [GitHub](source/github) - read from remote GitHub repositories
+* [GitHub Enterprise](source/github_ee) - read from remote GitHub Enterprise repositories
+* [Bitbucket](source/bitbucket) - read from remote Bitbucket repositories
+* [Gitlab](source/gitlab) - read from remote Gitlab repositories
+* [AWS S3](source/aws_s3) - read from Amazon Web Services S3
+* [Google Cloud Storage](source/google_cloud_storage) - read from Google Cloud Platform Storage
+
+## CLI usage
+
+* Simple wrapper around this library.
+* Handles ctrl+c (SIGINT) gracefully.
+* No config search paths, no config files, no magic ENV var injections.
+
+__[CLI Documentation](cmd/migrate)__
+
+### Basic usage
 
 ```bash
-# Clone repository
-git clone <repository-url>
-cd erp-cosmetics
-
-# Copy environment variables
-cp .env.example .env
-
-# Start all services với Docker Compose
-docker compose up -d
-
-# Check services status
-docker compose ps
-
-# View logs
-docker compose logs -f [service-name]
+$ migrate -source file://path/to/migrations -database postgres://localhost:5432/database up 2
 ```
 
-### Accessing Services
-
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| Frontend | http://localhost:3000 | admin / admin123 |
-| API Gateway | http://localhost:8080 | - |
-| PgAdmin | http://localhost:5050 | admin@erp.com / admin |
-| MinIO Console | http://localhost:9001 | minioadmin / minioadmin |
-| Grafana | http://localhost:3001 | admin / admin |
-
-### Running Individual Service (Development)
+### Docker usage
 
 ```bash
-# Navigate to service directory
-cd services/auth-service
-
-# Install dependencies
-go mod download
-
-# Run migrations
-make migrate-up
-
-# Start service
-go run cmd/main.go
-
-# Run tests
-go test ./...
+$ docker run -v {{ migration dir }}:/migrations --network host migrate/migrate
+    -path=/migrations/ -database postgres://localhost:5432/database up 2
 ```
 
-### Frontend Development
+## Use in your Go project
+
+* API is stable and frozen for this release (v3 & v4).
+* Uses [Go modules](https://golang.org/cmd/go/#hdr-Modules__module_versions__and_more) to manage dependencies.
+* To help prevent database corruptions, it supports graceful stops via `GracefulStop chan bool`.
+* Bring your own logger.
+* Uses `io.Reader` streams internally for low memory overhead.
+* Thread-safe and no goroutine leaks.
+
+__[Go Documentation](https://pkg.go.dev/github.com/golang-migrate/migrate/v4)__
+
+```go
+import (
+    "github.com/golang-migrate/migrate/v4"
+    _ "github.com/golang-migrate/migrate/v4/database/postgres"
+    _ "github.com/golang-migrate/migrate/v4/source/github"
+)
+
+func main() {
+    m, err := migrate.New(
+        "github://mattes:personal-access-token@mattes/migrate_test",
+        "postgres://localhost:5432/database?sslmode=enable")
+    m.Steps(2)
+}
+```
+
+Want to use an existing database client?
+
+```go
+import (
+    "database/sql"
+    _ "github.com/lib/pq"
+    "github.com/golang-migrate/migrate/v4"
+    "github.com/golang-migrate/migrate/v4/database/postgres"
+    _ "github.com/golang-migrate/migrate/v4/source/file"
+)
+
+func main() {
+    db, err := sql.Open("postgres", "postgres://localhost:5432/database?sslmode=enable")
+    driver, err := postgres.WithInstance(db, &postgres.Config{})
+    m, err := migrate.NewWithDatabaseInstance(
+        "file:///migrations",
+        "postgres", driver)
+    m.Up() // or m.Step(2) if you want to explicitly set the number of migrations to run
+}
+```
+
+## Getting started
+
+Go to [getting started](GETTING_STARTED.md)
+
+## Tutorials
+
+* [CockroachDB](database/cockroachdb/TUTORIAL.md)
+* [PostgreSQL](database/postgres/TUTORIAL.md)
+
+(more tutorials to come)
+
+## Migration files
+
+Each migration has an up and down migration. [Why?](FAQ.md#why-two-separate-files-up-and-down-for-a-migration)
 
 ```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
+1481574547_create_users_table.up.sql
+1481574547_create_users_table.down.sql
 ```
 
-## PROJECT STRUCTURE
+[Best practices: How to write migrations.](MIGRATIONS.md)
 
-```
-erp-cosmetics/
-├── services/                    # Microservices
-│   ├── api-gateway/
-│   ├── auth-service/
-│   ├── user-service/
-│   ├── master-data-service/
-│   ├── supplier-service/
-│   ├── procurement-service/
-│   ├── wms-service/
-│   ├── manufacturing-service/
-│   ├── sales-service/
-│   ├── marketing-service/
-│   ├── finance-service/
-│   ├── reporting-service/
-│   ├── notification-service/
-│   ├── ai-service/
-│   └── file-service/
-├── frontend/                    # Vue 3 + PrimeVue
-├── docs/                        # Documentation
-├── deploy/                      # Deployment configs
-│   ├── docker/
-│   └── nginx/
-├── scripts/                     # Utility scripts
-├── docker-compose.yml
-├── docker-compose.dev.yml
-├── .env.example
-└── README.md
-```
+## Coming from another db migration tool?
 
-## DEVELOPMENT WORKFLOW
+Check out [migradaptor](https://github.com/musinit/migradaptor/).
+*Note: migradaptor is not affliated or supported by this project*
 
-### Branch Strategy
+## Versions
 
-- `main`: Production-ready code
-- `develop`: Development branch
-- `feature/*`: New features
-- `bugfix/*`: Bug fixes
-- `hotfix/*`: Production hotfixes
+Version | Supported? | Import | Notes
+--------|------------|--------|------
+**master** | :white_check_mark: | `import "github.com/golang-migrate/migrate/v4"` | New features and bug fixes arrive here first |
+**v4** | :white_check_mark: | `import "github.com/golang-migrate/migrate/v4"` | Used for stable releases |
+**v3** | :x: | `import "github.com/golang-migrate/migrate"` (with package manager) or `import "gopkg.in/golang-migrate/migrate.v3"` (not recommended) | **DO NOT USE** - No longer supported |
 
-### Commit Convention
+## Development and Contributing
 
-```
-feat(service-name): Add new feature
-fix(service-name): Fix bug
-docs: Update documentation
-refactor(service-name): Code refactoring
-test(service-name): Add tests
-chore: Update dependencies
-```
+Yes, please! [`Makefile`](Makefile) is your friend,
+read the [development guide](CONTRIBUTING.md).
 
-### Code Review Process
-
-1. Create feature branch từ `develop`
-2. Implement feature với tests
-3. Create Pull Request
-4. Code review (min 1 approval)
-5. Merge to `develop`
-6. Deploy to staging
-7. QA testing
-8. Merge to `main` và deploy production
-
-## TESTING
-
-### Unit Tests
-
-```bash
-# Run all tests
-make test
-
-# Run tests with coverage
-make test-coverage
-
-# Run specific service tests
-cd services/auth-service
-go test -v ./...
-```
-
-### Integration Tests
-
-```bash
-# Start test environment
-docker compose -f docker-compose.test.yml up -d
-
-# Run integration tests
-make integration-test
-```
-
-### E2E Tests
-
-```bash
-cd frontend
-npm run test:e2e
-```
-
-## MONITORING & LOGGING
-
-### Logs
-
-```bash
-# View all logs
-docker compose logs -f
-
-# View specific service
-docker compose logs -f auth-service
-
-# View last 100 lines
-docker compose logs --tail=100 auth-service
-```
-
-### Metrics (Prometheus + Grafana)
-
-- Truy cập Grafana: http://localhost:3001
-- Default dashboards đã được import tự động
-- Custom metrics endpoint: `/metrics` trên mỗi service
-
-### Tracing (Jaeger)
-
-- Truy cập Jaeger UI: http://localhost:16686
-- Theo dõi distributed traces giữa services
-
-## DEPLOYMENT
-
-### Development
-
-```bash
-docker compose -f docker-compose.dev.yml up -d
-```
-
-### Staging
-
-```bash
-docker compose -f docker-compose.staging.yml up -d
-```
-
-### Production
-
-Xem chi tiết tại [16-DEPLOYMENT.md](./docs/16-DEPLOYMENT.md)
-
-## SECURITY
-
-### Environment Variables
-
-- **KHÔNG BAO GIỜ** commit file `.env` vào git
-- Sử dụng `.env.example` làm template
-- Production secrets quản lý qua Docker secrets
-
-### JWT Tokens
-
-- Access token: 15 phút
-- Refresh token: 7 ngày
-- Rotation tự động khi refresh
-
-### Database
-
-- Mỗi service có database riêng
-- Connection pooling được configure
-- Automated backups mỗi ngày
-
-## CONTRIBUTING
-
-1. Fork the repository
-2. Create feature branch
-3. Make your changes
-4. Write/update tests
-5. Update documentation
-6. Submit pull request
-
-## LICENSE
-
-Proprietary - All rights reserved
-
-## SUPPORT
-
-- **Documentation**: Xem thư mục `/docs`
-- **Issues**: Tạo issue trên GitHub
-- **Email**: dev-team@company.com
-- **Slack**: #erp-dev channel
-
-## CHANGELOG
-
-Xem [CHANGELOG.md](./CHANGELOG.md) để biết chi tiết các thay đổi theo version.
+Also have a look at the [FAQ](FAQ.md).
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23  
-**Maintainers**: ERP Development Team
+Looking for alternatives? [https://awesome-go.com/#database](https://awesome-go.com/#database).
