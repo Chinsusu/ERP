@@ -2,13 +2,13 @@
 
 **Updated**: January 24, 2026  
 **Repository**: https://github.com/Chinsusu/ERP  
-**Status**: 8 Services Implemented (Phase 1 Core + Phase 2 Supply Chain + Phase 3 Operations)
+**Status**: 10 Services Implemented (Phase 1-4 Complete)
 
 ---
 
 ## Executive Summary
 
-Complete ERP system for cosmetics manufacturing with Clean Architecture, microservices pattern, and event-driven design. Phase 2 (Supply Chain) now complete with Supplier, Procurement, and WMS services.
+Complete ERP system for cosmetics manufacturing with Clean Architecture, microservices pattern, and event-driven design. Phase 4 (Commercial) now complete with Sales and Marketing services.
 
 | Component | Files | Status |
 |-----------|-------|--------|
@@ -21,9 +21,11 @@ Complete ERP system for cosmetics manufacturing with Clean Architecture, microse
 | **Supplier Service** | 40 files | ✅ Running |
 | **Procurement Service** | 35 files | ✅ Running |
 | **WMS Service** | 80 files | ✅ Running |
-| **Manufacturing Service** | 54 files | ✅ **NEW** |
+| **Manufacturing Service** | 54 files | ✅ Running |
+| **Sales Service** | 54 files | ✅ **NEW** |
+| **Marketing Service** | 45 files | ✅ **NEW** |
 
-**Total**: ~390+ files, ~33,200+ LOC
+**Total**: ~480+ files, ~42,000+ LOC
 
 ---
 
@@ -150,9 +152,9 @@ Warehouse Management with FEFO logic for cosmetics industry.
 
 ---
 
-## Phase 3: Operations 🚧
+## Phase 3: Operations ✅
 
-### 8. Manufacturing Service (Port 8087) ✅ NEW
+### 8. Manufacturing Service (Port 8087) ✅
 BOM, Work Orders, QC, NCR, and Traceability.
 
 | Component | Details |
@@ -164,6 +166,34 @@ BOM, Work Orders, QC, NCR, and Traceability.
 | **QC Types** | IQC (Incoming), IPQC (In-Process), FQC (Final) |
 | **Traceability** | Forward (material→products) and Backward (product→materials) |
 | **Events** | bom.created/approved, wo.created/started/completed, qc.passed/failed, ncr.created |
+
+---
+
+## Phase 4: Commercial ✅ NEW
+
+### 9. Sales Service (Port 8088) ✅ NEW
+Customer management, quotations, sales orders, shipments.
+
+| Component | Details |
+|-----------|---------|
+| **Tables** | 11 (customer_groups, customers, contacts, addresses, quotations, quotation_items, sales_orders, so_items, shipments, returns, return_items) |
+| **Endpoints** | 35 (customers CRUD, quotations, sales orders, shipments) |
+| **Credit Control** | Automatic credit limit check on order confirmation |
+| **SO Lifecycle** | DRAFT → CONFIRMED → SHIPPED → DELIVERED |
+| **Quotation Workflow** | Convert quotation to sales order with one click |
+| **Events** | customer.created, order.confirmed/cancelled, shipment.shipped |
+
+### 10. Marketing Service (Port 8089) ✅ NEW
+KOL/Influencer database, campaigns, sample distribution.
+
+| Component | Details |
+|-----------|---------|
+| **Tables** | 8 (kol_tiers, kols, campaigns, collaborations, sample_requests, sample_items, sample_shipments, kol_posts) |
+| **Endpoints** | 24 (KOLs CRUD, campaigns, sample requests, approvals) |
+| **KOL Tiers** | MEGA (>1M), MACRO (100K-1M), MICRO (10K-100K), NANO (<10K) |
+| **Sample Workflow** | DRAFT → APPROVED → SHIPPED → DELIVERED → FEEDBACK |
+| **Campaign ROI** | Budget, spend, impressions, engagement, conversions tracking |
+| **Events** | campaign.created/launched, sample.approved/shipped, kol_post.recorded |
 
 ---
 
@@ -263,10 +293,10 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 | Master Data | 8083 | 9083 | master_data_db | ✅ Complete |
 | **Supplier** | **8084** | **9084** | **supplier_db** | ✅ Running |
 | **Procurement** | **8085** | **9085** | **procurement_db** | ✅ Running |
-| **WMS** | **8086** | **9086** | **wms_db** | ✅ **NEW** |
-| Manufacturing | 8087 | 9087 | manufacturing_db | 📋 Planned |
-| Sales | 8088 | 9088 | sales_db | 📋 Planned |
-| Marketing | 8089 | 9089 | marketing_db | 📋 Planned |
+| **WMS** | **8086** | **9086** | **wms_db** | ✅ Running |
+| **Manufacturing** | **8087** | **9087** | **manufacturing_db** | ✅ Running |
+| **Sales** | **8088** | **9088** | **sales_db** | ✅ **NEW** |
+| **Marketing** | **8089** | **9089** | **marketing_db** | ✅ **NEW** |
 | Notification | 8090 | 9090 | notification_db | 📋 Planned |
 | File | 8091 | 9091 | - | 📋 Planned |
 | Reporting | 8092 | 9092 | - | 📋 Planned |
@@ -277,16 +307,19 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 
 | Version | Description |
 |---------|-------------|
-| **v0.9.0** | **WMS Service - complete (CRITICAL)** |
-| v0.8.0 | Procurement Service - complete |
-| v0.7.0 | Supplier Service - complete |
-| v0.6.0 | API Gateway - complete |
-| v0.5.0 | Master Data Service - complete |
-| v0.4.0 | User Service - complete |
+| **v0.11.0** | **Marketing Service - complete (Phase 4.2)** |
+| **v0.10.0** | **Sales Service - complete (Phase 4.1)** |
+| v0.9.0 | Manufacturing Service - complete |
+| v0.8.0 | WMS Service - complete (CRITICAL) |
+| v0.7.0 | Procurement Service - complete |
+| v0.6.0 | Supplier Service - complete |
+| v0.5.0 | API Gateway - complete |
+| v0.4.0 | Master Data Service - complete |
+| v0.3.0 | User Service - complete |
 | v0.2.0 | Auth Service - complete |
 | v0.1.0 | Infrastructure setup |
 
-**Latest Commit**: `3f93bd9`
+**Latest Commit**: `de49d0a`
 
 ---
 
@@ -295,21 +328,23 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 | Phase | Services | Status |
 |-------|----------|--------|
 | **Phase 1: Core** | API Gateway, Auth, User, Master Data | ✅ Complete |
-| **Phase 2: Supply Chain** | Supplier, Procurement, **WMS** | ✅ **Complete** |
-| **Phase 3: Operations** | Manufacturing | 📋 Next |
-| **Phase 4: Commercial** | Sales, Marketing | 📋 Planned |
+| **Phase 2: Supply Chain** | Supplier, Procurement, WMS | ✅ Complete |
+| **Phase 3: Operations** | Manufacturing | ✅ Complete |
+| **Phase 4: Commercial** | **Sales, Marketing** | ✅ **Complete** |
 | **Phase 5: Support** | Notifications, Files, Reporting | 📋 Planned |
 
 ---
 
-## Next Steps (Phase 3)
+## Next Steps (Phase 5)
 
 ### Ready to Implement
-- [ ] Manufacturing Service (BOM, work orders, production, QC)
+- [ ] Notification Service (email, SMS, push notifications)
+- [ ] File Service (document upload, MinIO integration)
+- [ ] Reporting Service (dashboards, exports)
 
 ### Integration Points
-- Manufacturing subscribes to `wms.materials.available`
-- Manufacturing publishes `manufacturing.wo.completed` → WMS receives finished goods
+- Notifications subscribe to all service events
+- File service used by all services for document attachments
 
 ---
 
@@ -317,15 +352,15 @@ curl -X POST http://localhost:8085/api/v1/purchase-requisitions \
 
 | Metric | Value |
 |--------|-------|
-| Total Files | 340+ |
-| Lines of Code | ~28,500+ |
-| Services | 7 complete, 8 planned |
-| Database Tables | 46 active |
-| API Endpoints | 90+ |
-| NATS Events | 30+ defined |
+| Total Files | 480+ |
+| Lines of Code | ~42,000+ |
+| Services | 10 complete, 3 planned |
+| Database Tables | 68 active |
+| API Endpoints | 150+ |
+| NATS Events | 50+ defined |
 | Unit Tests | 24+ |
 
 ---
 
 **Repository**: https://github.com/Chinsusu/ERP  
-**Updated**: 2026-01-24T15:16:00Z
+**Updated**: 2026-01-24T16:48:00Z
