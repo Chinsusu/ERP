@@ -7,6 +7,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-01-24
+
+### Added - Procurement Service Complete (Phase 2.2)
+
+**Implementation Complete (~35 files, ~2,500 LOC)**
+- Full microservice for Purchase Requisitions and Purchase Orders
+- Multi-level approval workflow based on amount thresholds
+- PR to PO conversion with line item transfer
+
+**Database Layer (14 migration files)**
+- 7 tables: purchase_requisitions, pr_line_items, pr_approvals, purchase_orders, po_line_items, po_amendments, po_receipts
+- Indexes for performance optimization
+- Foreign key relationships for data integrity
+
+**Domain Layer**
+- PurchaseRequisition entity with workflow methods (Submit, Approve, Reject)
+- PurchaseOrder entity with workflow methods (Confirm, Cancel, Close)
+- PRLineItem, PRApproval, POLineItem, POAmendment, POReceipt entities
+- Multi-level approval logic (Auto < 10M, Dept Manager < 50M, Procurement < 200M, CFO > 200M VND)
+
+**API Endpoints (13 total)**
+- POST/GET /api/v1/purchase-requisitions - Create and list PRs
+- GET /api/v1/purchase-requisitions/:id - Get PR details
+- POST /api/v1/purchase-requisitions/:id/submit - Submit for approval
+- POST /api/v1/purchase-requisitions/:id/approve - Approve PR
+- POST /api/v1/purchase-requisitions/:id/reject - Reject PR
+- POST /api/v1/purchase-requisitions/:id/convert-to-po - Convert to PO
+- GET /api/v1/purchase-orders - List POs
+- GET /api/v1/purchase-orders/:id - Get PO details
+- POST /api/v1/purchase-orders/:id/confirm - Confirm PO
+- POST /api/v1/purchase-orders/:id/cancel - Cancel PO
+- POST /api/v1/purchase-orders/:id/close - Close PO
+- GET /api/v1/purchase-orders/:id/receipts - Get PO receipts
+
+**Events Published**
+- procurement.pr.created, procurement.pr.submitted
+- procurement.pr.approved, procurement.pr.rejected
+- procurement.po.created, procurement.po.confirmed
+- procurement.po.received, procurement.po.closed
+
+### Ports
+- HTTP: 8085
+- gRPC: 9085 (planned)
+
+---
+
+## [0.7.0] - 2026-01-24
+
+### Added - Supplier Service Complete (Phase 2.1)
+
+**Implementation Complete (~40 files, ~2,800 LOC)**
+- Full microservice for supplier management
+- Cosmetics industry-specific certification tracking
+- Approved Supplier List (ASL) management
+
+**Database Layer (16 migration files)**
+- 7 tables: suppliers, supplier_addresses, supplier_contacts, supplier_certifications, supplier_evaluations, approved_supplier_list, supplier_price_lists
+- Seed data: 4 sample suppliers with addresses, contacts, certifications
+- GMP, ISO, ORGANIC, ECOCERT, HALAL, COSMOS certification types
+
+**Domain Layer**
+- Supplier entity with status workflow (PENDING → APPROVED → BLOCKED)
+- Certification with expiry tracking (VALID, EXPIRING_SOON, EXPIRED)
+- Evaluation with 5 categories and weighted rating calculation
+- HasValidGMP() business method for compliance checking
+
+**API Endpoints (16 total)**
+- POST/GET /api/v1/suppliers - Create and list suppliers
+- GET /api/v1/suppliers/:id - Get supplier details
+- PUT /api/v1/suppliers/:id - Update supplier
+- POST /api/v1/suppliers/:id/approve - Approve supplier
+- POST /api/v1/suppliers/:id/block - Block supplier
+- GET/POST /api/v1/suppliers/:id/addresses - Manage addresses
+- GET/POST /api/v1/suppliers/:id/contacts - Manage contacts
+- GET/POST /api/v1/suppliers/:id/certifications - Manage certifications
+- GET /api/v1/certifications/expiring - Get expiring certs
+- GET/POST /api/v1/suppliers/:id/evaluations - Manage evaluations
+
+**Events Published**
+- supplier.created, supplier.approved, supplier.blocked
+- supplier.certification.added, supplier.certification.expiring
+- supplier.certification.expired, supplier.evaluation.completed
+
+### Ports
+- HTTP: 8084
+- gRPC: 9084 (planned)
+
+---
+
 ## [0.6.0] - 2026-01-24
 
 ### Added - API Gateway Complete
