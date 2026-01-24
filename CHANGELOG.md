@@ -15,8 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Scheduler**: Daily expiry checks, hourly low stock alerts
 - **gRPC Proto**: Ready for inter-service communication
 - **Inventory Count**: Full physical inventory workflow (Draft → In Progress → Completed)
-- **gRPC Server**: Complete gRPC server implementation for inter-service communication
+- **gRPC Server**: Complete gRPC server implementation, starts on port 9091
 - **Unit Tests**: 24 tests covering Lot FEFO, Stock operations, GRN/GI workflows
+- **Event Subscribers**: React to events from other services automatically
+
+**Event Handlers**:
+- `procurement.po.received` → Auto-create GRN
+- `sales.order.confirmed` → Reserve stock for sales orders
+- `sales.order.cancelled` → Release reservations
+- `manufacturing.wo.started` → Reserve materials for production
 
 **New Endpoints**:
 - POST /api/v1/goods-issue - Create goods issue (FEFO)
