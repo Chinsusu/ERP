@@ -135,9 +135,15 @@ func DefaultRoutes() []RouteConfig {
 		{Prefix: "/api/v1/materials", Service: "master-data-service:8083", AuthRequired: true},
 		{Prefix: "/api/v1/products", Service: "master-data-service:8083", AuthRequired: true},
 
-		// Future Services (placeholders)
+		// Supplier Service (Phase 2.1)
 		{Prefix: "/api/v1/suppliers", Service: "supplier-service:8084", AuthRequired: true},
-		{Prefix: "/api/v1/procurement", Service: "procurement-service:8085", AuthRequired: true},
+		{Prefix: "/api/v1/certifications", Service: "supplier-service:8084", AuthRequired: true},
+
+		// Procurement Service (Phase 2.2)
+		{Prefix: "/api/v1/purchase-requisitions", Service: "procurement-service:8085", AuthRequired: true},
+		{Prefix: "/api/v1/purchase-orders", Service: "procurement-service:8085", AuthRequired: true},
+
+		// Future Services (placeholders)
 		{Prefix: "/api/v1/warehouse", Service: "wms-service:8086", AuthRequired: true},
 		{Prefix: "/api/v1/manufacturing", Service: "manufacturing-service:8087", AuthRequired: true},
 		{Prefix: "/api/v1/sales", Service: "sales-service:8088", AuthRequired: true},

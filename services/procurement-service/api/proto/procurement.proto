@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package procurement;
+
+option go_package = "github.com/erp-cosmetics/procurement-service/api/proto/procurement";
+
+import "google/protobuf/timestamp.proto";
+
+// ProcurementService provides gRPC methods for procurement operations
+service ProcurementService {
+  // GetPO returns a purchase order by ID
+  rpc GetPO(GetPORequest) returns (POResponse);
+  
+  // GetPOsBySupplier returns all POs for a supplier
+  rpc GetPOsBySupplier(GetPOsBySupplierRequest) returns (POListResponse);
+  
+  // UpdatePOReceivedQty updates received quantity for a PO line item (called by WMS)
+  rpc UpdatePOReceivedQty(UpdateReceivedQtyRequest) returns (UpdateReceivedQtyResponse);
+  
+  // GetPendingPOs returns POs pending receipt (for WMS dashboard)
+  rpc GetPendingPOs(GetPendingPOsRequest) returns (POListResponse);
+}
+
+message GetPORequest {
+  string po_id = 1;
+}
+
+message GetPOsBySupplierRequest {
+  string supplier_id = 1;
+  string status = 2; // Optional filter by status
+}
+
+message GetPendingPOsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message UpdateReceivedQtyRequest {
+  string po_line_item_id = 1;
+  double received_qty = 2;
+  string grn_id = 3;
+  string grn_number = 4;
+  string batch_number = 5;
+  string lot_number = 6;
+  google.protobuf.Timestamp expiry_date = 7;
+  string received_by = 8;
+}
+
+message UpdateReceivedQtyResponse {
+  bool success = 1;
+  string message = 2;
+  string po_id = 3;
+  string po_status = 4;
+  string line_item_status = 5;
+  double total_received = 6;
+  double pending_qty = 7;
+}
+
+message POResponse {
+  string id = 1;
+  string po_number = 2;
+  string po_date = 3;
+  string pr_id = 4;
+  string supplier_id = 5;
+  string supplier_code = 6;
+  string supplier_name = 7;
+  string status = 8;
+  string delivery_address = 9;
+  string expected_delivery_date = 10;
+  double grand_total = 11;
+  string currency = 12;
+  repeated POLineItemProto line_items = 13;
+}
+
+message POLineItemProto {
+  string id = 1;
+  int32 line_number = 2;
+  string material_id = 3;
+  string material_code = 4;
+  string material_name = 5;
+  double quantity = 6;
+  double received_qty = 7;
+  double pending_qty = 8;
+  string uom_code = 9;
+  double unit_price = 10;
+  string status = 11;
+}
+
+message POListResponse {
+  repeated POResponse orders = 1;
+  int32 total = 2;
+}
