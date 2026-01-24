@@ -321,3 +321,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ QC checkpoints (IQC, IPQC, FQC)
 
 **Ready for**: Development team kickoff, implementation, and deployment.
+
+## [0.3.0] - 2026-01-24
+
+### Added - User Service Foundation
+
+**Database Layer (9 files)**
+- 4 database migrations (8 files total with up/down)
+- 3 tables: departments (hierarchical with materialized path), users, user_profiles
+- Seed data: 8 default departments (EXEC, IT, HR, FIN, OPS, MFG, WH, QC)
+- Seed data: Admin user matching Auth Service (user_id: 09c95223-32b6-4b50-87e7-4ea1333ae072)
+
+**Domain Layer (3 files)**
+- User entity: Email, employee code auto-generation, department/manager relationships
+- Department entity: Hierarchical structure with parent_id, materialized path, level computation
+- UserProfile entity: Extended user information (DOB, address, emergency contact, join date)
+
+**Project Setup**
+- go.mod with dependencies
+- Clean Architecture structure prepared
+
+### In Progress
+- Repository implementations
+- Use cases for user and department management
+- HTTP REST API endpoints
+- gRPC service implementation
+- Integration with Auth Service
+
