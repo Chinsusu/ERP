@@ -6,6 +6,68 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.5.0] - 2026-01-24
+
+### Added - Master Data Service Complete
+
+**Implementation Complete (47 files, ~3,000 LOC)**
+- Full microservice for materials, products, categories, and units of measure
+- Complete cosmetics industry-specific features
+
+**Database Layer (16 migration files)**
+- 7 tables: categories, units_of_measure, unit_conversions, materials, material_specifications, products, product_images
+- Hierarchical categories using materialized path pattern
+- Unit conversion support (bidirectional)
+- Seed data: 12 units (KG, G, MG, L, ML, PCS, etc.)
+- Seed data: 8 unit conversions
+- Seed data: 27 categories (material categories + product categories)
+
+**Domain Layer (4 entity files, 4 repository interfaces)**
+- Category entity with tree structure support
+- UnitOfMeasure and UnitConversion entities
+- Material entity with cosmetics-specific fields
+- Product entity with license tracking
+- MaterialSpecification for extended attributes
+- ProductImage for multi-image support
+
+**Cosmetics Industry Features**
+- INCI Names: International Nomenclature of Cosmetic Ingredients
+- CAS Numbers: Chemical Abstracts Service registry
+- Allergen Tracking: is_allergen, allergen_info fields
+- Storage Conditions: AMBIENT, COLD (2-8°C), FROZEN
+- Cosmetic License: Number and expiry date tracking
+- Auto-generated Codes: RM-0001, PKG-0001, FG-SERUM-0001
+
+**Infrastructure Layer (5 files)**
+- CategoryRepository with tree loading
+- UnitRepository with conversion logic
+- MaterialRepository with full-text search
+- ProductRepository with image management
+- Event publisher for NATS
+
+**Use Case Layer (4 use case packages)**
+- Category: CRUD, GetTree
+- Unit: CRUD, Convert
+- Material: CRUD, Search, AddSpecification
+- Product: CRUD, Search, AddImage
+
+**HTTP API (20+ endpoints)**
+- Categories: CRUD + /tree endpoint
+- Units: CRUD + /convert endpoint
+- Materials: CRUD + /search + /specifications
+- Products: CRUD + /search + /by-category + /images
+
+**Configuration & Deployment**
+- Makefile with build, run, migrate targets
+- Dockerfile for production builds
+- Comprehensive README.md with examples
+
+### Ports
+- HTTP: 8083
+- gRPC: 9083 (placeholder)
+- Database: master_data_db
+
 ## [0.2.0] - 2026-01-24
 
 ### Added - Auth Service Template (Complete & Tested)
