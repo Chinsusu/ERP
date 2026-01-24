@@ -139,6 +139,11 @@ func (c *Client) Close() {
 	}
 }
 
+// Conn returns the underlying NATS connection
+func (c *Client) Conn() *nats.Conn {
+	return c.conn
+}
+
 // Unmarshal unmarshals message data into a struct
 func Unmarshal(data []byte, v interface{}) error {
 	return json.Unmarshal(data, v)

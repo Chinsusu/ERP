@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,12 +11,14 @@ import (
 	"time"
 
 	"github.com/erp-cosmetics/wms-service/internal/config"
+	wmsgrpc "github.com/erp-cosmetics/wms-service/internal/delivery/grpc"
 	"github.com/erp-cosmetics/wms-service/internal/delivery/http/handler"
 	"github.com/erp-cosmetics/wms-service/internal/delivery/http/router"
 	"github.com/erp-cosmetics/wms-service/internal/domain/entity"
 	"github.com/erp-cosmetics/wms-service/internal/infrastructure/event"
 	"github.com/erp-cosmetics/wms-service/internal/infrastructure/persistence/postgres"
 	"github.com/erp-cosmetics/wms-service/internal/infrastructure/scheduler"
+	"github.com/erp-cosmetics/wms-service/internal/infrastructure/subscriber"
 	adjustment_uc "github.com/erp-cosmetics/wms-service/internal/usecase/adjustment"
 	grn_uc "github.com/erp-cosmetics/wms-service/internal/usecase/grn"
 	inventory_uc "github.com/erp-cosmetics/wms-service/internal/usecase/inventory"
@@ -26,8 +29,10 @@ import (
 	warehouse_uc "github.com/erp-cosmetics/wms-service/internal/usecase/warehouse"
 	"github.com/erp-cosmetics/shared/pkg/database"
 	"github.com/erp-cosmetics/shared/pkg/logger"
-	"github.com/erp-cosmetics/shared/pkg/nats"
+	natspkg "github.com/erp-cosmetics/shared/pkg/nats"
+	natslib "github.com/nats-io/nats.go"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -80,7 +85,7 @@ func main() {
 	}
 
 	// Connect to NATS
-	natsClient, err := nats.NewClient(&nats.Config{
+	natsClient, err := natspkg.NewClient(&natspkg.Config{
 		URL: cfg.NATSUrl,
 	})
 	if err != nil {
@@ -189,6 +194,48 @@ func main() {
 	wmsScheduler := scheduler.NewScheduler(lotRepo, stockRepo, eventPub, log, schedulerConfig)
 	wmsScheduler.Start()
 
+	// Start gRPC server
+	grpcPort := cfg.GRPCPort
+	if grpcPort == "" {
+		grpcPort = "9091"
+	}
+	wmsGRPCServer := wmsgrpc.NewWMSServer(
+		stockRepo, lotRepo,
+		issueStockFEFOUC,
+		createReservationUC, releaseReservationUC2, checkAvailabilityUC,
+		log,
+	)
+	grpcServer := grpc.NewServer()
+	_ = wmsGRPCServer // Register when proto is generated
+
+	go func() {
+		lis, err := net.Listen("tcp", ":"+grpcPort)
+		if err != nil {
+			log.Error("Failed to listen for gRPC", zap.Error(err))
+			return
+		}
+		log.Info("gRPC server started", zap.String("port", grpcPort))
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Error("gRPC server error", zap.Error(err))
+		}
+	}()
+
+	// Start event subscriber
+	var natsConn *natslib.Conn
+	if natsClient != nil {
+		natsConn = natsClient.Conn()
+	}
+	eventSub := subscriber.NewEventSubscriber(
+		natsConn,
+		log,
+		createGRNUC,
+		createReservationUC,
+		releaseReservationUC2,
+	)
+	if err := eventSub.Start(); err != nil {
+		log.Warn("Failed to start event subscriber", zap.Error(err))
+	}
+
 	// Start HTTP server
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
@@ -210,6 +257,12 @@ func main() {
 
 	// Stop scheduler
 	wmsScheduler.Stop()
+
+	// Stop event subscriber
+	eventSub.Stop()
+
+	// Stop gRPC server
+	grpcServer.GracefulStop()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
