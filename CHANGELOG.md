@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Frontend Setup (Phase 5.1) - VUE 3 + PRIMEVUE
+
+**Implementation Complete (~35 files, ~3,000 LOC)**
+- Vue 3.4+ with Composition API and TypeScript
+- PrimeVue 4 with Aura theme (dark mode support)
+- Pinia for state management
+- Vue Router 4 with auth guards
+- Axios with JWT token management and auto-refresh
+- TanStack Query ready for data fetching
+
+**Project Structure**
+- `src/api/` - Axios instance with interceptors, auth API, user API
+- `src/composables/` - useAuth, usePagination
+- `src/stores/` - auth.store (RBAC permissions), app.store (dark mode)
+- `src/router/` - Routes with lazy loading and permission guards
+- `src/layouts/` - DefaultLayout, AuthLayout
+- `src/components/layout/` - AppHeader, AppSidebar with gradient design
+
+**Core Features**
+- JWT authentication with token refresh
+- RBAC permission checking (service:resource:action format)
+- Dark mode toggle with localStorage persistence
+- Collapsible sidebar navigation
+- Permission-based menu filtering
+- Responsive design
+
+**Pages**
+- LoginPage with gradient branding
+- ForgotPasswordPage with success state
+- DashboardPage with stats cards
+- Placeholder pages for all modules
+
+**Build Output**
+- Production build: 29 assets (~445KB gzip main bundle)
+- Dev server: http://localhost:5173
+
+---
+
 ### Added - Marketing Service (Phase 4.2) - COMMERCIAL
 
 **Implementation Complete (~40 files, ~4,000 LOC)**
