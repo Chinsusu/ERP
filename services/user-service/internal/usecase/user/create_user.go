@@ -6,16 +6,14 @@ import (
 
 	"github.com/erp-cosmetics/user-service/internal/domain/entity"
 	"github.com/erp-cosmetics/user-service/internal/domain/repository"
-	"github.com/erp-cosmetics/user-service/internal/infrastructure/client"
-	"github.com/erp-cosmetics/user-service/internal/infrastructure/event"
 	"github.com/erp-cosmetics/shared/pkg/errors"
 )
 
 type CreateUserUseCase struct {
 	userRepo    repository.UserRepository
 	profileRepo repository.UserProfileRepository
-	authClient  *client.AuthClient
-	eventPub    *event.Publisher
+	authClient  AuthServiceClient
+	eventPub    EventPublisher
 }
 
 type CreateUserRequest struct {
@@ -34,8 +32,8 @@ type CreateUserRequest struct {
 func NewCreateUserUseCase(
 	userRepo repository.UserRepository,
 	profileRepo repository.UserProfileRepository,
-	authClient *client.AuthClient,
-	eventPub *event.Publisher,
+	authClient AuthServiceClient,
+	eventPub EventPublisher,
 ) *CreateUserUseCase {
 	return &CreateUserUseCase{
 		userRepo:    userRepo,

@@ -3,15 +3,15 @@ package department
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/erp-cosmetics/user-service/internal/domain/entity"
 	"github.com/erp-cosmetics/user-service/internal/domain/repository"
-	"github.com/erp-cosmetics/user-service/internal/infrastructure/event"
 	"github.com/erp-cosmetics/shared/pkg/errors"
 )
 
 type CreateDepartmentUseCase struct {
 	deptRepo repository.DepartmentRepository
-	eventPub *event.Publisher
+	eventPub EventPublisher
 }
 
 type CreateDepartmentRequest struct {
@@ -22,7 +22,7 @@ type CreateDepartmentRequest struct {
 
 func NewCreateDepartmentUseCase(
 	deptRepo repository.DepartmentRepository,
-	eventPub *event.Publisher,
+	eventPub EventPublisher,
 ) *CreateDepartmentUseCase {
 	return &CreateDepartmentUseCase{
 		deptRepo: deptRepo,
@@ -52,9 +52,18 @@ func (uc *CreateDepartmentUseCase) Execute(ctx context.Context, req *CreateDepar
 	// Get parent if specified
 	var parentPath string
 	if req.ParentID != nil {
-		// Parse parent ID and get parent
-		// Update path and level based on parent
-		parentPath = "/" // Placeholder
+		parentID, err := uuid.Parse(*req.ParentID)
+		if err != nil {
+			return nil, errors.BadRequest("invalid parent_id")
+		}
+
+		parent, err := uc.deptRepo.GetByID(ctx, parentID)
+		if err != nil {
+			return nil, errors.NotFound("parent department not found")
+		}
+
+		dept.ParentID = &parentID
+		parentPath = parent.Path
 	}
 
 	// Update path

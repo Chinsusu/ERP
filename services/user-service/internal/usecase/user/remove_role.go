@@ -1,0 +1,48 @@
+package user
+
+import (
+	"context"
+
+	"github.com/erp-cosmetics/user-service/internal/domain/repository"
+	"github.com/erp-cosmetics/shared/pkg/errors"
+	"github.com/google/uuid"
+)
+
+type RemoveRoleUseCase struct {
+	userRepo   repository.UserRepository
+	authClient AuthServiceClient
+	eventPub   EventPublisher
+}
+
+func NewRemoveRoleUseCase(userRepo repository.UserRepository, authClient AuthServiceClient, eventPub EventPublisher) *RemoveRoleUseCase {
+	return &RemoveRoleUseCase{
+		userRepo:   userRepo,
+		authClient: authClient,
+		eventPub:   eventPub,
+	}
+}
+
+func (uc *RemoveRoleUseCase) Execute(ctx context.Context, userID, roleID string) error {
+	uID, err := uuid.Parse(userID)
+	if err != nil {
+		return errors.BadRequest("invalid user ID")
+	}
+
+	user, err := uc.userRepo.GetByID(ctx, uID)
+	if err != nil {
+		return errors.NotFound("user not found")
+	}
+
+	if err := uc.authClient.RemoveRole(ctx, userID, roleID); err != nil {
+		return errors.Internal(err)
+	}
+
+	// Publish event
+	uc.eventPub.Publish("user.role_removed", map[string]interface{}{
+		"user_id": userID,
+		"email":   user.Email,
+		"role_id": roleID,
+	})
+
+	return nil
+}

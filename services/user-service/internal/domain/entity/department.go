@@ -56,7 +56,7 @@ func (d *Department) UpdatePath(parentPath string) {
 		d.Level = 0
 	} else {
 		d.Path = fmt.Sprintf("%s%s/", parentPath, d.Code)
-		d.Level = strings.Count(parentPath, "/")
+		d.Level = strings.Count(parentPath, "/") - 1
 	}
 }
 
