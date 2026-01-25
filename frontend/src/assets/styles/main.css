@@ -1,41 +1,66 @@
 /* ===================================
-   ERP Cosmetics - Global Styles
+   ERP Cosmetics - Vuexy Theme
    =================================== */
 
-/* CSS Variables for custom colors */
+/* Import Public Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap');
+
+/* CSS Variables - Vuexy Color Scheme */
 :root {
-  /* Brand colors - Cosmetics inspired (soft pink/rose gold gradient) */
-  --primary-color: #e91e63;
-  --primary-hover: #c2185b;
-  --secondary-color: #9c27b0;
+  /* Primary - Vuexy Purple */
+  --primary-color: #7367f0;
+  --primary-hover: #6558d3;
+  --primary-active: #5746af;
+  --primary-light: rgba(115, 103, 240, 0.12);
   
-  /* Background */
-  --surface-ground: #f8f9fa;
+  /* Secondary */
+  --secondary-color: #808390;
+  --secondary-light: #a8aaae;
+  --secondary-dark: #5d5f69;
+  
+  /* Background - Vuexy Light Gray */
+  --surface-ground: #f8f7fa;
   --surface-card: #ffffff;
-  --surface-border: #dee2e6;
+  --surface-border: #e7e5f0;
+  --surface-hover: #f3f2f7;
   
-  /* Text */
-  --text-color: #495057;
-  --text-color-secondary: #6c757d;
+  /* Text Colors */
+  --text-color: #2f2b3d;
+  --text-color-secondary: #808390;
+  --text-color-muted: #a8aaae;
   
   /* Sidebar */
-  --sidebar-width: 280px;
+  --sidebar-width: 260px;
   --sidebar-collapsed-width: 64px;
   
   /* Header */
   --header-height: 64px;
   
+  /* Shadows - Vuexy Style */
+  --shadow-card: 0 3px 12px 0 rgba(47, 43, 61, 0.14);
+  --shadow-card-hover: 0 6px 20px 0 rgba(47, 43, 61, 0.2);
+  --shadow-sm: 0 2px 6px 0 rgba(47, 43, 61, 0.08);
+  
+  /* Border Radius */
+  --border-radius: 6px;
+  --border-radius-lg: 8px;
+  
   /* Transitions */
-  --transition-duration: 0.2s;
+  --transition-duration: 0.3s;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Dark mode variables */
 .p-dark {
-  --surface-ground: #1a1a2e;
-  --surface-card: #16213e;
-  --surface-border: #2d3748;
+  --surface-ground: #1a1720;
+  --surface-card: #2f2b3d;
+  --surface-border: #3d3952;
+  --surface-hover: #484569;
   --text-color: #e2e8f0;
   --text-color-secondary: #a0aec0;
+  --text-color-muted: #718096;
+  --shadow-card: 0 3px 12px 0 rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 6px 20px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* Base reset */
@@ -52,7 +77,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--surface-ground);
   color: var(--text-color);
   line-height: 1.6;
@@ -65,6 +90,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   color: var(--text-color);
   margin-bottom: 0.5rem;
+  line-height: 1.3;
 }
 
 h1 { font-size: 2rem; }
@@ -77,14 +103,14 @@ h6 { font-size: 1rem; }
 a {
   color: var(--primary-color);
   text-decoration: none;
-  transition: color var(--transition-duration);
+  transition: color var(--transition-duration) var(--transition-timing);
 }
 
 a:hover {
   color: var(--primary-hover);
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - Vuexy style */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -97,6 +123,7 @@ a:hover {
 ::-webkit-scrollbar-thumb {
   background: var(--surface-border);
   border-radius: 4px;
+  transition: background 0.2s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -137,15 +164,21 @@ a:hover {
 .gap-3 { gap: 1rem; }
 .gap-4 { gap: 1.5rem; }
 
-/* Card utility */
+/* Card utility - Vuexy style */
 .card {
   background: var(--surface-card);
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-card);
+  border: none;
+  transition: box-shadow var(--transition-duration) var(--transition-timing);
 }
 
-/* Status badges */
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Status badges - Vuexy style */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -154,25 +187,26 @@ a:hover {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .status-badge.success {
-  background: rgba(76, 175, 80, 0.15);
+  background: rgba(76, 175, 80, 0.12);
   color: #4caf50;
 }
 
 .status-badge.warning {
-  background: rgba(255, 152, 0, 0.15);
+  background: rgba(255, 152, 0, 0.12);
   color: #ff9800;
 }
 
 .status-badge.danger {
-  background: rgba(244, 67, 54, 0.15);
+  background: rgba(244, 67, 54, 0.12);
   color: #f44336;
 }
 
 .status-badge.info {
-  background: rgba(33, 150, 243, 0.15);
+  background: rgba(33, 150, 243, 0.12);
   color: #2196f3;
 }
 
@@ -193,6 +227,152 @@ a:hover {
 .page-title {
   font-size: 1.5rem;
   font-weight: 600;
+  color: var(--text-color);
+}
+
+/* PrimeVue Component Overrides - Vuexy Style */
+
+/* Cards */
+.p-card {
+  box-shadow: var(--shadow-card);
+  border-radius: var(--border-radius);
+  border: none;
+  transition: box-shadow var(--transition-duration) var(--transition-timing);
+}
+
+.p-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.p-card-body {
+  padding: 1.5rem;
+}
+
+.p-card-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.p-card-subtitle {
+  color: var(--text-color-secondary);
+  font-size: 0.875rem;
+}
+
+/* Buttons */
+.p-button {
+  font-weight: 500;
+  border-radius: var(--border-radius);
+  transition: all 0.2s var(--transition-timing);
+}
+
+.p-button:not(.p-button-text):not(.p-button-outlined):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(47, 43, 61, 0.15);
+}
+
+.p-button:not(.p-button-text):not(.p-button-outlined):active {
+  transform: translateY(0);
+}
+
+.p-button-primary {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.p-button-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.p-button-primary:active {
+  background: var(--primary-active);
+  border-color: var(--primary-active);
+}
+
+/* Input fields */
+.p-inputtext {
+  border-radius: var(--border-radius);
+  border: 1px solid var(--surface-border);
+  transition: all 0.2s var(--transition-timing);
+}
+
+.p-inputtext:enabled:hover {
+  border-color: var(--text-color-secondary);
+}
+
+.p-inputtext:enabled:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(115, 103, 240, 0.2);
+}
+
+/* DataTable */
+.p-datatable {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--surface-hover);
+  color: var(--text-color);
+  font-weight: 600;
+  border-bottom: 1px solid var(--surface-border);
+  padding: 1rem;
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  transition: background-color 0.2s var(--transition-timing);
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--primary-light);
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  border-bottom: 1px solid var(--surface-hover);
+  padding: 1rem;
+}
+
+/* Sidebar/Menu */
+.p-menu {
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-card);
+}
+
+.p-menuitem-link {
+  border-radius: var(--border-radius);
+  transition: all 0.2s var(--transition-timing);
+}
+
+.p-menuitem-link:hover {
+  background: var(--primary-light);
+}
+
+.p-menuitem-link.p-menuitem-link-active {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Toast */
+.p-toast .p-toast-message {
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Dialog */
+.p-dialog {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.p-dialog-header {
+  border-bottom: 1px solid var(--surface-border);
+  padding: 1.5rem;
+}
+
+.p-dialog-content {
+  padding: 1.5rem;
 }
 
 /* Animation keyframes */
@@ -206,10 +386,34 @@ a:hover {
   to { transform: translateX(0); opacity: 1; }
 }
 
+@keyframes slideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 .fade-in {
   animation: fadeIn var(--transition-duration) ease-in-out;
 }
 
 .slide-in-left {
   animation: slideInLeft var(--transition-duration) ease-in-out;
+}
+
+.slide-in-up {
+  animation: slideInUp var(--transition-duration) ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  html {
+    font-size: 13px;
+  }
+  
+  .page-container {
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
 }
