@@ -77,7 +77,9 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, req *RefreshTokenReq
 	}
 
 	// Revoke old refresh token (token rotation)
-	uc.tokenRepo.RevokeRefreshToken(ctx, refreshTokenHash, userID)
+	if err := uc.tokenRepo.RevokeRefreshToken(ctx, refreshTokenHash, userID); err != nil {
+		return nil, errors.Internal(err)
+	}
 
 	// Get user roles
 	roles, err := uc.roleRepo.GetUserRoles(ctx, userID)
@@ -125,7 +127,9 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, req *RefreshTokenReq
 		UserAgent:      req.UserAgent,
 		ExpiresAt:      time.Now().Add(15 * time.Minute),
 	}
-	uc.tokenRepo.CreateSession(ctx, session)
+	if err := uc.tokenRepo.CreateSession(ctx, session); err != nil {
+		return nil, errors.Internal(err)
+	}
 
 	// Update cached permissions
 	permissions, _ := uc.permRepo.GetUserPermissions(ctx, userID)

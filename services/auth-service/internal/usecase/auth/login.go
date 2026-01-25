@@ -90,7 +90,9 @@ func (uc *LoginUseCase) Execute(ctx context.Context, req *LoginRequest) (*LoginR
 	if !user.VerifyPassword(req.Password) {
 		// Increment failed attempts
 		user.IncrementFailedAttempts()
-		uc.userRepo.Update(ctx, user)
+		if err := uc.userRepo.Update(ctx, user); err != nil {
+			return nil, errors.Internal(err)
+		}
 		
 		if user.IsLocked() {
 			return nil, errors.Forbidden("Account locked due to too many failed attempts")
@@ -102,7 +104,9 @@ func (uc *LoginUseCase) Execute(ctx context.Context, req *LoginRequest) (*LoginR
 	// Reset failed attempts on successful login
 	user.ResetFailedAttempts()
 	user.UpdateLastLogin()
-	uc.userRepo.Update(ctx, user)
+	if err := uc.userRepo.Update(ctx, user); err != nil {
+		return nil, errors.Internal(err)
+	}
 
 	// Get user roles and permissions
 	roles, err := uc.roleRepo.GetUserRoles(ctx, user.UserID)

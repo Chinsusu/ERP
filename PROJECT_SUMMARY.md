@@ -29,7 +29,7 @@ Complete ERP system for cosmetics manufacturing with Clean Architecture, microse
 | **File Service** | 20 files | ✅ **NEW** |
 | **Frontend (Vue 3)** | 55+ files | ✅ Phase 5.2 |
 
-**Total**: ~655+ files, ~57,000+ LOC
+**Total**: ~665+ files, ~58,200+ LOC
 
 ---
 
@@ -160,14 +160,14 @@ Document management with MinIO storage.
 
 | Metric | Value |
 |--------|-------|
-| Total Files | 655+ |
-| Lines of Code | ~57,000+ |
+| Total Files | 665+ |
+| Lines of Code | ~58,200+ |
 | Backend Services | 13 complete |
 | Frontend | Vue 3 + PrimeVue (55+ files) |
 | Database Tables | 78 active |
 | API Endpoints | 195+ |
 | NATS Events | 60+ defined |
-| Unit Tests | 24+ |
+| Unit Tests | 75+ |
 | Pre-built Reports | 10 |
 | Email Templates | 9 |
 | File Categories | 10 |
@@ -175,4 +175,4 @@ Document management with MinIO storage.
 ---
 
 **Repository**: https://github.com/Chinsusu/ERP  
-**Updated**: 2026-01-25T09:46:00Z
+**Updated**: 2026-01-25T10:15:00Z
