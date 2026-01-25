@@ -132,3 +132,38 @@ func TestCompleteGRNUseCase_Execute_Success(t *testing.T) {
 	stockRepo.AssertExpectations(t)
 	eventPub.AssertExpectations(t)
 }
+
+func TestCompleteGRNUseCase_Execute_NotFound(t *testing.T) {
+	ctx := context.Background()
+	grnRepo := new(testmocks.MockGRNRepository)
+	uc := grn.NewCompleteGRNUseCase(grnRepo, nil, nil, nil, nil)
+
+	grnID := uuid.New()
+	grnRepo.On("GetByID", ctx, grnID).Return(nil, errors.New("not found"))
+
+	res, err := uc.Execute(ctx, &grn.CompleteGRNInput{GRNID: grnID})
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
+	assert.Contains(t, err.Error(), "not found")
+}
+
+func TestCompleteGRNUseCase_Execute_InvalidStatus(t *testing.T) {
+	ctx := context.Background()
+	grnRepo := new(testmocks.MockGRNRepository)
+	uc := grn.NewCompleteGRNUseCase(grnRepo, nil, nil, nil, nil)
+
+	grnID := uuid.New()
+	targetGRN := &entity.GRN{
+		ID:     grnID,
+		Status: entity.GRNStatusCompleted,
+	}
+
+	grnRepo.On("GetByID", ctx, grnID).Return(targetGRN, nil)
+
+	res, err := uc.Execute(ctx, &grn.CompleteGRNInput{GRNID: grnID})
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
+	assert.Contains(t, err.Error(), "already completed")
+}

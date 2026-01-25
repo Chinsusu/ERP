@@ -1,8 +1,6 @@
 module github.com/erp-cosmetics/wms-service
 
-go 1.24.0
-
-toolchain go1.24.12
+go 1.22
 
 require (
 	github.com/erp-cosmetics/shared v0.0.0
@@ -12,8 +10,8 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
-	google.golang.org/grpc v1.78.0
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/grpc v1.61.0
+	google.golang.org/protobuf v1.36.10
 	gorm.io/gorm v1.25.7
 )
 
@@ -29,6 +27,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.19.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
