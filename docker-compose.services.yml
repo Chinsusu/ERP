@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for all services
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: erp_user
+      POSTGRES_PASSWORD: erp_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # MinIO for File Service
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # NATS for messaging
+  nats:
+    image: nats:2.10-alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    environment:
+      PORT: "8090"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: erp_user
+      DB_PASSWORD: erp_password
+      DB_NAME: erp_notification
+      NATS_URL: nats://nats:4222
+      SMTP_HOST: mailhog
+      SMTP_PORT: "1025"
+    ports:
+      - "8090:8090"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+
+  # Reporting Service
+  reporting-service:
+    build:
+      context: ./services/reporting-service
+      dockerfile: Dockerfile
+    environment:
+      PORT: "8092"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: erp_user
+      DB_PASSWORD: erp_password
+      DB_NAME: erp_reporting
+    ports:
+      - "8092:8092"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # File Service
+  file-service:
+    build:
+      context: ./services/file-service
+      dockerfile: Dockerfile
+    environment:
+      PORT: "8091"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: erp_user
+      DB_PASSWORD: erp_password
+      DB_NAME: erp_file
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY_ID: minioadmin
+      MINIO_SECRET_ACCESS_KEY: minioadmin
+      MINIO_USE_SSL: "false"
+    ports:
+      - "8091:8091"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  # MailHog for email testing
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  postgres_data:
+  minio_data:

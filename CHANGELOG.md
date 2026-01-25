@@ -7,6 +7,137 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - File Service (Phase 6.3) - 2026-01-25
+
+**Complete File Service Implementation (~20 files, ~1,200 LOC)**
+
+**Database Layer (6 migrations)**
+- `files` - File metadata and storage references
+- `file_categories` - Category definitions with validation rules
+- Seed: 10 file categories (DOCUMENT, IMAGE, CERTIFICATE, etc.)
+
+**Domain Layer**
+- `File` - File entity with metadata and helper methods
+- `FileCategory` - Category with validation (extensions, size limits)
+
+**Infrastructure Layer**
+- `MinIOClient` - S3-compatible storage (upload, download, presigned URLs)
+- PostgreSQL repositories for files and categories
+
+**API Endpoints (8 total)**
+- `POST /upload` - Single file upload
+- `POST /upload/multiple` - Multiple file upload
+- `GET /:id/download` - Download file
+- `GET /:id/url` - Get presigned URL
+- `GET /entity/:type/:id` - Files by entity
+- `GET /categories` - List categories
+
+**Port**: 8091 (HTTP)
+
+---
+
+### Added - Reporting Service (Phase 6.2) - 2026-01-25
+
+**Complete Reporting Service Implementation (~35 files, ~2,000 LOC)**
+
+**Database Layer (10 migrations)**
+- `report_definitions` - Report templates with SQL queries and parameters
+- `report_executions` - Execution tracking with status and results
+- `dashboards` - User dashboards with layout configuration
+- `widgets` - Dashboard widgets (KPI, Charts, Tables)
+- Seed: 10 default reports, 1 main dashboard with 8 widgets
+
+**Domain Layer (4 entities + 4 repository interfaces)**
+- `ReportDefinition` - Report templates with columns
+- `ReportExecution` - Execution tracking
+- `Dashboard` - Dashboard configuration
+- `Widget` - Widget configuration
+
+**Infrastructure Layer**
+- `csv_exporter.go` - CSV export
+- `excel_exporter.go` - Excel (XLSX) export with formatting
+- `stats_aggregator.go` - KPI aggregation from services
+
+**Use Cases (3)**
+- `DashboardUseCase` - Dashboard + widget CRUD
+- `ReportUseCase` - Execute and export reports
+- `StatsUseCase` - Real-time KPIs
+
+**API Endpoints (20 total)**
+- Dashboards: CRUD + widgets management
+- Reports: List, execute, download
+- Stats: Inventory/Sales/Production/Procurement KPIs
+
+**Pre-built Reports**: STOCK_SUMMARY, EXPIRY_REPORT, STOCK_MOVEMENT, LOW_STOCK_ITEMS, PO_SUMMARY, SUPPLIER_PERFORMANCE, PRODUCTION_OUTPUT, QC_SUMMARY, SALES_SUMMARY, TOP_PRODUCTS
+
+**Port**: 8092 (HTTP)
+
+---
+
+### Added - Notification Service (Phase 6.1) - 2026-01-25
+
+**Complete Notification Service Implementation (~40 files, ~2,500 LOC)**
+
+**Database Layer (12 migrations)**
+- `notification_templates` - Email/in-app notification templates with variables
+- `notifications` - Outbound notification queue (email, SMS, push)
+- `user_notifications` - In-app notifications with read/dismiss tracking
+- `alert_rules` - Configurable automated alert rules
+- `email_logs` - Email delivery tracking
+- Seed data: 9 default templates, 6 default alert rules
+
+**Domain Layer (5 entities + 4 repository interfaces)**
+- `Notification` - With status tracking and retry logic
+- `NotificationTemplate` - With template rendering
+- `UserNotification` - In-app notifications
+- `AlertRule` - Configurable alerts
+- `EmailLog` - Email tracking
+
+**Infrastructure Layer**
+- `smtp_sender.go` - SMTP email sender with TLS support + mock sender
+- `publisher.go` - NATS event publisher
+- `subscriber.go` - Event subscriptions from 9 service events
+
+**Use Case Layer (4 use cases)**
+- `SendNotification` - Send email/in-app/both with template rendering
+- `TemplateUseCase` - Template CRUD
+- `UserNotificationUseCase` - In-app notification management
+- `AlertRuleUseCase` - Alert rule management
+
+**HTTP Handlers (4 handlers + router)**
+- `NotificationHandler` - Send, template CRUD
+- `UserNotificationHandler` - List, read, delete
+- `AlertRuleHandler` - CRUD + activate/deactivate
+- `HealthHandler` - Health/ready checks
+
+**API Endpoints (17 total)**
+- `POST /api/v1/notifications/send`
+- Templates: GET/POST/PUT/DELETE `/api/v1/notifications/templates`
+- In-App: GET/POST/PATCH/DELETE `/api/v1/notifications/in-app`
+- Alert Rules: GET/POST/PUT/DELETE `/api/v1/alert-rules`
+
+**Event Subscriptions**
+- `wms.stock.low_stock_alert` → Low stock notification
+- `wms.lot.expiring_soon` → Lot expiry notification
+- `supplier.certification.expiring` → Certificate expiry notification
+- `procurement.pr.submitted` → PR approval notification
+- `procurement.po.created` → PO notification
+- `manufacturing.qc.failed` → QC failed notification
+- `sales.order.confirmed` → Order confirmation
+
+**Default Alert Rules**
+- Stock below reorder point
+- Lot expiring in 30/7 days
+- Certificate expiring in 90/30 days
+- Approval pending > 24 hours
+
+**Configuration**
+- Port: 8090 (HTTP)
+- SMTP configuration via environment variables
+- Background email processor with retry logic
+
+---
+
 ### Added - Frontend Business Modules (Phase 5.2) - 2026-01-25
 
 **Business Module Pages (~15 files, ~2,500 LOC)**
