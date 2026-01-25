@@ -1,0 +1,204 @@
+openapi: 3.0.3
+info:
+  title: ERP Cosmetics API
+  description: |
+    API documentation cho hệ thống ERP mỹ phẩm.
+    
+    ## Authentication
+    Sử dụng JWT Bearer token được cấp từ endpoint `/auth/login`.
+    
+    ## Rate Limiting
+    - Người dùng có xác thực: 1000 req/min
+    - Khách (không xác thực): 100 req/min
+    
+    ## Error Codes
+    - 400: Bad Request (Dữ liệu đầu vào không hợp lệ)
+    - 401: Unauthorized (Chưa đăng nhập hoặc token hết hạn)
+    - 403: Forbidden (Không có quyền truy cập)
+    - 404: Not Found (Không tìm thấy tài nguyên)
+    - 429: Rate Limited (Vượt quá giới hạn yêu cầu)
+    - 500: Internal Server Error (Lỗi hệ thống)
+    
+  version: 1.0.0
+  contact:
+    email: dev@company.vn
+    
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development Server
+  - url: https://erp.company.vn/api/v1
+    description: Production Server
+
+tags:
+  - name: Auth
+    description: Xác thực và phân quyền
+  - name: WMS
+    description: Quản lý Kho (Nhập, Xuất, Tồn)
+  - name: Manufacturing
+    description: Quản lý Sản xuất & BOM
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Đăng nhập hệ thống
+      description: Xác thực người dùng bằng email và mật khẩu để nhận Access Token & Refresh Token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@company.vn
+                password:
+                  type: string
+                  format: password
+                  example: Admin@123
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Sai email hoặc mật khẩu
+        '423':
+          description: Tài khoản tạm thời bị khóa do nhập sai nhiều lần
+
+  /stock:
+    get:
+      tags: [WMS]
+      summary: Lấy danh sách tồn kho
+      description: |
+        Truy vấn thông tin tồn kho tại các vị trí/kho khác nhau.
+        Quyền yêu cầu: `wms:stock:read`
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: warehouse_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: material_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockListResponse'
+
+  /goods-issue:
+    post:
+      tags: [WMS]
+      summary: Xuất kho (Nguyên tắc FEFO)
+      description: |
+        Hệ thống tự động chọn các lô (lot) có hạn sử dụng gần nhất để xuất kho.
+        Quyền yêu cầu: `wms:issue:create`
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoodsIssueRequest'
+      responses:
+        '200':
+          description: Xuất kho thành công
+        '400':
+          description: Tồn kho không đủ để xuất
+
+  /boms/{id}:
+    get:
+      tags: [Manufacturing]
+      summary: Xem chi tiết BOM (Định mức)
+      description: |
+        Lấy thông tin định mức nguyên liệu của sản phẩm.
+        Hệ thống tự động ẩn/mở thông tin công thức dựa trên quyền của người dùng:
+        - `read`: Tên nguyên liệu
+        - `quantity_view`: Số lượng
+        - `formula_view`: Thông tin công thức chi tiết
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+            refresh_token:
+              type: string
+            expires_in:
+              type: integer
+              example: 900
+    
+    StockListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockItem'
+    
+    StockItem:
+      type: object
+      properties:
+        material_name:
+          type: string
+        lot_number:
+          type: string
+        available_quantity:
+          type: number
+        expiry_date:
+          type: string
+          format: date
+    
+    GoodsIssueRequest:
+      type: object
+      properties:
+        material_id:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+        reference_id:
+          type: string
+          format: uuid

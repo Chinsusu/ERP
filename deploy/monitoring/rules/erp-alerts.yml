@@ -1,0 +1,37 @@
+groups:
+  - name: erp-critical
+    rules:
+      # Service down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.job }} has been down for more than 1 minute"
+
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) 
+          / 
+          sum(rate(http_requests_total[5m])) by (service) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Error rate is {{ $value | humanizePercentage }}"
+
+  - name: erp-business
+    rules:
+      # Low stock alert
+      - alert: LowStockAlert
+        expr: wms_stock_available_quantity < wms_material_reorder_point
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low stock for {{ $labels.material_code }}"
+          description: "Available: {{ $value }}, Reorder point: {{ $labels.reorder_point }}"
