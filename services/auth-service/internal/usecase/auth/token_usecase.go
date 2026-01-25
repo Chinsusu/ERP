@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type RefreshTokenUseCase struct {
+type TokenUseCase struct {
 	userRepo       repository.UserRepository
 	roleRepo       repository.RoleRepository
 	permRepo       repository.PermissionRepository
@@ -32,15 +32,15 @@ type RefreshTokenResponse struct {
 	ExpiresIn    int64
 }
 
-func NewRefreshTokenUseCase(
+func NewTokenUseCase(
 	userRepo repository.UserRepository,
 	roleRepo repository.RoleRepository,
 	permRepo repository.PermissionRepository,
 	tokenRepo repository.TokenRepository,
 	cacheRepo repository.CacheRepository,
 	jwtManager *jwt.Manager,
-) *RefreshTokenUseCase {
-	return &RefreshTokenUseCase{
+) *TokenUseCase {
+	return &TokenUseCase{
 		userRepo:   userRepo,
 		roleRepo:   roleRepo,
 		permRepo:   permRepo,
@@ -50,7 +50,7 @@ func NewRefreshTokenUseCase(
 	}
 }
 
-func (uc *RefreshTokenUseCase) Execute(ctx context.Context, req *RefreshTokenRequest) (*RefreshTokenResponse, error) {
+func (uc *TokenUseCase) Execute(ctx context.Context, req *RefreshTokenRequest) (*RefreshTokenResponse, error) {
 	// Verify refresh token JWT
 	claims, err := uc.jwtManager.VerifyToken(req.RefreshToken)
 	if err != nil {

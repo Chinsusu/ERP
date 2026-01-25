@@ -8,7 +8,7 @@ import (
 
 	"github.com/erp-cosmetics/auth-service/internal/domain/entity"
 	"github.com/erp-cosmetics/auth-service/internal/usecase/auth"
-	"github.com/erp-cosmetics/auth-service/internal/usecase/auth/mocks"
+	repoMocks "github.com/erp-cosmetics/auth-service/internal/domain/repository/mocks"
 	"github.com/erp-cosmetics/shared/pkg/jwt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -76,19 +76,19 @@ func createTestPermissions() []entity.Permission {
 }
 
 func setupLoginUseCaseMocks() (
-	*mocks.MockUserRepository,
-	*mocks.MockRoleRepository,
-	*mocks.MockPermissionRepository,
-	*mocks.MockTokenRepository,
-	*mocks.MockCacheRepository,
-	*mocks.MockEventPublisher,
+	*repoMocks.MockUserRepository,
+	*repoMocks.MockRoleRepository,
+	*repoMocks.MockPermissionRepository,
+	*repoMocks.MockTokenRepository,
+	*repoMocks.MockCacheRepository,
+	*repoMocks.MockEventPublisher,
 ) {
-	return &mocks.MockUserRepository{},
-		&mocks.MockRoleRepository{},
-		&mocks.MockPermissionRepository{},
-		&mocks.MockTokenRepository{},
-		&mocks.MockCacheRepository{},
-		&mocks.MockEventPublisher{}
+	return &repoMocks.MockUserRepository{},
+		&repoMocks.MockRoleRepository{},
+		&repoMocks.MockPermissionRepository{},
+		&repoMocks.MockTokenRepository{},
+		&repoMocks.MockCacheRepository{},
+		&repoMocks.MockEventPublisher{}
 }
 
 // TestLoginUseCase_Execute_Success tests successful login

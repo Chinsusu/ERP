@@ -8,25 +8,25 @@ import (
 
 	"github.com/erp-cosmetics/auth-service/internal/domain/entity"
 	"github.com/erp-cosmetics/auth-service/internal/usecase/auth"
-	"github.com/erp-cosmetics/auth-service/internal/usecase/auth/mocks"
+	repoMocks "github.com/erp-cosmetics/auth-service/internal/domain/repository/mocks"
 	"github.com/erp-cosmetics/shared/pkg/jwt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-func setupRefreshTokenUseCaseMocks() (
-	*mocks.MockUserRepository,
-	*mocks.MockRoleRepository,
-	*mocks.MockPermissionRepository,
-	*mocks.MockTokenRepository,
-	*mocks.MockCacheRepository,
+func setupTokenUseCaseMocks() (
+	*repoMocks.MockUserRepository,
+	*repoMocks.MockRoleRepository,
+	*repoMocks.MockPermissionRepository,
+	*repoMocks.MockTokenRepository,
+	*repoMocks.MockCacheRepository,
 ) {
-	return &mocks.MockUserRepository{},
-		&mocks.MockRoleRepository{},
-		&mocks.MockPermissionRepository{},
-		&mocks.MockTokenRepository{},
-		&mocks.MockCacheRepository{}
+	return &repoMocks.MockUserRepository{},
+		&repoMocks.MockRoleRepository{},
+		&repoMocks.MockPermissionRepository{},
+		&repoMocks.MockTokenRepository{},
+		&repoMocks.MockCacheRepository{}
 }
 
 func createValidRefreshToken(userID uuid.UUID) *entity.RefreshToken {
@@ -61,8 +61,8 @@ func createRevokedRefreshToken(userID uuid.UUID) *entity.RefreshToken {
 	}
 }
 
-// TestRefreshTokenUseCase_Execute_Success tests successful token refresh
-func TestRefreshTokenUseCase_Execute_Success(t *testing.T) {
+// TestTokenUseCase_Execute_Success tests successful token refresh
+func TestTokenUseCase_Execute_Success(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
 	password := "Admin@123"
@@ -76,7 +76,7 @@ func TestRefreshTokenUseCase_Execute_Success(t *testing.T) {
 	validRefreshTokenStr, _ := jwtManager.GenerateRefreshToken(user.UserID.String(), user.Email)
 	storedToken := createValidRefreshToken(user.UserID)
 
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	tokenRepo.On("GetRefreshToken", ctx, mock.AnythingOfType("string")).Return(storedToken, nil)
 	tokenRepo.On("RevokeRefreshToken", ctx, mock.AnythingOfType("string"), user.UserID).Return(nil)
@@ -87,7 +87,7 @@ func TestRefreshTokenUseCase_Execute_Success(t *testing.T) {
 	permRepo.On("GetUserPermissions", ctx, user.UserID).Return(permissions, nil)
 	cacheRepo.On("SetUserPermissions", ctx, user.UserID, permissions, mock.AnythingOfType("time.Duration")).Return(nil)
 
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{
 		RefreshToken: validRefreshTokenStr,
@@ -112,15 +112,15 @@ func TestRefreshTokenUseCase_Execute_Success(t *testing.T) {
 	roleRepo.AssertExpectations(t)
 }
 
-// TestRefreshTokenUseCase_Execute_InvalidToken tests refresh with invalid JWT
-func TestRefreshTokenUseCase_Execute_InvalidToken(t *testing.T) {
+// TestTokenUseCase_Execute_InvalidToken tests refresh with invalid JWT
+func TestTokenUseCase_Execute_InvalidToken(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	jwtManager := jwt.NewManager("test-secret-key-32-characters-long", 15*time.Minute, 7*24*time.Hour)
 
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{
 		RefreshToken: "invalid.jwt.token",
@@ -137,11 +137,11 @@ func TestRefreshTokenUseCase_Execute_InvalidToken(t *testing.T) {
 	assert.Contains(t, err.Error(), "Invalid or expired refresh token")
 }
 
-// TestRefreshTokenUseCase_Execute_ExpiredToken tests refresh with expired JWT
-func TestRefreshTokenUseCase_Execute_ExpiredToken(t *testing.T) {
+// TestTokenUseCase_Execute_ExpiredToken tests refresh with expired JWT
+func TestTokenUseCase_Execute_ExpiredToken(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	// Create a JWT manager with very short expiration
 	jwtManager := jwt.NewManager("test-secret-key-32-characters-long", 1*time.Millisecond, 1*time.Millisecond)
@@ -151,7 +151,7 @@ func TestRefreshTokenUseCase_Execute_ExpiredToken(t *testing.T) {
 	expiredToken, _ := jwtManager.GenerateRefreshToken(user.UserID.String(), user.Email)
 	time.Sleep(10 * time.Millisecond) // Wait for token to expire
 
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{
 		RefreshToken: expiredToken,
@@ -168,11 +168,11 @@ func TestRefreshTokenUseCase_Execute_ExpiredToken(t *testing.T) {
 	assert.Contains(t, err.Error(), "Invalid or expired refresh token")
 }
 
-// TestRefreshTokenUseCase_Execute_TokenNotInDB tests refresh with token not found in database
-func TestRefreshTokenUseCase_Execute_TokenNotInDB(t *testing.T) {
+// TestTokenUseCase_Execute_TokenNotInDB tests refresh with token not found in database
+func TestTokenUseCase_Execute_TokenNotInDB(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	jwtManager := jwt.NewManager("test-secret-key-32-characters-long", 15*time.Minute, 7*24*time.Hour)
 
@@ -181,7 +181,7 @@ func TestRefreshTokenUseCase_Execute_TokenNotInDB(t *testing.T) {
 
 	tokenRepo.On("GetRefreshToken", ctx, mock.AnythingOfType("string")).Return(nil, errors.New("token not found"))
 
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{
 		RefreshToken: validToken,
@@ -200,11 +200,11 @@ func TestRefreshTokenUseCase_Execute_TokenNotInDB(t *testing.T) {
 	tokenRepo.AssertExpectations(t)
 }
 
-// TestRefreshTokenUseCase_Execute_RevokedToken tests refresh with revoked token
-func TestRefreshTokenUseCase_Execute_RevokedToken(t *testing.T) {
+// TestTokenUseCase_Execute_RevokedToken tests refresh with revoked token
+func TestTokenUseCase_Execute_RevokedToken(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	jwtManager := jwt.NewManager("test-secret-key-32-characters-long", 15*time.Minute, 7*24*time.Hour)
 
@@ -214,7 +214,7 @@ func TestRefreshTokenUseCase_Execute_RevokedToken(t *testing.T) {
 
 	tokenRepo.On("GetRefreshToken", ctx, mock.AnythingOfType("string")).Return(revokedToken, nil)
 
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{
 		RefreshToken: validToken,
@@ -233,14 +233,14 @@ func TestRefreshTokenUseCase_Execute_RevokedToken(t *testing.T) {
 	tokenRepo.AssertExpectations(t)
 }
 
-// TestRefreshTokenUseCase_Execute_UserInactive tests refresh when user is inactive
-func TestRefreshTokenUseCase_Execute_UserInactive(t *testing.T) {
+// TestTokenUseCase_Execute_UserInactive tests refresh when user is inactive
+func TestTokenUseCase_Execute_UserInactive(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
 	inactiveUser := createInactiveUser("password")
 	storedToken := createValidRefreshToken(inactiveUser.UserID)
 
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	jwtManager := jwt.NewManager("test-secret-key-32-characters-long", 15*time.Minute, 7*24*time.Hour)
 	validToken, _ := jwtManager.GenerateRefreshToken(inactiveUser.UserID.String(), inactiveUser.Email)
@@ -248,7 +248,7 @@ func TestRefreshTokenUseCase_Execute_UserInactive(t *testing.T) {
 	tokenRepo.On("GetRefreshToken", ctx, mock.AnythingOfType("string")).Return(storedToken, nil)
 	userRepo.On("GetByUserID", ctx, inactiveUser.UserID).Return(inactiveUser, nil)
 
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{
 		RefreshToken: validToken,
@@ -268,14 +268,14 @@ func TestRefreshTokenUseCase_Execute_UserInactive(t *testing.T) {
 	userRepo.AssertExpectations(t)
 }
 
-// TestRefreshTokenUseCase_Execute_UserNotFound tests refresh when user is not found
-func TestRefreshTokenUseCase_Execute_UserNotFound(t *testing.T) {
+// TestTokenUseCase_Execute_UserNotFound tests refresh when user is not found
+func TestTokenUseCase_Execute_UserNotFound(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
 	userID := uuid.New()
 	storedToken := createValidRefreshToken(userID)
 
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	jwtManager := jwt.NewManager("test-secret-key-32-characters-long", 15*time.Minute, 7*24*time.Hour)
 	validToken, _ := jwtManager.GenerateRefreshToken(userID.String(), "deleted@company.vn")
@@ -283,7 +283,7 @@ func TestRefreshTokenUseCase_Execute_UserNotFound(t *testing.T) {
 	tokenRepo.On("GetRefreshToken", ctx, mock.AnythingOfType("string")).Return(storedToken, nil)
 	userRepo.On("GetByUserID", ctx, userID).Return(nil, errors.New("user not found"))
 
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{
 		RefreshToken: validToken,
@@ -304,16 +304,16 @@ func TestRefreshTokenUseCase_Execute_UserNotFound(t *testing.T) {
 }
 
 // Table-driven tests for refresh token scenarios
-func TestRefreshTokenUseCase_Execute_Scenarios(t *testing.T) {
+func TestTokenUseCase_Execute_Scenarios(t *testing.T) {
 	tests := []struct {
 		name        string
-		setupMocks  func(*mocks.MockTokenRepository, *mocks.MockUserRepository, *entity.User)
+		setupMocks  func(*repoMocks.MockTokenRepository, *repoMocks.MockUserRepository, *entity.User)
 		wantErr     bool
 		errContains string
 	}{
 		{
 			name: "database error fetching token",
-			setupMocks: func(tokenRepo *mocks.MockTokenRepository, userRepo *mocks.MockUserRepository, user *entity.User) {
+			setupMocks: func(tokenRepo *repoMocks.MockTokenRepository, userRepo *repoMocks.MockUserRepository, user *entity.User) {
 				tokenRepo.On("GetRefreshToken", mock.Anything, mock.AnythingOfType("string")).Return(nil, errors.New("database error"))
 			},
 			wantErr:     true,
@@ -326,13 +326,13 @@ func TestRefreshTokenUseCase_Execute_Scenarios(t *testing.T) {
 			ctx := context.Background()
 			user := createTestUser("password")
 
-			userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+			userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 			tt.setupMocks(tokenRepo, userRepo, user)
 
 			jwtManager := jwt.NewManager("test-secret-key-32-characters-long", 15*time.Minute, 7*24*time.Hour)
 			validToken, _ := jwtManager.GenerateRefreshToken(user.UserID.String(), user.Email)
 
-			uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+			uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 			req := &auth.RefreshTokenRequest{
 				RefreshToken: validToken,
@@ -355,14 +355,14 @@ func TestRefreshTokenUseCase_Execute_Scenarios(t *testing.T) {
 		})
 	}
 }
-// TestRefreshTokenUseCase_Execute_RolesFetchError tests error handling when fetching roles fails
-func TestRefreshTokenUseCase_Execute_RolesFetchError(t *testing.T) {
+// TestTokenUseCase_Execute_RolesFetchError tests error handling when fetching roles fails
+func TestTokenUseCase_Execute_RolesFetchError(t *testing.T) {
 	ctx := context.Background()
 	user := createTestUser("Admin@123")
 	refreshToken := createValidRefreshToken(user.UserID)
 	refreshTokenStr, _ := jwt.NewManager("test-secret", time.Minute, time.Hour).GenerateRefreshToken(user.UserID.String(), user.Email)
 
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	tokenRepo.On("GetRefreshToken", ctx, mock.Anything).Return(refreshToken, nil)
 	userRepo.On("GetByUserID", ctx, user.UserID).Return(user, nil)
@@ -370,7 +370,7 @@ func TestRefreshTokenUseCase_Execute_RolesFetchError(t *testing.T) {
 	roleRepo.On("GetUserRoles", ctx, user.UserID).Return(nil, errors.New("roles fetch error"))
 
 	jwtManager := jwt.NewManager("test-secret", time.Minute, time.Hour)
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{RefreshToken: refreshTokenStr}
 	resp, err := uc.Execute(ctx, req)
@@ -380,14 +380,14 @@ func TestRefreshTokenUseCase_Execute_RolesFetchError(t *testing.T) {
 	assert.Contains(t, err.Error(), "roles fetch error")
 }
 
-// TestRefreshTokenUseCase_Execute_TokenCreateError tests error handling when creating new refresh token fails
-func TestRefreshTokenUseCase_Execute_TokenCreateError(t *testing.T) {
+// TestTokenUseCase_Execute_TokenCreateError tests error handling when creating new refresh token fails
+func TestTokenUseCase_Execute_TokenCreateError(t *testing.T) {
 	ctx := context.Background()
 	user := createTestUser("Admin@123")
 	refreshToken := createValidRefreshToken(user.UserID)
 	refreshTokenStr, _ := jwt.NewManager("test-secret", time.Minute, time.Hour).GenerateRefreshToken(user.UserID.String(), user.Email)
 
-	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupRefreshTokenUseCaseMocks()
+	userRepo, roleRepo, permRepo, tokenRepo, cacheRepo := setupTokenUseCaseMocks()
 
 	tokenRepo.On("GetRefreshToken", ctx, mock.Anything).Return(refreshToken, nil)
 	userRepo.On("GetByUserID", ctx, user.UserID).Return(user, nil)
@@ -396,7 +396,7 @@ func TestRefreshTokenUseCase_Execute_TokenCreateError(t *testing.T) {
 	tokenRepo.On("CreateRefreshToken", ctx, mock.Anything).Return(errors.New("token creation error"))
 
 	jwtManager := jwt.NewManager("test-secret", time.Minute, time.Hour)
-	uc := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	uc := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 
 	req := &auth.RefreshTokenRequest{RefreshToken: refreshTokenStr}
 	resp, err := uc.Execute(ctx, req)

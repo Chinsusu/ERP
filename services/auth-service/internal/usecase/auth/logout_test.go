@@ -12,27 +12,27 @@ import (
 
 	"github.com/erp-cosmetics/auth-service/internal/domain/entity"
 	"github.com/erp-cosmetics/auth-service/internal/usecase/auth"
-	"github.com/erp-cosmetics/auth-service/internal/usecase/auth/mocks"
+	repoMocks "github.com/erp-cosmetics/auth-service/internal/domain/repository/mocks"
 	"github.com/erp-cosmetics/shared/pkg/jwt"
 )
 
 type LogoutUseCaseTestSuite struct {
 	suite.Suite
 	ctx            context.Context
-	userRepo       *mocks.MockUserRepository
-	tokenRepo      *mocks.MockTokenRepository
-	cacheRepo      *mocks.MockCacheRepository
-	eventPublisher *mocks.MockEventPublisher
+	userRepo       *repoMocks.MockUserRepository
+	tokenRepo      *repoMocks.MockTokenRepository
+	cacheRepo      *repoMocks.MockCacheRepository
+	eventPublisher *repoMocks.MockEventPublisher
 	jwtManager     *jwt.Manager
 	useCase        *auth.LogoutUseCase
 }
 
 func (s *LogoutUseCaseTestSuite) SetupTest() {
 	s.ctx = context.Background()
-	s.userRepo = new(mocks.MockUserRepository)
-	s.tokenRepo = new(mocks.MockTokenRepository)
-	s.cacheRepo = new(mocks.MockCacheRepository)
-	s.eventPublisher = new(mocks.MockEventPublisher)
+	s.userRepo = new(repoMocks.MockUserRepository)
+	s.tokenRepo = new(repoMocks.MockTokenRepository)
+	s.cacheRepo = new(repoMocks.MockCacheRepository)
+	s.eventPublisher = new(repoMocks.MockEventPublisher)
 	s.jwtManager = jwt.NewManager("test-secret", time.Minute*15, time.Hour*24)
 	s.useCase = auth.NewLogoutUseCase(
 		s.userRepo,

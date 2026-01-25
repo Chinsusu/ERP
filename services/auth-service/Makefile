@@ -21,6 +21,16 @@ test:
 	@echo "Running tests..."
 	go test -v ./...
 
+## test-auth: Run auth service tests
+test-auth:
+	@echo "Running auth service tests..."
+	go test -v ./internal/usecase/auth/...
+
+## test-user: Run user related tests in auth service
+test-user:
+	@echo "Running user related tests in auth service..."
+	go test -v ./internal/domain/user/...
+
 ## test-coverage: Run tests with coverage
 test-coverage:
 	@echo "Running tests with coverage..."
