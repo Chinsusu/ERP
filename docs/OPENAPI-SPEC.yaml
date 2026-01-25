@@ -2,22 +2,22 @@ openapi: 3.0.3
 info:
   title: ERP Cosmetics API
   description: |
-    API documentation cho hệ thống ERP mỹ phẩm.
+    Complete API documentation for ERP Cosmetics system.
     
     ## Authentication
-    Sử dụng JWT Bearer token được cấp từ endpoint `/auth/login`.
+    All endpoints (except /auth/login) require JWT Bearer token.
     
     ## Rate Limiting
-    - Người dùng có xác thực: 1000 req/min
-    - Khách (không xác thực): 100 req/min
+    - Authenticated: 1000 req/min
+    - Unauthenticated: 100 req/min
     
-    ## Error Codes
-    - 400: Bad Request (Dữ liệu đầu vào không hợp lệ)
-    - 401: Unauthorized (Chưa đăng nhập hoặc token hết hạn)
-    - 403: Forbidden (Không có quyền truy cập)
-    - 404: Not Found (Không tìm thấy tài nguyên)
-    - 429: Rate Limited (Vượt quá giới hạn yêu cầu)
-    - 500: Internal Server Error (Lỗi hệ thống)
+    ## Common Error Codes
+    - 400: Bad Request (invalid input)
+    - 401: Unauthorized (missing/expired token)
+    - 403: Forbidden (insufficient permissions)
+    - 404: Not Found
+    - 429: Rate Limited
+    - 500: Internal Server Error
     
   version: 1.0.0
   contact:
@@ -25,24 +25,39 @@ info:
     
 servers:
   - url: http://localhost:8080/api/v1
-    description: Development Server
+    description: Development
   - url: https://erp.company.vn/api/v1
-    description: Production Server
+    description: Production
 
 tags:
   - name: Auth
-    description: Xác thực và phân quyền
+    description: Authentication & Authorization
+  - name: Users
+    description: User Management
+  - name: Materials
+    description: Material Master Data
+  - name: Suppliers
+    description: Supplier Management
+  - name: Procurement
+    description: Purchase Requisitions & Orders
   - name: WMS
-    description: Quản lý Kho (Nhập, Xuất, Tồn)
+    description: Warehouse Management (FEFO)
   - name: Manufacturing
-    description: Quản lý Sản xuất & BOM
+    description: BOM, Work Orders, QC
+  - name: Sales
+    description: Customers & Orders
+  - name: Reports
+    description: Dashboards & Reports
 
 paths:
+  # ==================
+  # AUTH
+  # ==================
   /auth/login:
     post:
       tags: [Auth]
-      summary: Đăng nhập hệ thống
-      description: Xác thực người dùng bằng email và mật khẩu để nhận Access Token & Refresh Token.
+      summary: User Login
+      description: Authenticate user and return JWT tokens
       requestBody:
         required: true
         content:
@@ -58,26 +73,250 @@ paths:
                 password:
                   type: string
                   format: password
-                  example: Admin@123
       responses:
         '200':
-          description: Đăng nhập thành công
+          description: Login successful
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
-          description: Sai email hoặc mật khẩu
+          description: Invalid credentials
         '423':
-          description: Tài khoản tạm thời bị khóa do nhập sai nhiều lần
+          description: Account locked (5 failed attempts)
 
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh Access Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: New tokens issued
+        '401':
+          description: Invalid/expired refresh token
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get Current User
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user info with permissions
+
+  # ==================
+  # USERS
+  # ==================
+  /users:
+    get:
+      tags: [Users]
+      summary: List Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: department_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Paginated user list
+
+    post:
+      tags: [Users]
+      summary: Create User
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+
+  # ==================
+  # MATERIALS
+  # ==================
+  /materials:
+    get:
+      tags: [Materials]
+      summary: List Materials
+      description: |
+        Query materials with filters.
+        Permission: `masterdata:material:read`
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category_id
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: Search by name, code, INCI, CAS
+          schema:
+            type: string
+        - name: is_allergen
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Material list
+
+    post:
+      tags: [Materials]
+      summary: Create Material
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaterialRequest'
+      responses:
+        '201':
+          description: Material created
+
+  # ==================
+  # SUPPLIERS
+  # ==================
+  /suppliers:
+    get:
+      tags: [Suppliers]
+      summary: List Suppliers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, APPROVED, BLOCKED]
+        - name: has_valid_gmp
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Supplier list
+
+  /suppliers/{id}/certifications:
+    get:
+      tags: [Suppliers]
+      summary: Get Supplier Certifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Certifications (GMP, ISO, Organic, etc.)
+
+  /certifications/expiring:
+    get:
+      tags: [Suppliers]
+      summary: Get Expiring Certifications
+      description: Certificates expiring within specified days
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 90
+      responses:
+        '200':
+          description: Expiring certifications
+
+  # ==================
+  # PROCUREMENT
+  # ==================
+  /purchase-requisitions:
+    get:
+      tags: [Procurement]
+      summary: List Purchase Requisitions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: PR list
+
+    post:
+      tags: [Procurement]
+      summary: Create Purchase Requisition
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: PR created
+
+  /purchase-requisitions/{id}/submit:
+    post:
+      tags: [Procurement]
+      summary: Submit PR for Approval
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PR submitted
+
+  /purchase-orders:
+    get:
+      tags: [Procurement]
+      summary: List Purchase Orders
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: PO list
+
+  # ==================
+  # WMS
+  # ==================
   /stock:
     get:
       tags: [WMS]
-      summary: Lấy danh sách tồn kho
+      summary: Get Stock List
       description: |
-        Truy vấn thông tin tồn kho tại các vị trí/kho khác nhau.
-        Quyền yêu cầu: `wms:stock:read`
+        Query stock with filters.
+        Permission: `wms:stock:read`
       security:
         - bearerAuth: []
       parameters:
@@ -91,45 +330,100 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: has_stock
+          in: query
+          schema:
+            type: boolean
       responses:
         '200':
-          description: Success
+          description: Stock list
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockListResponse'
 
-  /goods-issue:
+  /stock/expiring:
+    get:
+      tags: [WMS]
+      summary: Get Expiring Stock
+      description: Lots expiring within specified days (for FEFO planning)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 90
+      responses:
+        '200':
+          description: Expiring lots
+
+  /grn:
     post:
       tags: [WMS]
-      summary: Xuất kho (Nguyên tắc FEFO)
-      description: |
-        Hệ thống tự động chọn các lô (lot) có hạn sử dụng gần nhất để xuất kho.
-        Quyền yêu cầu: `wms:issue:create`
+      summary: Create Goods Receipt Note
+      description: Create GRN from PO
       security:
         - bearerAuth: []
       requestBody:
-        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GRNRequest'
+      responses:
+        '201':
+          description: GRN created
+
+  /goods-issue:
+    post:
+      tags: [WMS]
+      summary: Issue Goods (FEFO)
+      description: |
+        Issue stock using FEFO (First Expired First Out).
+        System automatically selects lots with earliest expiry dates.
+        Permission: `wms:issue:create`
+      security:
+        - bearerAuth: []
+      requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/GoodsIssueRequest'
       responses:
         '200':
-          description: Xuất kho thành công
+          description: Issue successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodsIssueResponse'
         '400':
-          description: Tồn kho không đủ để xuất
+          description: Insufficient stock
+
+  # ==================
+  # MANUFACTURING
+  # ==================
+  /boms:
+    get:
+      tags: [Manufacturing]
+      summary: List BOMs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: BOM list
 
   /boms/{id}:
     get:
       tags: [Manufacturing]
-      summary: Xem chi tiết BOM (Định mức)
+      summary: Get BOM Details
       description: |
-        Lấy thông tin định mức nguyên liệu của sản phẩm.
-        Hệ thống tự động ẩn/mở thông tin công thức dựa trên quyền của người dùng:
-        - `read`: Tên nguyên liệu
-        - `quantity_view`: Số lượng
-        - `formula_view`: Thông tin công thức chi tiết
+        Get BOM with permission-based content filtering:
+        - `manufacturing:bom:read` → Material names only
+        - `manufacturing:bom:quantity_view` → With quantities
+        - `manufacturing:bom:formula_view` → Full formula (encrypted content)
+        
+        **All access is audit logged.**
       security:
         - bearerAuth: []
       parameters:
@@ -141,7 +435,137 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success
+          description: BOM details (filtered by permission)
+
+  /work-orders:
+    get:
+      tags: [Manufacturing]
+      summary: List Work Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PLANNED, RELEASED, IN_PROGRESS, QC_PENDING, COMPLETED, CANCELLED]
+      responses:
+        '200':
+          description: Work order list
+
+    post:
+      tags: [Manufacturing]
+      summary: Create Work Order
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Work order created
+
+  /work-orders/{id}/start:
+    patch:
+      tags: [Manufacturing]
+      summary: Start Work Order
+      description: Start production. Materials are reserved (FEFO).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Work order started
+
+  /traceability/backward/{lot_id}:
+    get:
+      tags: [Manufacturing]
+      summary: Backward Traceability
+      description: |
+        Trace from finished product lot → source material lots.
+        Used for quality investigation and recalls.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: lot_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Source materials and lots
+
+  /traceability/forward/{lot_id}:
+    get:
+      tags: [Manufacturing]
+      summary: Forward Traceability
+      description: |
+        Trace from material lot → finished product lots.
+        Used for recall impact analysis.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Affected finished products
+
+  # ==================
+  # SALES
+  # ==================
+  /customers:
+    get:
+      tags: [Sales]
+      summary: List Customers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Customer list
+
+  /sales-orders:
+    get:
+      tags: [Sales]
+      summary: List Sales Orders
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Order list
+
+    post:
+      tags: [Sales]
+      summary: Create Sales Order
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Order created (stock reserved)
+
+  # ==================
+  # REPORTS
+  # ==================
+  /dashboards:
+    get:
+      tags: [Reports]
+      summary: Get Dashboard Data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard KPIs
+
+  /reports/stock-summary:
+    get:
+      tags: [Reports]
+      summary: Stock Summary Report
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv, xlsx]
+            default: json
+      responses:
+        '200':
+          description: Stock summary
 
 components:
   securitySchemes:
@@ -167,38 +591,153 @@ components:
             expires_in:
               type: integer
               example: 900
-    
+
+    CreateUserRequest:
+      type: object
+      required: [email, first_name, last_name]
+      properties:
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        department_id:
+          type: string
+          format: uuid
+        role_ids:
+          type: array
+          items:
+            type: string
+
+    MaterialRequest:
+      type: object
+      required: [name, category_id, base_uom_id]
+      properties:
+        name:
+          type: string
+        inci_name:
+          type: string
+          description: International Nomenclature of Cosmetic Ingredients
+        cas_number:
+          type: string
+          description: Chemical Abstracts Service number
+        category_id:
+          type: string
+        base_uom_id:
+          type: string
+        is_allergen:
+          type: boolean
+        storage_condition:
+          type: string
+          enum: [AMBIENT, COLD, FROZEN]
+
     StockListResponse:
       type: object
       properties:
-        status:
-          type: string
         data:
           type: array
           items:
             $ref: '#/components/schemas/StockItem'
-    
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
     StockItem:
       type: object
       properties:
+        material_id:
+          type: string
         material_name:
           type: string
         lot_number:
           type: string
+        quantity:
+          type: number
+        reserved_quantity:
+          type: number
         available_quantity:
           type: number
         expiry_date:
           type: string
           format: date
-    
-    GoodsIssueRequest:
+        location:
+          type: string
+
+    GRNRequest:
       type: object
+      required: [po_id, items]
       properties:
-        material_id:
+        po_id:
           type: string
           format: uuid
-        quantity:
-          type: number
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              material_id:
+                type: string
+              quantity:
+                type: number
+              supplier_lot:
+                type: string
+              manufacturing_date:
+                type: string
+                format: date
+              expiry_date:
+                type: string
+                format: date
+              location_id:
+                type: string
+
+    GoodsIssueRequest:
+      type: object
+      required: [issue_type, items]
+      properties:
+        issue_type:
+          type: string
+          enum: [PRODUCTION, SALES, SAMPLE, ADJUSTMENT]
         reference_id:
           type: string
           format: uuid
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              material_id:
+                type: string
+              quantity:
+                type: number
+                minimum: 0.0001
+
+    GoodsIssueResponse:
+      type: object
+      properties:
+        movement_number:
+          type: string
+        issued_from_lots:
+          type: array
+          items:
+            type: object
+            properties:
+              lot_number:
+                type: string
+              quantity:
+                type: number
+              expiry_date:
+                type: string
+                format: date
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        total_pages:
+          type: integer
