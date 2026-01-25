@@ -1,0 +1,41 @@
+# Generic Dockerfile for building Go services
+# Usage: docker build -f Dockerfile.service --build-arg SERVICE=auth-service -t erp/auth-service .
+
+ARG SERVICE
+FROM golang:1.24-alpine AS builder
+
+ARG SERVICE
+WORKDIR /build
+
+# Copy shared module
+COPY shared/ ./shared/
+
+# Copy service
+COPY services/${SERVICE}/ ./services/${SERVICE}/
+
+WORKDIR /build/services/${SERVICE}
+
+# Download dependencies
+RUN go mod download
+
+# Build
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/main.go
+
+# Create migrations directory and copy if exists
+RUN mkdir -p /migrations && \
+    (cp -r migrations/* /migrations/ 2>/dev/null || true)
+
+# Final stage
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates wget
+
+WORKDIR /app
+
+# Copy binary
+COPY --from=builder /build/services/*/main ./main
+
+# Copy migrations (may be empty)
+COPY --from=builder /migrations ./migrations/
+
+CMD ["./main"]

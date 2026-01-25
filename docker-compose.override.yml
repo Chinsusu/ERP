@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  api-gateway:
+    image: erp/api-gateway:latest
+  
+  user-service:
+    image: erp/user-service:latest
+  
+  frontend:
+    image: erp/frontend:latest
