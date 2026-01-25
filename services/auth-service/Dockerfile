@@ -1,5 +1,5 @@
 # Multi-stage build for production
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /build
 
@@ -12,6 +12,7 @@ COPY services/auth-service/ ./services/auth-service/
 WORKDIR /build/services/auth-service
 
 # Download dependencies
+ENV GOTOOLCHAIN=auto
 RUN go mod download
 
 # Build the application
@@ -27,8 +28,8 @@ WORKDIR /root/
 # Copy the binary
 COPY --from=builder /build/services/auth-service/main .
 
-# Copy migrations if exists
-COPY --from=builder /build/services/auth-service/migrations ./migrations/ 2>/dev/null || true
+# Copy migrations
+COPY --from=builder /build/services/auth-service/migrations ./migrations/
 
 # Expose ports
 EXPOSE 8081 9081

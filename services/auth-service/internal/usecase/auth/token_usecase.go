@@ -50,6 +50,9 @@ func NewTokenUseCase(
 	}
 }
 
+// Type alias for backward compatibility with handler
+type RefreshTokenUseCase = TokenUseCase
+
 func (uc *TokenUseCase) Execute(ctx context.Context, req *RefreshTokenRequest) (*RefreshTokenResponse, error) {
 	// Verify refresh token JWT
 	claims, err := uc.jwtManager.VerifyToken(req.RefreshToken)

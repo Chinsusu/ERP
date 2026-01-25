@@ -1,27 +1,34 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
-WORKDIR /app
+WORKDIR /build
 
-RUN apk add --no-cache git
+# Copy shared module first
+COPY shared/ ./shared/
 
-COPY go.mod go.sum ./
-COPY ../../shared ./../../shared
+# Copy service code
+COPY services/api-gateway/ ./services/api-gateway/
 
+WORKDIR /build/services/api-gateway
+
+# Download dependencies
+ENV GOTOOLCHAIN=auto
 RUN go mod download
 
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o /api-gateway cmd/main.go
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/main.go
 
 FROM alpine:latest
 
-WORKDIR /app
+WORKDIR /root/
 
 RUN apk --no-cache add ca-certificates
 
-COPY --from=builder /api-gateway .
-COPY config ./config
+# Copy the binary
+COPY --from=builder /build/services/api-gateway/main .
+
+# Copy config
+COPY --from=builder /build/services/api-gateway/config ./config
 
 EXPOSE 8080
 
-CMD ["./api-gateway"]
+CMD ["./main"]

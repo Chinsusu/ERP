@@ -100,7 +100,7 @@ func main() {
 	// Initialize use cases
 	loginUC := auth.NewLoginUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager, eventPublisher)
 	logoutUC := auth.NewLogoutUseCase(userRepo, tokenRepo, cacheRepo, jwtManager, eventPublisher)
-	refreshUC := auth.NewRefreshTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
+	refreshUC := auth.NewTokenUseCase(userRepo, roleRepo, permRepo, tokenRepo, cacheRepo, jwtManager)
 	_ = permission.NewGetPermissionsUseCase(permRepo, cacheRepo) // Will be used later
 
 	// Initialize HTTP handlers

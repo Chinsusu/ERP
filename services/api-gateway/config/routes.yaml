@@ -3,7 +3,7 @@ routes:
   # Auth Service (Public endpoints)
   # ============================================
   - prefix: /api/v1/auth
-    service: auth-service:8081
+    service: erp-auth-service:8081
     auth_required: false
     rate_limit: 30/min
 
@@ -11,86 +11,86 @@ routes:
   # User Service
   # ============================================
   - prefix: /api/v1/users
-    service: user-service:8082
+    service: erp-user-service:8082
     auth_required: true
 
   - prefix: /api/v1/departments
-    service: user-service:8082
+    service: erp-user-service:8082
     auth_required: true
 
   # ============================================
   # Master Data Service
   # ============================================
   - prefix: /api/v1/categories
-    service: master-data-service:8083
+    service: erp-master-data-service:8083
     auth_required: true
 
   - prefix: /api/v1/units
-    service: master-data-service:8083
+    service: erp-master-data-service:8083
     auth_required: true
 
   - prefix: /api/v1/materials
-    service: master-data-service:8083
+    service: erp-master-data-service:8083
     auth_required: true
 
   - prefix: /api/v1/products
-    service: master-data-service:8083
+    service: erp-master-data-service:8083
     auth_required: true
 
   # ============================================
   # Supplier Service
   # ============================================
   - prefix: /api/v1/suppliers
-    service: supplier-service:8084
+    service: erp-supplier-service:8084
     auth_required: true
 
   # ============================================
   # Procurement Service
   # ============================================
   - prefix: /api/v1/procurement
-    service: procurement-service:8085
+    service: erp-procurement-service:8085
     auth_required: true
 
   # ============================================
   # WMS Service
   # ============================================
   - prefix: /api/v1/warehouse
-    service: wms-service:8086
+    service: erp-wms-service:8086
     auth_required: true
 
   # ============================================
   # Manufacturing Service
   # ============================================
   - prefix: /api/v1/manufacturing
-    service: manufacturing-service:8087
+    service: erp-manufacturing-service:8087
     auth_required: true
 
   # ============================================
   # Sales Service
   # ============================================
   - prefix: /api/v1/sales
-    service: sales-service:8088
+    service: erp-sales-service:8088
     auth_required: true
 
   # ============================================
   # Marketing Service
   # ============================================
   - prefix: /api/v1/marketing
-    service: marketing-service:8089
+    service: erp-marketing-service:8089
     auth_required: true
 
   # ============================================
   # Notification Service
   # ============================================
   - prefix: /api/v1/notifications
-    service: notification-service:8090
+    service: erp-notification-service:8090
     auth_required: true
 
   # ============================================
   # File Service
   # ============================================
   - prefix: /api/v1/files
-    service: file-service:8091
+    service: erp-file-service:8091
     auth_required: true
     timeout: 60s
 
@@ -98,6 +98,6 @@ routes:
   # Reporting Service
   # ============================================
   - prefix: /api/v1/reports
-    service: reporting-service:8092
+    service: erp-reporting-service:8092
     auth_required: true
     timeout: 60s

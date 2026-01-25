@@ -123,34 +123,34 @@ func LoadRoutes(path string) ([]RouteConfig, error) {
 func DefaultRoutes() []RouteConfig {
 	return []RouteConfig{
 		// Auth Service (no auth required)
-		{Prefix: "/api/v1/auth", Service: "auth-service:8081", AuthRequired: false, RateLimit: "30/min"},
+		{Prefix: "/api/v1/auth", Service: "erp-auth-service:8081", AuthRequired: false, RateLimit: "30/min"},
 
 		// User Service
-		{Prefix: "/api/v1/users", Service: "user-service:8082", AuthRequired: true},
-		{Prefix: "/api/v1/departments", Service: "user-service:8082", AuthRequired: true},
+		{Prefix: "/api/v1/users", Service: "erp-user-service:8082", AuthRequired: true},
+		{Prefix: "/api/v1/departments", Service: "erp-user-service:8082", AuthRequired: true},
 
 		// Master Data Service
-		{Prefix: "/api/v1/categories", Service: "master-data-service:8083", AuthRequired: true},
-		{Prefix: "/api/v1/units", Service: "master-data-service:8083", AuthRequired: true},
-		{Prefix: "/api/v1/materials", Service: "master-data-service:8083", AuthRequired: true},
-		{Prefix: "/api/v1/products", Service: "master-data-service:8083", AuthRequired: true},
+		{Prefix: "/api/v1/categories", Service: "erp-master-data-service:8083", AuthRequired: true},
+		{Prefix: "/api/v1/units", Service: "erp-master-data-service:8083", AuthRequired: true},
+		{Prefix: "/api/v1/materials", Service: "erp-master-data-service:8083", AuthRequired: true},
+		{Prefix: "/api/v1/products", Service: "erp-master-data-service:8083", AuthRequired: true},
 
 		// Supplier Service (Phase 2.1)
-		{Prefix: "/api/v1/suppliers", Service: "supplier-service:8084", AuthRequired: true},
-		{Prefix: "/api/v1/certifications", Service: "supplier-service:8084", AuthRequired: true},
+		{Prefix: "/api/v1/suppliers", Service: "erp-supplier-service:8084", AuthRequired: true},
+		{Prefix: "/api/v1/certifications", Service: "erp-supplier-service:8084", AuthRequired: true},
 
 		// Procurement Service (Phase 2.2)
-		{Prefix: "/api/v1/purchase-requisitions", Service: "procurement-service:8085", AuthRequired: true},
-		{Prefix: "/api/v1/purchase-orders", Service: "procurement-service:8085", AuthRequired: true},
+		{Prefix: "/api/v1/purchase-requisitions", Service: "erp-procurement-service:8085", AuthRequired: true},
+		{Prefix: "/api/v1/purchase-orders", Service: "erp-procurement-service:8085", AuthRequired: true},
 
 		// Future Services (placeholders)
-		{Prefix: "/api/v1/warehouse", Service: "wms-service:8086", AuthRequired: true},
-		{Prefix: "/api/v1/manufacturing", Service: "manufacturing-service:8087", AuthRequired: true},
-		{Prefix: "/api/v1/sales", Service: "sales-service:8088", AuthRequired: true},
-		{Prefix: "/api/v1/marketing", Service: "marketing-service:8089", AuthRequired: true},
-		{Prefix: "/api/v1/notifications", Service: "notification-service:8090", AuthRequired: true},
-		{Prefix: "/api/v1/files", Service: "file-service:8091", AuthRequired: true},
-		{Prefix: "/api/v1/reports", Service: "reporting-service:8092", AuthRequired: true},
+		{Prefix: "/api/v1/warehouse", Service: "erp-wms-service:8086", AuthRequired: true},
+		{Prefix: "/api/v1/manufacturing", Service: "erp-manufacturing-service:8087", AuthRequired: true},
+		{Prefix: "/api/v1/sales", Service: "erp-sales-service:8088", AuthRequired: true},
+		{Prefix: "/api/v1/marketing", Service: "erp-marketing-service:8089", AuthRequired: true},
+		{Prefix: "/api/v1/notifications", Service: "erp-notification-service:8090", AuthRequired: true},
+		{Prefix: "/api/v1/files", Service: "erp-file-service:8091", AuthRequired: true},
+		{Prefix: "/api/v1/reports", Service: "erp-reporting-service:8092", AuthRequired: true},
 	}
 }
 

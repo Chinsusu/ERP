@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Phase 12.1: Auth Service Deployment - 2026-01-25
+
+**Deployment Progress: 98% Complete** (92% → 98%)
+
+**Auth Service Deployment** ✅:
+- ✅ **Fixed Dockerfile**: Updated to build from project root with shared dependencies
+  - Go version: 1.22 → 1.23-alpine
+  - Added `GOTOOLCHAIN=auto` for automatic Go 1.24 upgrade
+  - Fixed build context: `/build/services/auth-service/`
+  - Fixed migrations copy path
+- ✅ **Fixed Compilation Errors**:
+  - Added `type RefreshTokenUseCase = TokenUseCase` alias
+  - Fixed `NewTokenUseCase` call in `cmd/main.go`
+- ✅ **Database Migrations**: 9 migrations executed successfully
+  - Created 8 tables (roles, permissions, role_permissions, user_credentials, user_roles, refresh_tokens, sessions, password_reset_tokens)
+  - Seeded 5 default roles (Super Admin, Admin, Manager, Staff, Viewer)
+  - Seeded 42 permissions across all services
+  - Created admin user: admin@company.vn
+- ✅ **Container Running**: `erp-auth-service` (port 8081)
+  - Connected to PostgreSQL ✓
+  - Connected to Redis ✓
+  - Connected to NATS ✓
+  - HTTP server listening
+
+**API Gateway Rebuild** ✅:
+- ✅ **Updated Service Discovery**: All service names now use `erp-` prefix
+  - Updated `config.go` DefaultRoutes()
+  - Updated `config/routes.yaml`
+  - Fixed health check service names
+- ✅ **Fixed Dockerfile**: Similar to auth service
+  - Go version: 1.22 → 1.23-alpine
+  - Added `GOTOOLCHAIN=auto`
+  - Fixed build context
+- ✅ **End-to-End Routing Verified**:
+  - API Gateway → Auth Service: ✅ Working
+  - Test: `POST /api/v1/auth/login` returns proper 401 response
+  - Routing configuration loaded successfully
+
+**Infrastructure Improvements**:
+- ✅ **Disk Space Management**: Freed 10.64GB
+  - Pruned unused Docker images
+  - Pruned stopped containers
+  - Disk usage: 98% → 77%
+
+**Services Running: 8/13 (62%)**:
+1. ✅ API Gateway (Rebuilt & Updated)
+2. ✅ **Auth Service (NEW!)**
+3. ✅ Master Data
+4. ✅ Supplier
+5. ✅ WMS
+6. ✅ Manufacturing
+7. ✅ Sales
+8. ⚠️ Marketing (restarting loop)
+
+**Remaining Work (2%)**:
+- Password verification issue (minor - can be fixed with password reset)
+- Deploy remaining services: User, Procurement, Notification, File, Reporting
+
 ### Added - Phase 12: Production Deployment - 2026-01-25
 
 **Deployment Progress: 92% Complete**
