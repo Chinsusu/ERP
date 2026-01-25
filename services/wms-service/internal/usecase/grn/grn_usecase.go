@@ -10,6 +10,13 @@ import (
 	"github.com/google/uuid"
 )
 
+// EventPublisher defines event publishing interface for GRN
+type EventPublisher interface {
+	PublishGRNCreated(event *event.GRNCreatedEvent) error
+	PublishGRNCompleted(event *event.GRNCompletedEvent) error
+	PublishStockReceived(event *event.StockReceivedEvent) error
+}
+
 // CreateGRNUseCase handles GRN creation
 type CreateGRNUseCase struct {
 	grnRepo      repository.GRNRepository
@@ -17,7 +24,7 @@ type CreateGRNUseCase struct {
 	stockRepo    repository.StockRepository
 	zoneRepo     repository.ZoneRepository
 	locationRepo repository.LocationRepository
-	eventPub     *event.Publisher
+	eventPub     EventPublisher
 }
 
 // NewCreateGRNUseCase creates a new use case
@@ -27,7 +34,7 @@ func NewCreateGRNUseCase(
 	stockRepo repository.StockRepository,
 	zoneRepo repository.ZoneRepository,
 	locationRepo repository.LocationRepository,
-	eventPub *event.Publisher,
+	eventPub EventPublisher,
 ) *CreateGRNUseCase {
 	return &CreateGRNUseCase{
 		grnRepo:      grnRepo,
@@ -178,7 +185,7 @@ type CompleteGRNUseCase struct {
 	lotRepo   repository.LotRepository
 	stockRepo repository.StockRepository
 	zoneRepo  repository.ZoneRepository
-	eventPub  *event.Publisher
+	eventPub  EventPublisher
 }
 
 // NewCompleteGRNUseCase creates a new use case
@@ -187,7 +194,7 @@ func NewCompleteGRNUseCase(
 	lotRepo repository.LotRepository,
 	stockRepo repository.StockRepository,
 	zoneRepo repository.ZoneRepository,
-	eventPub *event.Publisher,
+	eventPub EventPublisher,
 ) *CompleteGRNUseCase {
 	return &CompleteGRNUseCase{
 		grnRepo:   grnRepo,

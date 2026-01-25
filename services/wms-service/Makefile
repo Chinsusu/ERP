@@ -24,10 +24,16 @@ test:
 	@echo "Running tests..."
 	@go test -v ./...
 
+# Run WMS service tests
+test-wms:
+	@echo "Running WMS service tests..."
+	@go test -v ./internal/domain/entity/... ./internal/usecase/...
+
 # Run tests with coverage
 test-coverage:
 	@echo "Running tests with coverage..."
 	@go test -v -coverprofile=coverage.out ./...
+	@go tool cover -func=coverage.out | grep "internal/domain/entity/stock_fefo.go"
 	@go tool cover -html=coverage.out -o coverage.html
 
 # Clean build artifacts

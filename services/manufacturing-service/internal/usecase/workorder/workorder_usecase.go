@@ -9,15 +9,23 @@ import (
 	"github.com/google/uuid"
 )
 
+// EventPublisher defines event publishing interface for work order
+type EventPublisher interface {
+	PublishWOCreated(event event.WOEvent) error
+	PublishWOReleased(event event.WOEvent) error
+	PublishWOStarted(event event.WOEvent) error
+	PublishWOCompleted(event event.WOCompletedEvent) error
+}
+
 // CreateWOUseCase handles work order creation
 type CreateWOUseCase struct {
 	woRepo   repository.WorkOrderRepository
 	bomRepo  repository.BOMRepository
-	eventPub *event.Publisher
+	eventPub EventPublisher
 }
 
 // NewCreateWOUseCase creates a new CreateWOUseCase
-func NewCreateWOUseCase(woRepo repository.WorkOrderRepository, bomRepo repository.BOMRepository, eventPub *event.Publisher) *CreateWOUseCase {
+func NewCreateWOUseCase(woRepo repository.WorkOrderRepository, bomRepo repository.BOMRepository, eventPub EventPublisher) *CreateWOUseCase {
 	return &CreateWOUseCase{
 		woRepo:   woRepo,
 		bomRepo:  bomRepo,
@@ -146,11 +154,11 @@ func (uc *ListWOsUseCase) Execute(ctx context.Context, filter repository.WOFilte
 // ReleaseWOUseCase handles releasing a work order
 type ReleaseWOUseCase struct {
 	repo     repository.WorkOrderRepository
-	eventPub *event.Publisher
+	eventPub EventPublisher
 }
 
 // NewReleaseWOUseCase creates a new ReleaseWOUseCase
-func NewReleaseWOUseCase(repo repository.WorkOrderRepository, eventPub *event.Publisher) *ReleaseWOUseCase {
+func NewReleaseWOUseCase(repo repository.WorkOrderRepository, eventPub EventPublisher) *ReleaseWOUseCase {
 	return &ReleaseWOUseCase{repo: repo, eventPub: eventPub}
 }
 
@@ -186,11 +194,11 @@ func (uc *ReleaseWOUseCase) Execute(ctx context.Context, woID uuid.UUID, updated
 // StartWOUseCase handles starting a work order
 type StartWOUseCase struct {
 	repo     repository.WorkOrderRepository
-	eventPub *event.Publisher
+	eventPub EventPublisher
 }
 
 // NewStartWOUseCase creates a new StartWOUseCase
-func NewStartWOUseCase(repo repository.WorkOrderRepository, eventPub *event.Publisher) *StartWOUseCase {
+func NewStartWOUseCase(repo repository.WorkOrderRepository, eventPub EventPublisher) *StartWOUseCase {
 	return &StartWOUseCase{repo: repo, eventPub: eventPub}
 }
 
@@ -227,11 +235,11 @@ func (uc *StartWOUseCase) Execute(ctx context.Context, woID uuid.UUID, superviso
 type CompleteWOUseCase struct {
 	repo      repository.WorkOrderRepository
 	traceRepo repository.TraceabilityRepository
-	eventPub  *event.Publisher
+	eventPub  EventPublisher
 }
 
 // NewCompleteWOUseCase creates a new CompleteWOUseCase
-func NewCompleteWOUseCase(repo repository.WorkOrderRepository, traceRepo repository.TraceabilityRepository, eventPub *event.Publisher) *CompleteWOUseCase {
+func NewCompleteWOUseCase(repo repository.WorkOrderRepository, traceRepo repository.TraceabilityRepository, eventPub EventPublisher) *CompleteWOUseCase {
 	return &CompleteWOUseCase{
 		repo:      repo,
 		traceRepo: traceRepo,

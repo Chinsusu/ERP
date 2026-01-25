@@ -10,14 +10,19 @@ import (
 	"github.com/google/uuid"
 )
 
+// EventPublisher defines event publishing interface for reservation
+type EventPublisher interface {
+	PublishStockReserved(event *event.StockReservedEvent) error
+}
+
 // CreateReservationUseCase handles stock reservation
 type CreateReservationUseCase struct {
 	stockRepo repository.StockRepository
-	eventPub  *event.Publisher
+	eventPub  EventPublisher
 }
 
 // NewCreateReservationUseCase creates a new use case
-func NewCreateReservationUseCase(stockRepo repository.StockRepository, eventPub *event.Publisher) *CreateReservationUseCase {
+func NewCreateReservationUseCase(stockRepo repository.StockRepository, eventPub EventPublisher) *CreateReservationUseCase {
 	return &CreateReservationUseCase{
 		stockRepo: stockRepo,
 		eventPub:  eventPub,

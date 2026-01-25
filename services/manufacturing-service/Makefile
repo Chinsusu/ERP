@@ -11,7 +11,20 @@ run:
 
 # Run tests
 test:
+	@echo "Running all tests..."
 	@go test ./... -v
+
+# Run Manufacturing tests
+test-mfg:
+	@echo "Running Manufacturing Service tests..."
+	@go test -v ./internal/domain/entity/... ./internal/usecase/...
+
+# Run tests with coverage
+test-coverage:
+	@echo "Running tests with coverage..."
+	@go test -v -coverprofile=coverage.out ./...
+	@go tool cover -func=coverage.out | grep "internal/domain/entity/bom.go"
+	@go tool cover -html=coverage.out -o coverage.html
 
 # Clean build artifacts
 clean:

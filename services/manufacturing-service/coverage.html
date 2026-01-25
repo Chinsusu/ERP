@@ -1,0 +1,4527 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>cmd: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/erp-cosmetics/manufacturing-service/cmd/main.go (0.0%)</option>
+				
+				<option value="file1">github.com/erp-cosmetics/manufacturing-service/internal/config/config.go (0.0%)</option>
+				
+				<option value="file2">github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/handler/bom_handler.go (0.0%)</option>
+				
+				<option value="file3">github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/handler/qc_handler.go (0.0%)</option>
+				
+				<option value="file4">github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/handler/response.go (0.0%)</option>
+				
+				<option value="file5">github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/handler/wo_handler.go (0.0%)</option>
+				
+				<option value="file6">github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/router/router.go (0.0%)</option>
+				
+				<option value="file7">github.com/erp-cosmetics/manufacturing-service/internal/domain/entity/bom.go (52.8%)</option>
+				
+				<option value="file8">github.com/erp-cosmetics/manufacturing-service/internal/domain/entity/errors.go (0.0%)</option>
+				
+				<option value="file9">github.com/erp-cosmetics/manufacturing-service/internal/domain/entity/ncr.go (0.0%)</option>
+				
+				<option value="file10">github.com/erp-cosmetics/manufacturing-service/internal/domain/entity/qc.go (0.0%)</option>
+				
+				<option value="file11">github.com/erp-cosmetics/manufacturing-service/internal/domain/entity/traceability.go (0.0%)</option>
+				
+				<option value="file12">github.com/erp-cosmetics/manufacturing-service/internal/domain/entity/work_order.go (73.3%)</option>
+				
+				<option value="file13">github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/event/publisher.go (0.0%)</option>
+				
+				<option value="file14">github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/persistence/postgres/bom_repo.go (0.0%)</option>
+				
+				<option value="file15">github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/persistence/postgres/qc_repo.go (0.0%)</option>
+				
+				<option value="file16">github.com/erp-cosmetics/manufacturing-service/internal/testmocks/mocks.go (37.5%)</option>
+				
+				<option value="file17">github.com/erp-cosmetics/manufacturing-service/internal/testutils/builders.go (44.4%)</option>
+				
+				<option value="file18">github.com/erp-cosmetics/manufacturing-service/internal/usecase/bom/bom_usecase.go (52.1%)</option>
+				
+				<option value="file19">github.com/erp-cosmetics/manufacturing-service/internal/usecase/ncr/ncr_usecase.go (0.0%)</option>
+				
+				<option value="file20">github.com/erp-cosmetics/manufacturing-service/internal/usecase/qc/qc_usecase.go (59.1%)</option>
+				
+				<option value="file21">github.com/erp-cosmetics/manufacturing-service/internal/usecase/traceability/traceability_usecase.go (80.0%)</option>
+				
+				<option value="file22">github.com/erp-cosmetics/manufacturing-service/internal/usecase/workorder/workorder_usecase.go (38.6%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "context"
+        "fmt"
+        "net/http"
+        "os"
+        "os/signal"
+        "syscall"
+        "time"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/config"
+        "github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/handler"
+        "github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/router"
+        "github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/event"
+        "github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/persistence/postgres"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/bom"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/ncr"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/qc"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/traceability"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/workorder"
+        "github.com/erp-cosmetics/shared/pkg/database"
+        "github.com/erp-cosmetics/shared/pkg/logger"
+        "github.com/erp-cosmetics/shared/pkg/nats"
+        "go.uber.org/zap"
+)
+
+func main() <span class="cov0" title="0">{
+        // Load configuration
+        cfg, err := config.Load()
+        if err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Failed to load config: %v", err))</span>
+        }
+
+        // Initialize logger
+        <span class="cov0" title="0">log, err := logger.NewLogger(cfg.ServiceName, &amp;logger.Config{
+                Level:  cfg.LogLevel,
+                Format: cfg.LogFormat,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Failed to init logger: %v", err))</span>
+        }
+        <span class="cov0" title="0">defer logger.Sync()
+
+        log.Info("Starting Manufacturing Service",
+                zap.String("service", cfg.ServiceName),
+                zap.String("port", cfg.Port),
+        )
+
+        // Connect to PostgreSQL
+        db, err := database.Connect(database.NewDefaultConfig(cfg.GetDSN()))
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Failed to connect to database", zap.Error(err))
+        }</span>
+        <span class="cov0" title="0">log.Info("Connected to PostgreSQL")
+
+        // Connect to NATS
+        natsClient, err := nats.NewClient(&amp;nats.Config{
+                URL: cfg.NATSUrl,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                log.Warn("Failed to connect to NATS, events will not be published", zap.Error(err))
+        }</span> else<span class="cov0" title="0"> {
+                log.Info("Connected to NATS")
+        }</span>
+
+        // Initialize repositories
+        <span class="cov0" title="0">bomRepo := postgres.NewBOMRepository(db)
+        woRepo := postgres.NewWorkOrderRepository(db)
+        qcRepo := postgres.NewQCRepository(db)
+        ncrRepo := postgres.NewNCRRepository(db)
+        traceRepo := postgres.NewTraceabilityRepository(db)
+
+        // Initialize event publisher
+        eventPub := event.NewPublisher(natsClient, log)
+
+        // Initialize BOM use cases
+        createBOMUC := bom.NewCreateBOMUseCase(bomRepo, eventPub, cfg.BOMEncryptionKey)
+        getBOMUC := bom.NewGetBOMUseCase(bomRepo, cfg.BOMEncryptionKey)
+        listBOMsUC := bom.NewListBOMsUseCase(bomRepo)
+        approveBOMUC := bom.NewApproveBOMUseCase(bomRepo, eventPub)
+        getActiveBOMUC := bom.NewGetActiveBOMUseCase(bomRepo)
+
+        // Initialize Work Order use cases
+        createWOUC := workorder.NewCreateWOUseCase(woRepo, bomRepo, eventPub)
+        getWOUC := workorder.NewGetWOUseCase(woRepo)
+        listWOsUC := workorder.NewListWOsUseCase(woRepo)
+        releaseWOUC := workorder.NewReleaseWOUseCase(woRepo, eventPub)
+        startWOUC := workorder.NewStartWOUseCase(woRepo, eventPub)
+        completeWOUC := workorder.NewCompleteWOUseCase(woRepo, traceRepo, eventPub)
+
+        // Initialize QC use cases
+        getCheckpointsUC := qc.NewGetCheckpointsUseCase(qcRepo)
+        createInspectionUC := qc.NewCreateInspectionUseCase(qcRepo, eventPub)
+        getInspectionUC := qc.NewGetInspectionUseCase(qcRepo)
+        listInspectionsUC := qc.NewListInspectionsUseCase(qcRepo)
+        approveInspectionUC := qc.NewApproveInspectionUseCase(qcRepo, eventPub)
+
+        // Initialize NCR use cases
+        createNCRUC := ncr.NewCreateNCRUseCase(ncrRepo, eventPub)
+        getNCRUC := ncr.NewGetNCRUseCase(ncrRepo)
+        listNCRsUC := ncr.NewListNCRsUseCase(ncrRepo)
+        closeNCRUC := ncr.NewCloseNCRUseCase(ncrRepo)
+
+        // Initialize Traceability use cases
+        traceBackwardUC := traceability.NewTraceBackwardUseCase(traceRepo, woRepo)
+        traceForwardUC := traceability.NewTraceForwardUseCase(traceRepo)
+
+        // Initialize handlers
+        bomHandler := handler.NewBOMHandler(createBOMUC, getBOMUC, listBOMsUC, approveBOMUC, getActiveBOMUC)
+        woHandler := handler.NewWOHandler(createWOUC, getWOUC, listWOsUC, releaseWOUC, startWOUC, completeWOUC)
+        qcHandler := handler.NewQCHandler(getCheckpointsUC, createInspectionUC, getInspectionUC, listInspectionsUC, approveInspectionUC)
+        ncrHandler := handler.NewNCRHandler(createNCRUC, getNCRUC, listNCRsUC, closeNCRUC)
+        traceHandler := handler.NewTraceHandler(traceBackwardUC, traceForwardUC)
+        healthHandler := handler.NewHealthHandler()
+
+        // Setup router
+        r := router.SetupRouter(bomHandler, woHandler, qcHandler, ncrHandler, traceHandler, healthHandler)
+
+        // Start HTTP server
+        srv := &amp;http.Server{
+                Addr:    ":" + cfg.Port,
+                Handler: r,
+        }
+
+        go func() </span><span class="cov0" title="0">{
+                log.Info("HTTP server started", zap.String("port", cfg.Port))
+                if err := srv.ListenAndServe(); err != nil &amp;&amp; err != http.ErrServerClosed </span><span class="cov0" title="0">{
+                        log.Fatal("Failed to start HTTP server", zap.Error(err))
+                }</span>
+        }()
+
+        // Graceful shutdown
+        <span class="cov0" title="0">quit := make(chan os.Signal, 1)
+        signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+        &lt;-quit
+        log.Info("Shutting down server...")
+
+        ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+        defer cancel()
+
+        if err := srv.Shutdown(ctx); err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Server forced to shutdown", zap.Error(err))
+        }</span>
+
+        <span class="cov0" title="0">if natsClient != nil </span><span class="cov0" title="0">{
+                natsClient.Close()
+        }</span>
+
+        <span class="cov0" title="0">log.Info("Server exited properly")</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package config
+
+import (
+        "encoding/hex"
+        "fmt"
+        "os"
+
+        "github.com/spf13/viper"
+)
+
+// Config holds all configuration
+type Config struct {
+        ServiceName string
+        Port        string
+        GRPCPort    string
+        LogLevel    string
+        LogFormat   string
+
+        // Database
+        DBHost     string
+        DBPort     string
+        DBUser     string
+        DBPassword string
+        DBName     string
+        DBSSLMode  string
+
+        // NATS
+        NATSUrl string
+
+        // BOM Encryption
+        BOMEncryptionKey []byte
+
+        // WMS gRPC
+        WMSGRPCAddress string
+}
+
+// Load loads configuration from environment
+func Load() (*Config, error) <span class="cov0" title="0">{
+        viper.AutomaticEnv()
+
+        // Set defaults
+        viper.SetDefault("SERVICE_NAME", "manufacturing-service")
+        viper.SetDefault("PORT", "8087")
+        viper.SetDefault("GRPC_PORT", "9087")
+        viper.SetDefault("LOG_LEVEL", "info")
+        viper.SetDefault("LOG_FORMAT", "json")
+        viper.SetDefault("DB_HOST", "localhost")
+        viper.SetDefault("DB_PORT", "5432")
+        viper.SetDefault("DB_USER", "postgres")
+        viper.SetDefault("DB_PASSWORD", "postgres123")
+        viper.SetDefault("DB_NAME", "manufacturing_db")
+        viper.SetDefault("DB_SSLMODE", "disable")
+        viper.SetDefault("NATS_URL", "nats://localhost:4222")
+        viper.SetDefault("WMS_GRPC_ADDRESS", "localhost:9086")
+
+        cfg := &amp;Config{
+                ServiceName:    viper.GetString("SERVICE_NAME"),
+                Port:           viper.GetString("PORT"),
+                GRPCPort:       viper.GetString("GRPC_PORT"),
+                LogLevel:       viper.GetString("LOG_LEVEL"),
+                LogFormat:      viper.GetString("LOG_FORMAT"),
+                DBHost:         viper.GetString("DB_HOST"),
+                DBPort:         viper.GetString("DB_PORT"),
+                DBUser:         viper.GetString("DB_USER"),
+                DBPassword:     viper.GetString("DB_PASSWORD"),
+                DBName:         viper.GetString("DB_NAME"),
+                DBSSLMode:      viper.GetString("DB_SSLMODE"),
+                NATSUrl:        viper.GetString("NATS_URL"),
+                WMSGRPCAddress: viper.GetString("WMS_GRPC_ADDRESS"),
+        }
+
+        // Load encryption key (32 bytes for AES-256)
+        keyHex := os.Getenv("BOM_ENCRYPTION_KEY")
+        if keyHex == "" </span><span class="cov0" title="0">{
+                // Default key for development only - CHANGE IN PRODUCTION
+                keyHex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        }</span>
+        
+        <span class="cov0" title="0">key, err := hex.DecodeString(keyHex)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("invalid BOM_ENCRYPTION_KEY: %w", err)
+        }</span>
+        <span class="cov0" title="0">if len(key) != 32 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("BOM_ENCRYPTION_KEY must be 32 bytes (64 hex characters)")
+        }</span>
+        <span class="cov0" title="0">cfg.BOMEncryptionKey = key
+
+        return cfg, nil</span>
+}
+
+// GetDSN returns database connection string
+func (c *Config) GetDSN() string <span class="cov0" title="0">{
+        return fmt.Sprintf(
+                "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+                c.DBHost, c.DBPort, c.DBUser, c.DBPassword, c.DBName, c.DBSSLMode,
+        )
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package handler
+
+import (
+        "fmt"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/dto"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/bom"
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+)
+
+// BOMHandler handles BOM-related requests
+type BOMHandler struct {
+        createBOMUC    *bom.CreateBOMUseCase
+        getBOMUC       *bom.GetBOMUseCase
+        listBOMsUC     *bom.ListBOMsUseCase
+        approveBOMUC   *bom.ApproveBOMUseCase
+        getActiveBOMUC *bom.GetActiveBOMUseCase
+}
+
+// NewBOMHandler creates a new BOMHandler
+func NewBOMHandler(
+        createBOMUC *bom.CreateBOMUseCase,
+        getBOMUC *bom.GetBOMUseCase,
+        listBOMsUC *bom.ListBOMsUseCase,
+        approveBOMUC *bom.ApproveBOMUseCase,
+        getActiveBOMUC *bom.GetActiveBOMUseCase,
+) *BOMHandler <span class="cov0" title="0">{
+        return &amp;BOMHandler{
+                createBOMUC:    createBOMUC,
+                getBOMUC:       getBOMUC,
+                listBOMsUC:     listBOMsUC,
+                approveBOMUC:   approveBOMUC,
+                getActiveBOMUC: getActiveBOMUC,
+        }
+}</span>
+
+// CreateBOM creates a new BOM
+func (h *BOMHandler) CreateBOM(c *gin.Context) <span class="cov0" title="0">{
+        var req dto.CreateBOMRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        // Convert item type
+        var items []bom.CreateBOMItemInput
+        for i, item := range req.Items </span><span class="cov0" title="0">{
+                itemType := entity.BOMItemTypeMaterial
+                if item.ItemType != "" </span><span class="cov0" title="0">{
+                        itemType = entity.BOMItemType(item.ItemType)
+                }</span>
+                <span class="cov0" title="0">items = append(items, bom.CreateBOMItemInput{
+                        LineNumber:      i + 1,
+                        MaterialID:      item.MaterialID,
+                        ItemType:        itemType,
+                        Quantity:        item.Quantity,
+                        UOMID:           item.UOMID,
+                        QuantityMin:     item.QuantityMin,
+                        QuantityMax:     item.QuantityMax,
+                        IsCritical:      item.IsCritical,
+                        ScrapPercentage: item.ScrapPercentage,
+                        UnitCost:        item.UnitCost,
+                        Notes:           item.Notes,
+                })</span>
+        }
+
+        <span class="cov0" title="0">confidentiality := entity.ConfidentialityRestricted
+        if req.ConfidentialityLevel != "" </span><span class="cov0" title="0">{
+                confidentiality = entity.ConfidentialityLevel(req.ConfidentialityLevel)
+        }</span>
+
+        <span class="cov0" title="0">input := bom.CreateBOMInput{
+                BOMNumber:            req.BOMNumber,
+                ProductID:            req.ProductID,
+                Version:              req.Version,
+                Name:                 req.Name,
+                Description:          req.Description,
+                BatchSize:            req.BatchSize,
+                BatchUnitID:          req.BatchUnitID,
+                ConfidentialityLevel: confidentiality,
+                LaborCost:            req.LaborCost,
+                OverheadCost:         req.OverheadCost,
+                FormulaDetails:       req.FormulaDetails,
+                Items:                items,
+                CreatedBy:            userID,
+        }
+
+        result, err := h.createBOMUC.Execute(c.Request.Context(), input)
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">created(c, toBOMResponse(result, nil, false))</span>
+}
+
+// GetBOM gets a BOM by ID
+func (h *BOMHandler) GetBOM(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid BOM ID")
+                return
+        }</span>
+
+        // Check if user can view formula (would check permission via auth service)
+        <span class="cov0" title="0">canViewFormula := true // TODO: check permission manufacturing:bom:formula_view
+
+        result, err := h.getBOMUC.Execute(c.Request.Context(), id, canViewFormula)
+        if err != nil </span><span class="cov0" title="0">{
+                notFound(c, "BOM not found")
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, toBOMResponse(result.BOM, result.FormulaDetails, result.CanViewFormula))</span>
+}
+
+// ListBOMs lists BOMs
+func (h *BOMHandler) ListBOMs(c *gin.Context) <span class="cov0" title="0">{
+        filter := repository.BOMFilter{
+                Page:     getPageFromQuery(c),
+                PageSize: getPageSizeFromQuery(c),
+                Search:   c.Query("search"),
+        }
+
+        if status := c.Query("status"); status != "" </span><span class="cov0" title="0">{
+                s := entity.BOMStatus(status)
+                filter.Status = &amp;s
+        }</span>
+        <span class="cov0" title="0">if productID := c.Query("product_id"); productID != "" </span><span class="cov0" title="0">{
+                if id, err := uuid.Parse(productID); err == nil </span><span class="cov0" title="0">{
+                        filter.ProductID = &amp;id
+                }</span>
+        }
+
+        <span class="cov0" title="0">boms, total, err := h.listBOMsUC.Execute(c.Request.Context(), filter)
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">var items []dto.BOMResponse
+        for _, b := range boms </span><span class="cov0" title="0">{
+                items = append(items, toBOMResponse(b, nil, false))
+        }</span>
+
+        <span class="cov0" title="0">successWithMeta(c, items, newMeta(filter.Page, filter.PageSize, total))</span>
+}
+
+// ApproveBOM approves a BOM
+func (h *BOMHandler) ApproveBOM(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid BOM ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        result, err := h.approveBOMUC.Execute(c.Request.Context(), id, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, toBOMResponse(result, nil, false))</span>
+}
+
+// Helper functions
+func toBOMResponse(b *entity.BOM, formula *entity.FormulaDetails, canViewFormula bool) dto.BOMResponse <span class="cov0" title="0">{
+        resp := dto.BOMResponse{
+                ID:                   b.ID,
+                BOMNumber:            b.BOMNumber,
+                ProductID:            b.ProductID,
+                Version:              b.Version,
+                Name:                 b.Name,
+                Description:          b.Description,
+                Status:               string(b.Status),
+                BatchSize:            b.BatchSize,
+                ConfidentialityLevel: string(b.ConfidentialityLevel),
+                MaterialCost:         b.MaterialCost,
+                LaborCost:            b.LaborCost,
+                OverheadCost:         b.OverheadCost,
+                TotalCost:            b.TotalCost,
+                EffectiveFrom:        b.EffectiveFrom,
+                EffectiveTo:          b.EffectiveTo,
+                CreatedAt:            b.CreatedAt,
+        }
+
+        for _, item := range b.Items </span><span class="cov0" title="0">{
+                resp.Items = append(resp.Items, dto.BOMItemResponse{
+                        ID:         item.ID,
+                        LineNumber: item.LineNumber,
+                        MaterialID: item.MaterialID,
+                        ItemType:   string(item.ItemType),
+                        Quantity:   item.Quantity,
+                        UOMID:      item.UOMID,
+                        IsCritical: item.IsCritical,
+                        UnitCost:   item.UnitCost,
+                        TotalCost:  item.TotalCost,
+                        Notes:      item.Notes,
+                })
+        }</span>
+
+        <span class="cov0" title="0">if canViewFormula &amp;&amp; formula != nil </span><span class="cov0" title="0">{
+                resp.FormulaDetails = formula
+        }</span> else<span class="cov0" title="0"> if !canViewFormula &amp;&amp; b.ConfidentialityLevel == entity.ConfidentialityRestricted </span><span class="cov0" title="0">{
+                resp.Message = "Full BOM details restricted. Contact R&amp;D Manager."
+        }</span>
+
+        <span class="cov0" title="0">return resp</span>
+}
+
+func getUserIDFromContext(c *gin.Context) uuid.UUID <span class="cov0" title="0">{
+        if userIDStr := c.GetString("user_id"); userIDStr != "" </span><span class="cov0" title="0">{
+                if id, err := uuid.Parse(userIDStr); err == nil </span><span class="cov0" title="0">{
+                        return id
+                }</span>
+        }
+        <span class="cov0" title="0">return uuid.New()</span> // fallback for development
+}
+
+func getPageFromQuery(c *gin.Context) int <span class="cov0" title="0">{
+        page := 1
+        if p := c.Query("page"); p != "" </span><span class="cov0" title="0">{
+                if n, err := parseInt(p); err == nil &amp;&amp; n &gt; 0 </span><span class="cov0" title="0">{
+                        page = n
+                }</span>
+        }
+        <span class="cov0" title="0">return page</span>
+}
+
+func getPageSizeFromQuery(c *gin.Context) int <span class="cov0" title="0">{
+        pageSize := 20
+        if ps := c.Query("page_size"); ps != "" </span><span class="cov0" title="0">{
+                if n, err := parseInt(ps); err == nil &amp;&amp; n &gt; 0 &amp;&amp; n &lt;= 100 </span><span class="cov0" title="0">{
+                        pageSize = n
+                }</span>
+        }
+        <span class="cov0" title="0">return pageSize</span>
+}
+
+func parseInt(s string) (int, error) <span class="cov0" title="0">{
+        var n int
+        _, err := fmt.Sscanf(s, "%d", &amp;n)
+        return n, err
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package handler
+
+import (
+        "github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/dto"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/ncr"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/qc"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/traceability"
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+)
+
+// QCHandler handles QC-related requests
+type QCHandler struct {
+        getCheckpointsUC    *qc.GetCheckpointsUseCase
+        createInspectionUC  *qc.CreateInspectionUseCase
+        getInspectionUC     *qc.GetInspectionUseCase
+        listInspectionsUC   *qc.ListInspectionsUseCase
+        approveInspectionUC *qc.ApproveInspectionUseCase
+}
+
+// NewQCHandler creates a new QCHandler
+func NewQCHandler(
+        getCheckpointsUC *qc.GetCheckpointsUseCase,
+        createInspectionUC *qc.CreateInspectionUseCase,
+        getInspectionUC *qc.GetInspectionUseCase,
+        listInspectionsUC *qc.ListInspectionsUseCase,
+        approveInspectionUC *qc.ApproveInspectionUseCase,
+) *QCHandler <span class="cov0" title="0">{
+        return &amp;QCHandler{
+                getCheckpointsUC:    getCheckpointsUC,
+                createInspectionUC:  createInspectionUC,
+                getInspectionUC:     getInspectionUC,
+                listInspectionsUC:   listInspectionsUC,
+                approveInspectionUC: approveInspectionUC,
+        }
+}</span>
+
+// GetCheckpoints gets all QC checkpoints
+func (h *QCHandler) GetCheckpoints(c *gin.Context) <span class="cov0" title="0">{
+        checkpoints, err := h.getCheckpointsUC.Execute(c.Request.Context())
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+        <span class="cov0" title="0">success(c, checkpoints)</span>
+}
+
+// CreateInspection creates a new QC inspection
+func (h *QCHandler) CreateInspection(c *gin.Context) <span class="cov0" title="0">{
+        var req dto.CreateInspectionRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        var items []qc.CreateInspectionItemInput
+        for i, item := range req.Items </span><span class="cov0" title="0">{
+                items = append(items, qc.CreateInspectionItemInput{
+                        ItemNumber:    i + 1,
+                        TestName:      item.TestName,
+                        TestMethod:    item.TestMethod,
+                        Specification: item.Specification,
+                        TargetValue:   item.TargetValue,
+                        MinValue:      item.MinValue,
+                        MaxValue:      item.MaxValue,
+                        ActualValue:   item.ActualValue,
+                        UOM:           item.UOM,
+                        Result:        entity.ItemResult(item.Result),
+                        Notes:         item.Notes,
+                })
+        }</span>
+
+        <span class="cov0" title="0">input := qc.CreateInspectionInput{
+                InspectionType:    entity.CheckpointType(req.InspectionType),
+                CheckpointID:      req.CheckpointID,
+                ReferenceType:     entity.ReferenceType(req.ReferenceType),
+                ReferenceID:       req.ReferenceID,
+                ProductID:         req.ProductID,
+                MaterialID:        req.MaterialID,
+                LotID:             req.LotID,
+                LotNumber:         req.LotNumber,
+                InspectedQuantity: req.InspectedQuantity,
+                SampleSize:        req.SampleSize,
+                InspectorID:       userID,
+                InspectorName:     req.InspectorName,
+                Items:             items,
+        }
+
+        result, err := h.createInspectionUC.Execute(c.Request.Context(), input)
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">created(c, result)</span>
+}
+
+// GetInspection gets a QC inspection by ID
+func (h *QCHandler) GetInspection(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid inspection ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">result, err := h.getInspectionUC.Execute(c.Request.Context(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                notFound(c, "Inspection not found")
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, result)</span>
+}
+
+// ListInspections lists QC inspections
+func (h *QCHandler) ListInspections(c *gin.Context) <span class="cov0" title="0">{
+        filter := repository.QCFilter{
+                Page:     getPageFromQuery(c),
+                PageSize: getPageSizeFromQuery(c),
+        }
+
+        if t := c.Query("type"); t != "" </span><span class="cov0" title="0">{
+                ct := entity.CheckpointType(t)
+                filter.InspectionType = &amp;ct
+        }</span>
+        <span class="cov0" title="0">if r := c.Query("result"); r != "" </span><span class="cov0" title="0">{
+                ir := entity.InspectionResult(r)
+                filter.Result = &amp;ir
+        }</span>
+
+        <span class="cov0" title="0">inspections, total, err := h.listInspectionsUC.Execute(c.Request.Context(), filter)
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">successWithMeta(c, inspections, newMeta(filter.Page, filter.PageSize, total))</span>
+}
+
+// ApproveInspection approves or rejects an inspection
+func (h *QCHandler) ApproveInspection(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid inspection ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">var req dto.ApproveInspectionRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        input := qc.ApproveInspectionInput{
+                InspectionID:     id,
+                Result:           entity.InspectionResult(req.Result),
+                AcceptedQuantity: req.AcceptedQuantity,
+                RejectedQuantity: req.RejectedQuantity,
+                ApproverID:       userID,
+                Notes:            req.Notes,
+        }
+
+        result, err := h.approveInspectionUC.Execute(c.Request.Context(), input)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, result)</span>
+}
+
+// NCRHandler handles NCR-related requests
+type NCRHandler struct {
+        createNCRUC *ncr.CreateNCRUseCase
+        getNCRUC    *ncr.GetNCRUseCase
+        listNCRsUC  *ncr.ListNCRsUseCase
+        closeNCRUC  *ncr.CloseNCRUseCase
+}
+
+// NewNCRHandler creates a new NCRHandler
+func NewNCRHandler(
+        createNCRUC *ncr.CreateNCRUseCase,
+        getNCRUC *ncr.GetNCRUseCase,
+        listNCRsUC *ncr.ListNCRsUseCase,
+        closeNCRUC *ncr.CloseNCRUseCase,
+) *NCRHandler <span class="cov0" title="0">{
+        return &amp;NCRHandler{
+                createNCRUC: createNCRUC,
+                getNCRUC:    getNCRUC,
+                listNCRsUC:  listNCRsUC,
+                closeNCRUC:  closeNCRUC,
+        }
+}</span>
+
+// CreateNCR creates a new NCR
+func (h *NCRHandler) CreateNCR(c *gin.Context) <span class="cov0" title="0">{
+        var req dto.CreateNCRRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        severity := entity.NCRSeverityMedium
+        if req.Severity != "" </span><span class="cov0" title="0">{
+                severity = entity.NCRSeverity(req.Severity)
+        }</span>
+
+        <span class="cov0" title="0">input := ncr.CreateNCRInput{
+                NCType:           entity.NCType(req.NCType),
+                Severity:         severity,
+                ReferenceType:    req.ReferenceType,
+                ReferenceID:      req.ReferenceID,
+                ProductID:        req.ProductID,
+                MaterialID:       req.MaterialID,
+                LotID:            req.LotID,
+                LotNumber:        req.LotNumber,
+                Description:      req.Description,
+                QuantityAffected: req.QuantityAffected,
+                UOMID:            req.UOMID,
+                ImmediateAction:  req.ImmediateAction,
+                CreatedBy:        userID,
+        }
+
+        result, err := h.createNCRUC.Execute(c.Request.Context(), input)
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">created(c, result)</span>
+}
+
+// GetNCR gets an NCR by ID
+func (h *NCRHandler) GetNCR(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid NCR ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">result, err := h.getNCRUC.Execute(c.Request.Context(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                notFound(c, "NCR not found")
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, result)</span>
+}
+
+// ListNCRs lists NCRs
+func (h *NCRHandler) ListNCRs(c *gin.Context) <span class="cov0" title="0">{
+        filter := repository.NCRFilter{
+                Page:     getPageFromQuery(c),
+                PageSize: getPageSizeFromQuery(c),
+        }
+
+        if status := c.Query("status"); status != "" </span><span class="cov0" title="0">{
+                s := entity.NCRStatus(status)
+                filter.Status = &amp;s
+        }</span>
+        <span class="cov0" title="0">if severity := c.Query("severity"); severity != "" </span><span class="cov0" title="0">{
+                sev := entity.NCRSeverity(severity)
+                filter.Severity = &amp;sev
+        }</span>
+
+        <span class="cov0" title="0">ncrs, total, err := h.listNCRsUC.Execute(c.Request.Context(), filter)
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">successWithMeta(c, ncrs, newMeta(filter.Page, filter.PageSize, total))</span>
+}
+
+// CloseNCR closes an NCR
+func (h *NCRHandler) CloseNCR(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid NCR ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">var req dto.CloseNCRRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        var disposition *entity.Disposition
+        if req.Disposition != "" </span><span class="cov0" title="0">{
+                d := entity.Disposition(req.Disposition)
+                disposition = &amp;d
+        }</span>
+
+        <span class="cov0" title="0">input := ncr.CloseNCRInput{
+                NCRID:            id,
+                RootCause:        req.RootCause,
+                CorrectiveAction: req.CorrectiveAction,
+                PreventiveAction: req.PreventiveAction,
+                Disposition:      disposition,
+                DispositionQty:   req.DispositionQty,
+                ClosureNotes:     req.ClosureNotes,
+                ClosedBy:         userID,
+        }
+
+        result, err := h.closeNCRUC.Execute(c.Request.Context(), input)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, result)</span>
+}
+
+// TraceHandler handles traceability requests
+type TraceHandler struct {
+        traceBackwardUC *traceability.TraceBackwardUseCase
+        traceForwardUC  *traceability.TraceForwardUseCase
+}
+
+// NewTraceHandler creates a new TraceHandler
+func NewTraceHandler(
+        traceBackwardUC *traceability.TraceBackwardUseCase,
+        traceForwardUC *traceability.TraceForwardUseCase,
+) *TraceHandler <span class="cov0" title="0">{
+        return &amp;TraceHandler{
+                traceBackwardUC: traceBackwardUC,
+                traceForwardUC:  traceForwardUC,
+        }
+}</span>
+
+// TraceBackward traces backward from product lot to material lots
+func (h *TraceHandler) TraceBackward(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("lot_id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid lot ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">result, err := h.traceBackwardUC.Execute(c.Request.Context(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                notFound(c, "Traceability data not found")
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, result)</span>
+}
+
+// TraceForward traces forward from material lot to product lots
+func (h *TraceHandler) TraceForward(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("lot_id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid lot ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">result, err := h.traceForwardUC.Execute(c.Request.Context(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                notFound(c, "Traceability data not found")
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, result)</span>
+}
+
+// HealthHandler handles health check requests
+type HealthHandler struct{}
+
+// NewHealthHandler creates a new HealthHandler
+func NewHealthHandler() *HealthHandler <span class="cov0" title="0">{
+        return &amp;HealthHandler{}
+}</span>
+
+// Health returns service health
+func (h *HealthHandler) Health(c *gin.Context) <span class="cov0" title="0">{
+        success(c, gin.H{
+                "status":  "healthy",
+                "service": "manufacturing-service",
+        })
+}</span>
+
+// Ready returns readiness status
+func (h *HealthHandler) Ready(c *gin.Context) <span class="cov0" title="0">{
+        success(c, gin.H{"status": "ready"})
+}</span>
+
+// Live returns liveness status
+func (h *HealthHandler) Live(c *gin.Context) <span class="cov0" title="0">{
+        success(c, gin.H{"status": "live"})
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+// Response helpers - extending shared package for this service
+
+type apiResponse struct {
+        Success bool        `json:"success"`
+        Data    interface{} `json:"data,omitempty"`
+        Error   *errorInfo  `json:"error,omitempty"`
+        Meta    *meta       `json:"meta,omitempty"`
+}
+
+type errorInfo struct {
+        Code    string `json:"code"`
+        Message string `json:"message"`
+}
+
+type meta struct {
+        Page       int   `json:"page,omitempty"`
+        PageSize   int   `json:"page_size,omitempty"`
+        TotalItems int64 `json:"total_items,omitempty"`
+        TotalPages int   `json:"total_pages,omitempty"`
+}
+
+func success(c *gin.Context, data interface{}) <span class="cov0" title="0">{
+        c.JSON(http.StatusOK, apiResponse{
+                Success: true,
+                Data:    data,
+        })
+}</span>
+
+func created(c *gin.Context, data interface{}) <span class="cov0" title="0">{
+        c.JSON(http.StatusCreated, apiResponse{
+                Success: true,
+                Data:    data,
+        })
+}</span>
+
+func successWithMeta(c *gin.Context, data interface{}, m *meta) <span class="cov0" title="0">{
+        c.JSON(http.StatusOK, apiResponse{
+                Success: true,
+                Data:    data,
+                Meta:    m,
+        })
+}</span>
+
+func badRequest(c *gin.Context, message string) <span class="cov0" title="0">{
+        c.JSON(http.StatusBadRequest, apiResponse{
+                Success: false,
+                Error: &amp;errorInfo{
+                        Code:    "BAD_REQUEST",
+                        Message: message,
+                },
+        })
+}</span>
+
+func notFound(c *gin.Context, message string) <span class="cov0" title="0">{
+        c.JSON(http.StatusNotFound, apiResponse{
+                Success: false,
+                Error: &amp;errorInfo{
+                        Code:    "NOT_FOUND",
+                        Message: message,
+                },
+        })
+}</span>
+
+func internalError(c *gin.Context, message string) <span class="cov0" title="0">{
+        c.JSON(http.StatusInternalServerError, apiResponse{
+                Success: false,
+                Error: &amp;errorInfo{
+                        Code:    "INTERNAL_ERROR",
+                        Message: message,
+                },
+        })
+}</span>
+
+func newMeta(page, pageSize int, totalItems int64) *meta <span class="cov0" title="0">{
+        totalPages := int(totalItems) / pageSize
+        if int(totalItems)%pageSize &gt; 0 </span><span class="cov0" title="0">{
+                totalPages++
+        }</span>
+        <span class="cov0" title="0">return &amp;meta{
+                Page:       page,
+                PageSize:   pageSize,
+                TotalItems: totalItems,
+                TotalPages: totalPages,
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package handler
+
+import (
+        "time"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/dto"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/erp-cosmetics/manufacturing-service/internal/usecase/workorder"
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+)
+
+// WOHandler handles work order-related requests
+type WOHandler struct {
+        createWOUC   *workorder.CreateWOUseCase
+        getWOUC      *workorder.GetWOUseCase
+        listWOsUC    *workorder.ListWOsUseCase
+        releaseWOUC  *workorder.ReleaseWOUseCase
+        startWOUC    *workorder.StartWOUseCase
+        completeWOUC *workorder.CompleteWOUseCase
+}
+
+// NewWOHandler creates a new WOHandler
+func NewWOHandler(
+        createWOUC *workorder.CreateWOUseCase,
+        getWOUC *workorder.GetWOUseCase,
+        listWOsUC *workorder.ListWOsUseCase,
+        releaseWOUC *workorder.ReleaseWOUseCase,
+        startWOUC *workorder.StartWOUseCase,
+        completeWOUC *workorder.CompleteWOUseCase,
+) *WOHandler <span class="cov0" title="0">{
+        return &amp;WOHandler{
+                createWOUC:   createWOUC,
+                getWOUC:      getWOUC,
+                listWOsUC:    listWOsUC,
+                releaseWOUC:  releaseWOUC,
+                startWOUC:    startWOUC,
+                completeWOUC: completeWOUC,
+        }
+}</span>
+
+// CreateWO creates a new work order
+func (h *WOHandler) CreateWO(c *gin.Context) <span class="cov0" title="0">{
+        var req dto.CreateWORequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        priority := entity.WOPriorityNormal
+        if req.Priority != "" </span><span class="cov0" title="0">{
+                priority = entity.WOPriority(req.Priority)
+        }</span>
+
+        <span class="cov0" title="0">input := workorder.CreateWOInput{
+                ProductID:        req.ProductID,
+                BOMID:            req.BOMID,
+                PlannedQuantity:  req.PlannedQuantity,
+                UOMID:            req.UOMID,
+                PlannedStartDate: req.PlannedStartDate,
+                PlannedEndDate:   req.PlannedEndDate,
+                BatchNumber:      req.BatchNumber,
+                SalesOrderID:     req.SalesOrderID,
+                ProductionLine:   req.ProductionLine,
+                Shift:            req.Shift,
+                Priority:         priority,
+                Notes:            req.Notes,
+                CreatedBy:        userID,
+        }
+
+        result, err := h.createWOUC.Execute(c.Request.Context(), input)
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">created(c, toWOResponse(result))</span>
+}
+
+// GetWO gets a work order by ID
+func (h *WOHandler) GetWO(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid work order ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">result, err := h.getWOUC.Execute(c.Request.Context(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                notFound(c, "Work order not found")
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, toWOResponse(result))</span>
+}
+
+// ListWOs lists work orders
+func (h *WOHandler) ListWOs(c *gin.Context) <span class="cov0" title="0">{
+        filter := repository.WOFilter{
+                Page:     getPageFromQuery(c),
+                PageSize: getPageSizeFromQuery(c),
+                Search:   c.Query("search"),
+        }
+
+        if status := c.Query("status"); status != "" </span><span class="cov0" title="0">{
+                s := entity.WOStatus(status)
+                filter.Status = &amp;s
+        }</span>
+        <span class="cov0" title="0">if priority := c.Query("priority"); priority != "" </span><span class="cov0" title="0">{
+                p := entity.WOPriority(priority)
+                filter.Priority = &amp;p
+        }</span>
+
+        <span class="cov0" title="0">wos, total, err := h.listWOsUC.Execute(c.Request.Context(), filter)
+        if err != nil </span><span class="cov0" title="0">{
+                internalError(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">var items []dto.WOResponse
+        for _, wo := range wos </span><span class="cov0" title="0">{
+                items = append(items, toWOResponse(wo))
+        }</span>
+
+        <span class="cov0" title="0">successWithMeta(c, items, newMeta(filter.Page, filter.PageSize, total))</span>
+}
+
+// ReleaseWO releases a work order
+func (h *WOHandler) ReleaseWO(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid work order ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        result, err := h.releaseWOUC.Execute(c.Request.Context(), id, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, toWOResponse(result))</span>
+}
+
+// StartWO starts a work order
+func (h *WOHandler) StartWO(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid work order ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">var req dto.StartWORequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">result, err := h.startWOUC.Execute(c.Request.Context(), id, req.SupervisorID)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, toWOResponse(result))</span>
+}
+
+// CompleteWO completes a work order
+func (h *WOHandler) CompleteWO(c *gin.Context) <span class="cov0" title="0">{
+        id, err := uuid.Parse(c.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, "Invalid work order ID")
+                return
+        }</span>
+
+        <span class="cov0" title="0">var req dto.CompleteWORequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">userID := getUserIDFromContext(c)
+
+        input := workorder.CompleteWOInput{
+                WOID:             id,
+                ActualQuantity:   req.ActualQuantity,
+                GoodQuantity:     req.GoodQuantity,
+                RejectedQuantity: req.RejectedQuantity,
+                Notes:            req.Notes,
+                UpdatedBy:        userID,
+        }
+
+        result, err := h.completeWOUC.Execute(c.Request.Context(), input)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequest(c, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">success(c, toWOResponse(result))</span>
+}
+
+func toWOResponse(wo *entity.WorkOrder) dto.WOResponse <span class="cov0" title="0">{
+        return dto.WOResponse{
+                ID:               wo.ID,
+                WONumber:         wo.WONumber,
+                WODate:           wo.WODate,
+                ProductID:        wo.ProductID,
+                BOMID:            wo.BOMID,
+                Status:           string(wo.Status),
+                Priority:         string(wo.Priority),
+                PlannedQuantity:  wo.PlannedQuantity,
+                ActualQuantity:   wo.ActualQuantity,
+                GoodQuantity:     wo.GoodQuantity,
+                RejectedQuantity: wo.RejectedQuantity,
+                YieldPercentage:  wo.YieldPercentage,
+                BatchNumber:      wo.BatchNumber,
+                PlannedStartDate: wo.PlannedStartDate,
+                PlannedEndDate:   wo.PlannedEndDate,
+                ActualStartDate:  wo.ActualStartDate,
+                ActualEndDate:    wo.ActualEndDate,
+                ProductionLine:   wo.ProductionLine,
+                Notes:            wo.Notes,
+                CreatedAt:        wo.CreatedAt,
+        }
+}</span>
+
+// Dummy time for compilation
+var _ = time.Now
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package router
+
+import (
+        "github.com/erp-cosmetics/manufacturing-service/internal/delivery/http/handler"
+        "github.com/gin-gonic/gin"
+)
+
+// SetupRouter configures the HTTP router
+func SetupRouter(
+        bomHandler *handler.BOMHandler,
+        woHandler *handler.WOHandler,
+        qcHandler *handler.QCHandler,
+        ncrHandler *handler.NCRHandler,
+        traceHandler *handler.TraceHandler,
+        healthHandler *handler.HealthHandler,
+) *gin.Engine <span class="cov0" title="0">{
+        r := gin.New()
+
+        // Global middleware
+        r.Use(gin.Recovery())
+        r.Use(gin.Logger())
+
+        // Health endpoints
+        r.GET("/health", healthHandler.Health)
+        r.GET("/ready", healthHandler.Ready)
+        r.GET("/live", healthHandler.Live)
+
+        // API v1
+        v1 := r.Group("/api/v1")
+        </span><span class="cov0" title="0">{
+                // BOM routes
+                boms := v1.Group("/boms")
+                </span><span class="cov0" title="0">{
+                        boms.POST("", bomHandler.CreateBOM)
+                        boms.GET("", bomHandler.ListBOMs)
+                        boms.GET("/:id", bomHandler.GetBOM)
+                        boms.POST("/:id/approve", bomHandler.ApproveBOM)
+                }</span>
+
+                // Work Order routes
+                <span class="cov0" title="0">workOrders := v1.Group("/work-orders")
+                </span><span class="cov0" title="0">{
+                        workOrders.POST("", woHandler.CreateWO)
+                        workOrders.GET("", woHandler.ListWOs)
+                        workOrders.GET("/:id", woHandler.GetWO)
+                        workOrders.PATCH("/:id/release", woHandler.ReleaseWO)
+                        workOrders.PATCH("/:id/start", woHandler.StartWO)
+                        workOrders.PATCH("/:id/complete", woHandler.CompleteWO)
+                }</span>
+
+                // QC routes
+                <span class="cov0" title="0">v1.GET("/qc-checkpoints", qcHandler.GetCheckpoints)
+                
+                qcInspections := v1.Group("/qc-inspections")
+                </span><span class="cov0" title="0">{
+                        qcInspections.POST("", qcHandler.CreateInspection)
+                        qcInspections.GET("", qcHandler.ListInspections)
+                        qcInspections.GET("/:id", qcHandler.GetInspection)
+                        qcInspections.PATCH("/:id/approve", qcHandler.ApproveInspection)
+                }</span>
+
+                // NCR routes
+                <span class="cov0" title="0">ncrs := v1.Group("/ncrs")
+                </span><span class="cov0" title="0">{
+                        ncrs.POST("", ncrHandler.CreateNCR)
+                        ncrs.GET("", ncrHandler.ListNCRs)
+                        ncrs.GET("/:id", ncrHandler.GetNCR)
+                        ncrs.PATCH("/:id/close", ncrHandler.CloseNCR)
+                }</span>
+
+                // Traceability routes
+                <span class="cov0" title="0">trace := v1.Group("/traceability")
+                </span><span class="cov0" title="0">{
+                        trace.GET("/backward/:lot_id", traceHandler.TraceBackward)
+                        trace.GET("/forward/:lot_id", traceHandler.TraceForward)
+                }</span>
+        }
+
+        <span class="cov0" title="0">return r</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package entity
+
+import (
+        "crypto/aes"
+        "crypto/cipher"
+        "crypto/rand"
+        "encoding/json"
+        "errors"
+        "io"
+        "time"
+
+        "github.com/google/uuid"
+)
+
+// BOMStatus represents BOM status
+type BOMStatus string
+
+const (
+        BOMStatusDraft           BOMStatus = "DRAFT"
+        BOMStatusPendingApproval BOMStatus = "PENDING_APPROVAL"
+        BOMStatusApproved        BOMStatus = "APPROVED"
+        BOMStatusObsolete        BOMStatus = "OBSOLETE"
+)
+
+// ConfidentialityLevel represents the access level for BOM
+type ConfidentialityLevel string
+
+const (
+        ConfidentialityPublic      ConfidentialityLevel = "PUBLIC"
+        ConfidentialityInternal    ConfidentialityLevel = "INTERNAL"
+        ConfidentialityConfidental ConfidentialityLevel = "CONFIDENTIAL"
+        ConfidentialityRestricted  ConfidentialityLevel = "RESTRICTED"
+)
+
+// BOMItemType represents the type of BOM item
+type BOMItemType string
+
+const (
+        BOMItemTypeMaterial   BOMItemType = "MATERIAL"
+        BOMItemTypePackaging  BOMItemType = "PACKAGING"
+        BOMItemTypeConsumable BOMItemType = "CONSUMABLE"
+)
+
+// BOM represents a Bill of Materials with encrypted formula
+type BOM struct {
+        ID                   uuid.UUID            `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        BOMNumber            string               `json:"bom_number" gorm:"type:varchar(50);unique;not null"`
+        ProductID            uuid.UUID            `json:"product_id" gorm:"type:uuid;not null"`
+        Version              int                  `json:"version" gorm:"default:1"`
+        Name                 string               `json:"name" gorm:"type:varchar(200);not null"`
+        Description          string               `json:"description" gorm:"type:text"`
+        Status               BOMStatus            `json:"status" gorm:"type:varchar(30);default:'DRAFT'"`
+        BatchSize            float64              `json:"batch_size" gorm:"type:decimal(15,4);not null"`
+        BatchUnitID          uuid.UUID            `json:"batch_unit_id" gorm:"type:uuid;not null"`
+        FormulaDetails       []byte               `json:"-" gorm:"type:bytea"` // Encrypted - never expose directly
+        ConfidentialityLevel ConfidentialityLevel `json:"confidentiality_level" gorm:"type:varchar(30);default:'RESTRICTED'"`
+        MaterialCost         float64              `json:"material_cost" gorm:"type:decimal(18,2);default:0"`
+        LaborCost            float64              `json:"labor_cost" gorm:"type:decimal(18,2);default:0"`
+        OverheadCost         float64              `json:"overhead_cost" gorm:"type:decimal(18,2);default:0"`
+        TotalCost            float64              `json:"total_cost" gorm:"type:decimal(18,2);default:0"`
+        EffectiveFrom        *time.Time           `json:"effective_from" gorm:"type:date"`
+        EffectiveTo          *time.Time           `json:"effective_to" gorm:"type:date"`
+        ApprovedBy           *uuid.UUID           `json:"approved_by" gorm:"type:uuid"`
+        ApprovedAt           *time.Time           `json:"approved_at"`
+        CreatedBy            *uuid.UUID           `json:"created_by" gorm:"type:uuid"`
+        UpdatedBy            *uuid.UUID           `json:"updated_by" gorm:"type:uuid"`
+        CreatedAt            time.Time            `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+        UpdatedAt            time.Time            `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
+
+        // Associations
+        Items []BOMLineItem `json:"items,omitempty" gorm:"foreignKey:BOMID"`
+}
+
+// TableName returns the table name
+func (BOM) TableName() string <span class="cov0" title="0">{
+        return "boms"
+}</span>
+
+// BOMLineItem represents a line item in a BOM
+type BOMLineItem struct {
+        ID              uuid.UUID   `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        BOMID           uuid.UUID   `json:"bom_id" gorm:"type:uuid;not null"`
+        LineNumber      int         `json:"line_number" gorm:"not null"`
+        MaterialID      uuid.UUID   `json:"material_id" gorm:"type:uuid;not null"`
+        ItemType        BOMItemType `json:"item_type" gorm:"type:varchar(30);default:'MATERIAL'"`
+        Quantity        float64     `json:"quantity" gorm:"type:decimal(15,4);not null"`
+        UOMID           uuid.UUID   `json:"uom_id" gorm:"type:uuid;not null"`
+        QuantityMin     *float64    `json:"quantity_min" gorm:"type:decimal(15,4)"`
+        QuantityMax     *float64    `json:"quantity_max" gorm:"type:decimal(15,4)"`
+        IsCritical      bool        `json:"is_critical" gorm:"default:false"`
+        ScrapPercentage float64     `json:"scrap_percentage" gorm:"type:decimal(5,2);default:0"`
+        UnitCost        float64     `json:"unit_cost" gorm:"type:decimal(18,4);default:0"`
+        TotalCost       float64     `json:"total_cost" gorm:"type:decimal(18,2);default:0"`
+        Notes           string      `json:"notes" gorm:"type:text"`
+        CreatedAt       time.Time   `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+        UpdatedAt       time.Time   `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+// TableName returns the table name
+func (BOMLineItem) TableName() string <span class="cov0" title="0">{
+        return "bom_line_items"
+}</span>
+
+// BOMVersion represents a version snapshot of a BOM
+type BOMVersion struct {
+        ID           uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        BOMID        uuid.UUID  `json:"bom_id" gorm:"type:uuid;not null"`
+        Version      int        `json:"version" gorm:"not null"`
+        ChangeReason string     `json:"change_reason" gorm:"type:text"`
+        ChangedBy    *uuid.UUID `json:"changed_by" gorm:"type:uuid"`
+        ChangedAt    time.Time  `json:"changed_at" gorm:"default:CURRENT_TIMESTAMP"`
+        Snapshot     []byte     `json:"snapshot" gorm:"type:jsonb;not null"` // JSON snapshot of BOM
+        CreatedAt    time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+// TableName returns the table name
+func (BOMVersion) TableName() string <span class="cov0" title="0">{
+        return "bom_versions"
+}</span>
+
+// FormulaDetails represents the decrypted formula content
+type FormulaDetails struct {
+        ProcessingSteps    []string          `json:"processing_steps"`
+        CriticalParameters map[string]string `json:"critical_parameters"`
+        Notes              string            `json:"notes"`
+}
+
+// EncryptFormula encrypts formula details using AES-256-GCM
+func EncryptFormula(formula *FormulaDetails, key []byte) ([]byte, error) <span class="cov8" title="1">{
+        if formula == nil </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+
+        <span class="cov8" title="1">plaintext, err := json.Marshal(formula)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">block, err := aes.NewCipher(key)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">gcm, err := cipher.NewGCM(block)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">nonce := make([]byte, gcm.NonceSize())
+        if _, err := io.ReadFull(rand.Reader, nonce); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">ciphertext := gcm.Seal(nonce, nonce, plaintext, nil)
+        return ciphertext, nil</span>
+}
+
+// DecryptFormula decrypts formula details using AES-256-GCM
+func DecryptFormula(ciphertext []byte, key []byte) (*FormulaDetails, error) <span class="cov8" title="1">{
+        if len(ciphertext) == 0 </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+
+        <span class="cov8" title="1">block, err := aes.NewCipher(key)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">gcm, err := cipher.NewGCM(block)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">nonceSize := gcm.NonceSize()
+        if len(ciphertext) &lt; nonceSize </span><span class="cov0" title="0">{
+                return nil, errors.New("ciphertext too short")
+        }</span>
+
+        <span class="cov8" title="1">nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
+        plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">var formula FormulaDetails
+        if err := json.Unmarshal(plaintext, &amp;formula); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;formula, nil</span>
+}
+
+// BOM business methods
+
+// IsDraft returns true if BOM is in draft status
+func (b *BOM) IsDraft() bool <span class="cov0" title="0">{
+        return b.Status == BOMStatusDraft
+}</span>
+
+// CanBeApproved returns true if BOM can be approved
+func (b *BOM) CanBeApproved() bool <span class="cov0" title="0">{
+        return b.Status == BOMStatusPendingApproval
+}</span>
+
+// CanBeModified returns true if BOM can be modified
+func (b *BOM) CanBeModified() bool <span class="cov0" title="0">{
+        return b.Status == BOMStatusDraft
+}</span>
+
+// Submit submits BOM for approval
+func (b *BOM) Submit() error <span class="cov8" title="1">{
+        if b.Status != BOMStatusDraft </span><span class="cov0" title="0">{
+                return errors.New("only draft BOMs can be submitted")
+        }</span>
+        <span class="cov8" title="1">b.Status = BOMStatusPendingApproval
+        b.UpdatedAt = time.Now()
+        return nil</span>
+}
+
+// Approve approves the BOM
+func (b *BOM) Approve(approverID uuid.UUID) error <span class="cov8" title="1">{
+        if b.Status != BOMStatusPendingApproval </span><span class="cov8" title="1">{
+                return errors.New("only pending approval BOMs can be approved")
+        }</span>
+        <span class="cov8" title="1">b.Status = BOMStatusApproved
+        b.ApprovedBy = &amp;approverID
+        now := time.Now()
+        b.ApprovedAt = &amp;now
+        b.EffectiveFrom = &amp;now
+        b.UpdatedAt = now
+        return nil</span>
+}
+
+// MarkObsolete marks the BOM as obsolete
+func (b *BOM) MarkObsolete() <span class="cov0" title="0">{
+        b.Status = BOMStatusObsolete
+        now := time.Now()
+        b.EffectiveTo = &amp;now
+        b.UpdatedAt = now
+}</span>
+
+// CalculateTotalCost calculates the total cost of the BOM
+func (b *BOM) CalculateTotalCost() <span class="cov0" title="0">{
+        var materialCost float64
+        for _, item := range b.Items </span><span class="cov0" title="0">{
+                materialCost += item.TotalCost
+        }</span>
+        <span class="cov0" title="0">b.MaterialCost = materialCost
+        b.TotalCost = b.MaterialCost + b.LaborCost + b.OverheadCost</span>
+}
+
+// IsActive returns true if BOM is active (approved and within effective dates)
+func (b *BOM) IsActive() bool <span class="cov0" title="0">{
+        if b.Status != BOMStatusApproved </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">now := time.Now()
+        if b.EffectiveFrom != nil &amp;&amp; now.Before(*b.EffectiveFrom) </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">if b.EffectiveTo != nil &amp;&amp; now.After(*b.EffectiveTo) </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">return true</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package entity
+
+// Error definitions for manufacturing domain
+type DomainError struct {
+        Code    string
+        Message string
+}
+
+func (e *DomainError) Error() string <span class="cov0" title="0">{
+        return e.Message
+}</span>
+
+// Common domain errors
+var (
+        ErrBOMNotFound             = &amp;DomainError{Code: "BOM_NOT_FOUND", Message: "BOM not found"}
+        ErrBOMNotDraft             = &amp;DomainError{Code: "BOM_NOT_DRAFT", Message: "BOM is not in draft status"}
+        ErrBOMNotPendingApproval   = &amp;DomainError{Code: "BOM_NOT_PENDING", Message: "BOM is not pending approval"}
+        ErrBOMAlreadyApproved      = &amp;DomainError{Code: "BOM_ALREADY_APPROVED", Message: "BOM is already approved"}
+        ErrInvalidEncryptionKey    = &amp;DomainError{Code: "INVALID_KEY", Message: "Invalid encryption key"}
+        
+        ErrWONotFound              = &amp;DomainError{Code: "WO_NOT_FOUND", Message: "Work order not found"}
+        ErrWOCannotRelease         = &amp;DomainError{Code: "WO_CANNOT_RELEASE", Message: "Work order cannot be released"}
+        ErrWOCannotStart           = &amp;DomainError{Code: "WO_CANNOT_START", Message: "Work order cannot be started"}
+        ErrWOCannotComplete        = &amp;DomainError{Code: "WO_CANNOT_COMPLETE", Message: "Work order cannot be completed"}
+        ErrWOCannotCancel          = &amp;DomainError{Code: "WO_CANNOT_CANCEL", Message: "Work order cannot be cancelled"}
+        ErrMaterialNotIssued       = &amp;DomainError{Code: "MATERIAL_NOT_ISSUED", Message: "Material not fully issued"}
+        
+        ErrQCInspectionNotFound    = &amp;DomainError{Code: "QC_NOT_FOUND", Message: "QC inspection not found"}
+        ErrQCAlreadyApproved       = &amp;DomainError{Code: "QC_ALREADY_APPROVED", Message: "QC inspection already approved"}
+        ErrQCCheckpointNotFound    = &amp;DomainError{Code: "QC_CHECKPOINT_NOT_FOUND", Message: "QC checkpoint not found"}
+        
+        ErrNCRNotFound             = &amp;DomainError{Code: "NCR_NOT_FOUND", Message: "NCR not found"}
+        ErrNCRAlreadyClosed        = &amp;DomainError{Code: "NCR_ALREADY_CLOSED", Message: "NCR is already closed"}
+        
+        ErrTraceNotFound           = &amp;DomainError{Code: "TRACE_NOT_FOUND", Message: "Traceability record not found"}
+        ErrLotNotFound             = &amp;DomainError{Code: "LOT_NOT_FOUND", Message: "Lot not found"}
+)
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package entity
+
+import (
+        "time"
+
+        "github.com/google/uuid"
+)
+
+// NCType represents non-conformance type
+type NCType string
+
+const (
+        NCTypeMaterial  NCType = "MATERIAL"
+        NCTypeProcess   NCType = "PROCESS"
+        NCTypeProduct   NCType = "PRODUCT"
+        NCTypeEquipment NCType = "EQUIPMENT"
+)
+
+// NCRSeverity represents NCR severity level
+type NCRSeverity string
+
+const (
+        NCRSeverityLow      NCRSeverity = "LOW"
+        NCRSeverityMedium   NCRSeverity = "MEDIUM"
+        NCRSeverityHigh     NCRSeverity = "HIGH"
+        NCRSeverityCritical NCRSeverity = "CRITICAL"
+)
+
+// NCRStatus represents NCR status
+type NCRStatus string
+
+const (
+        NCRStatusOpen             NCRStatus = "OPEN"
+        NCRStatusInvestigation    NCRStatus = "INVESTIGATION"
+        NCRStatusCorrectiveAction NCRStatus = "CORRECTIVE_ACTION"
+        NCRStatusClosed           NCRStatus = "CLOSED"
+)
+
+// Disposition represents NCR disposition
+type Disposition string
+
+const (
+        DispositionUseAsIs          Disposition = "USE_AS_IS"
+        DispositionRework           Disposition = "REWORK"
+        DispositionScrap            Disposition = "SCRAP"
+        DispositionReturnToSupplier Disposition = "RETURN_TO_SUPPLIER"
+)
+
+// NCR represents a Non-Conformance Report
+type NCR struct {
+        ID                  uuid.UUID   `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        NCRNumber           string      `json:"ncr_number" gorm:"type:varchar(30);unique;not null"`
+        NCRDate             time.Time   `json:"ncr_date" gorm:"type:date;not null"`
+        NCType              NCType      `json:"nc_type" gorm:"type:varchar(30);not null"`
+        Severity            NCRSeverity `json:"severity" gorm:"type:varchar(20);default:'MEDIUM'"`
+        Status              NCRStatus   `json:"status" gorm:"type:varchar(30);default:'OPEN'"`
+        ReferenceType       string      `json:"reference_type" gorm:"type:varchar(30)"`
+        ReferenceID         *uuid.UUID  `json:"reference_id" gorm:"type:uuid"`
+        ProductID           *uuid.UUID  `json:"product_id" gorm:"type:uuid"`
+        MaterialID          *uuid.UUID  `json:"material_id" gorm:"type:uuid"`
+        LotID               *uuid.UUID  `json:"lot_id" gorm:"type:uuid"`
+        LotNumber           string      `json:"lot_number" gorm:"type:varchar(50)"`
+        Description         string      `json:"description" gorm:"type:text;not null"`
+        QuantityAffected    *float64    `json:"quantity_affected" gorm:"type:decimal(15,4)"`
+        UOMID               *uuid.UUID  `json:"uom_id" gorm:"type:uuid"`
+        RootCause           string      `json:"root_cause" gorm:"type:text"`
+        InvestigationDate   *time.Time  `json:"investigation_date"`
+        InvestigatedBy      *uuid.UUID  `json:"investigated_by" gorm:"type:uuid"`
+        ImmediateAction     string      `json:"immediate_action" gorm:"type:text"`
+        CorrectiveAction    string      `json:"corrective_action" gorm:"type:text"`
+        PreventiveAction    string      `json:"preventive_action" gorm:"type:text"`
+        Disposition         *Disposition `json:"disposition" gorm:"type:varchar(30)"`
+        DispositionQuantity *float64    `json:"disposition_quantity" gorm:"type:decimal(15,4)"`
+        DispositionDate     *time.Time  `json:"disposition_date"`
+        DispositionBy       *uuid.UUID  `json:"disposition_by" gorm:"type:uuid"`
+        ClosedAt            *time.Time  `json:"closed_at"`
+        ClosedBy            *uuid.UUID  `json:"closed_by" gorm:"type:uuid"`
+        ClosureNotes        string      `json:"closure_notes" gorm:"type:text"`
+        CreatedBy           *uuid.UUID  `json:"created_by" gorm:"type:uuid"`
+        UpdatedBy           *uuid.UUID  `json:"updated_by" gorm:"type:uuid"`
+        CreatedAt           time.Time   `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+        UpdatedAt           time.Time   `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+// TableName returns the table name
+func (NCR) TableName() string <span class="cov0" title="0">{
+        return "ncrs"
+}</span>
+
+// NCR business methods
+
+// IsOpen returns true if NCR is open
+func (n *NCR) IsOpen() bool <span class="cov0" title="0">{
+        return n.Status == NCRStatusOpen
+}</span>
+
+// CanBeClosed returns true if NCR can be closed
+func (n *NCR) CanBeClosed() bool <span class="cov0" title="0">{
+        return n.Status != NCRStatusClosed
+}</span>
+
+// StartInvestigation moves NCR to investigation phase
+func (n *NCR) StartInvestigation(investigatorID uuid.UUID) <span class="cov0" title="0">{
+        n.Status = NCRStatusInvestigation
+        n.InvestigatedBy = &amp;investigatorID
+        now := time.Now()
+        n.InvestigationDate = &amp;now
+        n.UpdatedAt = now
+}</span>
+
+// RecordRootCause records the root cause
+func (n *NCR) RecordRootCause(rootCause string) <span class="cov0" title="0">{
+        n.RootCause = rootCause
+        n.Status = NCRStatusCorrectiveAction
+        n.UpdatedAt = time.Now()
+}</span>
+
+// SetDisposition sets the disposition for the NCR
+func (n *NCR) SetDisposition(disposition Disposition, quantity float64, disposedBy uuid.UUID) <span class="cov0" title="0">{
+        n.Disposition = &amp;disposition
+        n.DispositionQuantity = &amp;quantity
+        n.DispositionBy = &amp;disposedBy
+        now := time.Now()
+        n.DispositionDate = &amp;now
+        n.UpdatedAt = now
+}</span>
+
+// Close closes the NCR
+func (n *NCR) Close(closedBy uuid.UUID, notes string) error <span class="cov0" title="0">{
+        if !n.CanBeClosed() </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">n.Status = NCRStatusClosed
+        n.ClosedBy = &amp;closedBy
+        n.ClosureNotes = notes
+        now := time.Now()
+        n.ClosedAt = &amp;now
+        n.UpdatedAt = now
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package entity
+
+import (
+        "encoding/json"
+        "time"
+
+        "github.com/google/uuid"
+)
+
+// CheckpointType represents QC checkpoint type
+type CheckpointType string
+
+const (
+        CheckpointTypeIQC  CheckpointType = "IQC"  // Incoming QC
+        CheckpointTypeIPQC CheckpointType = "IPQC" // In-Process QC
+        CheckpointTypeFQC  CheckpointType = "FQC"  // Final QC
+)
+
+// InspectionResult represents QC result
+type InspectionResult string
+
+const (
+        InspectionResultPending     InspectionResult = "PENDING"
+        InspectionResultPassed      InspectionResult = "PASSED"
+        InspectionResultFailed      InspectionResult = "FAILED"
+        InspectionResultConditional InspectionResult = "CONDITIONAL"
+)
+
+// ItemResult represents individual test result
+type ItemResult string
+
+const (
+        ItemResultPass ItemResult = "PASS"
+        ItemResultFail ItemResult = "FAIL"
+        ItemResultNA   ItemResult = "N/A"
+)
+
+// ReferenceType represents what is being inspected
+type ReferenceType string
+
+const (
+        ReferenceTypeWorkOrder ReferenceType = "WORK_ORDER"
+        ReferenceTypeGRN       ReferenceType = "GRN"
+        ReferenceTypeLot       ReferenceType = "LOT"
+)
+
+// QCCheckpoint represents a QC checkpoint template
+type QCCheckpoint struct {
+        ID             uuid.UUID      `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        Code           string         `json:"code" gorm:"type:varchar(20);unique;not null"`
+        Name           string         `json:"name" gorm:"type:varchar(100);not null"`
+        Description    string         `json:"description" gorm:"type:text"`
+        CheckpointType CheckpointType `json:"checkpoint_type" gorm:"type:varchar(20);not null"`
+        AppliesTo      string         `json:"applies_to" gorm:"type:varchar(20);default:'ALL'"` // ALL, MATERIAL, PRODUCT
+        TestItems      json.RawMessage `json:"test_items" gorm:"type:jsonb;not null"`
+        IsActive       bool           `json:"is_active" gorm:"default:true"`
+        CreatedAt      time.Time      `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+        UpdatedAt      time.Time      `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+// TableName returns the table name
+func (QCCheckpoint) TableName() string <span class="cov0" title="0">{
+        return "qc_checkpoints"
+}</span>
+
+// TestItemTemplate represents a test item in a checkpoint
+type TestItemTemplate struct {
+        Name          string   `json:"name"`
+        Method        string   `json:"method"`
+        Specification string   `json:"specification"`
+        Type          string   `json:"type"` // PASS_FAIL, NUMERIC
+        Min           *float64 `json:"min,omitempty"`
+        Max           *float64 `json:"max,omitempty"`
+        Unit          string   `json:"unit,omitempty"`
+}
+
+// QCInspection represents an actual QC inspection
+type QCInspection struct {
+        ID                uuid.UUID        `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        InspectionNumber  string           `json:"inspection_number" gorm:"type:varchar(30);unique;not null"`
+        InspectionDate    time.Time        `json:"inspection_date" gorm:"not null"`
+        InspectionType    CheckpointType   `json:"inspection_type" gorm:"type:varchar(20);not null"`
+        CheckpointID      *uuid.UUID       `json:"checkpoint_id" gorm:"type:uuid"`
+        ReferenceType     ReferenceType    `json:"reference_type" gorm:"type:varchar(30);not null"`
+        ReferenceID       uuid.UUID        `json:"reference_id" gorm:"type:uuid;not null"`
+        ProductID         *uuid.UUID       `json:"product_id" gorm:"type:uuid"`
+        MaterialID        *uuid.UUID       `json:"material_id" gorm:"type:uuid"`
+        LotID             *uuid.UUID       `json:"lot_id" gorm:"type:uuid"`
+        LotNumber         string           `json:"lot_number" gorm:"type:varchar(50)"`
+        InspectedQuantity float64          `json:"inspected_quantity" gorm:"type:decimal(15,4);not null"`
+        AcceptedQuantity  *float64         `json:"accepted_quantity" gorm:"type:decimal(15,4)"`
+        RejectedQuantity  *float64         `json:"rejected_quantity" gorm:"type:decimal(15,4)"`
+        SampleSize        *int             `json:"sample_size"`
+        Result            InspectionResult `json:"result" gorm:"type:varchar(20);default:'PENDING'"`
+        OverallScore      *float64         `json:"overall_score" gorm:"type:decimal(5,2)"`
+        InspectorID       uuid.UUID        `json:"inspector_id" gorm:"type:uuid;not null"`
+        InspectorName     string           `json:"inspector_name" gorm:"type:varchar(100)"`
+        ApprovedBy        *uuid.UUID       `json:"approved_by" gorm:"type:uuid"`
+        ApprovedAt        *time.Time       `json:"approved_at"`
+        TestResults       json.RawMessage  `json:"test_results" gorm:"type:jsonb"`
+        Notes             string           `json:"notes" gorm:"type:text"`
+        CreatedAt         time.Time        `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+        UpdatedAt         time.Time        `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
+
+        // Associations
+        Items []QCInspectionItem `json:"items,omitempty" gorm:"foreignKey:InspectionID"`
+}
+
+// TableName returns the table name
+func (QCInspection) TableName() string <span class="cov0" title="0">{
+        return "qc_inspections"
+}</span>
+
+// QCInspectionItem represents an individual test in an inspection
+type QCInspectionItem struct {
+        ID            uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        InspectionID  uuid.UUID  `json:"inspection_id" gorm:"type:uuid;not null"`
+        ItemNumber    int        `json:"item_number" gorm:"not null"`
+        TestName      string     `json:"test_name" gorm:"type:varchar(100);not null"`
+        TestMethod    string     `json:"test_method" gorm:"type:varchar(100)"`
+        Specification string     `json:"specification" gorm:"type:varchar(200)"`
+        TargetValue   string     `json:"target_value" gorm:"type:varchar(100)"`
+        MinValue      string     `json:"min_value" gorm:"type:varchar(100)"`
+        MaxValue      string     `json:"max_value" gorm:"type:varchar(100)"`
+        ActualValue   string     `json:"actual_value" gorm:"type:varchar(100)"`
+        UOM           string     `json:"uom" gorm:"type:varchar(20)"`
+        Result        ItemResult `json:"result" gorm:"type:varchar(20);not null"`
+        Notes         string     `json:"notes" gorm:"type:text"`
+        CreatedAt     time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+// TableName returns the table name
+func (QCInspectionItem) TableName() string <span class="cov0" title="0">{
+        return "qc_inspection_items"
+}</span>
+
+// QC business methods
+
+// IsPending returns true if inspection is pending
+func (q *QCInspection) IsPending() bool <span class="cov0" title="0">{
+        return q.Result == InspectionResultPending
+}</span>
+
+// CanBeApproved returns true if inspection can be approved
+func (q *QCInspection) CanBeApproved() bool <span class="cov0" title="0">{
+        return q.Result == InspectionResultPending
+}</span>
+
+// Pass marks the inspection as passed
+func (q *QCInspection) Pass(approverID uuid.UUID) <span class="cov0" title="0">{
+        q.Result = InspectionResultPassed
+        q.ApprovedBy = &amp;approverID
+        now := time.Now()
+        q.ApprovedAt = &amp;now
+        q.UpdatedAt = now
+}</span>
+
+// Fail marks the inspection as failed
+func (q *QCInspection) Fail(approverID uuid.UUID) <span class="cov0" title="0">{
+        q.Result = InspectionResultFailed
+        q.ApprovedBy = &amp;approverID
+        now := time.Now()
+        q.ApprovedAt = &amp;now
+        q.UpdatedAt = now
+}</span>
+
+// ConditionalPass marks the inspection as conditionally passed
+func (q *QCInspection) ConditionalPass(approverID uuid.UUID) <span class="cov0" title="0">{
+        q.Result = InspectionResultConditional
+        q.ApprovedBy = &amp;approverID
+        now := time.Now()
+        q.ApprovedAt = &amp;now
+        q.UpdatedAt = now
+}</span>
+
+// CalculateScore calculates the overall score based on items
+func (q *QCInspection) CalculateScore() <span class="cov0" title="0">{
+        if len(q.Items) == 0 </span><span class="cov0" title="0">{
+                return
+        }</span>
+        
+        <span class="cov0" title="0">passCount := 0
+        totalCount := 0
+        
+        for _, item := range q.Items </span><span class="cov0" title="0">{
+                if item.Result != ItemResultNA </span><span class="cov0" title="0">{
+                        totalCount++
+                        if item.Result == ItemResultPass </span><span class="cov0" title="0">{
+                                passCount++
+                        }</span>
+                }
+        }
+        
+        <span class="cov0" title="0">if totalCount &gt; 0 </span><span class="cov0" title="0">{
+                score := float64(passCount) / float64(totalCount) * 100
+                q.OverallScore = &amp;score
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package entity
+
+import (
+        "time"
+
+        "github.com/google/uuid"
+)
+
+// BatchTraceability links material lots to product lots for traceability
+type BatchTraceability struct {
+        ID                  uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        WorkOrderID         uuid.UUID  `json:"work_order_id" gorm:"type:uuid;not null"`
+        WOMaterialIssueID   *uuid.UUID `json:"wo_material_issue_id" gorm:"type:uuid"`
+        MaterialID          uuid.UUID  `json:"material_id" gorm:"type:uuid;not null"`
+        MaterialLotID       uuid.UUID  `json:"material_lot_id" gorm:"type:uuid;not null"`
+        MaterialLotNumber   string     `json:"material_lot_number" gorm:"type:varchar(50);not null"`
+        MaterialQuantity    float64    `json:"material_quantity" gorm:"type:decimal(15,4);not null"`
+        MaterialUOMID       uuid.UUID  `json:"material_uom_id" gorm:"type:uuid;not null"`
+        SupplierLotNumber   string     `json:"supplier_lot_number" gorm:"type:varchar(100)"`
+        ProductID           uuid.UUID  `json:"product_id" gorm:"type:uuid;not null"`
+        ProductLotID        *uuid.UUID `json:"product_lot_id" gorm:"type:uuid"`
+        ProductLotNumber    string     `json:"product_lot_number" gorm:"type:varchar(50)"`
+        TraceDate           time.Time  `json:"trace_date" gorm:"default:CURRENT_TIMESTAMP"`
+        CreatedAt           time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+// TableName returns the table name
+func (BatchTraceability) TableName() string <span class="cov0" title="0">{
+        return "batch_traceability"
+}</span>
+
+// BackwardTraceResult represents the result of a backward trace
+type BackwardTraceResult struct {
+        FinishedLot   FinishedLotInfo    `json:"finished_lot"`
+        WorkOrder     WorkOrderInfo      `json:"work_order"`
+        MaterialsUsed []MaterialTraceInfo `json:"materials_used"`
+}
+
+// ForwardTraceResult represents the result of a forward trace
+type ForwardTraceResult struct {
+        MaterialLot     MaterialLotInfo    `json:"material_lot"`
+        UsedInProducts  []ProductTraceInfo `json:"used_in_products"`
+        TotalQtyUsed    float64            `json:"total_quantity_used"`
+        RemainingQty    float64            `json:"remaining_quantity"`
+}
+
+// FinishedLotInfo contains finished product lot info
+type FinishedLotInfo struct {
+        LotNumber        string    `json:"lot_number"`
+        ProductCode      string    `json:"product_code"`
+        ProductName      string    `json:"product_name"`
+        Quantity         float64   `json:"quantity"`
+        ManufacturedDate time.Time `json:"manufactured_date"`
+}
+
+// WorkOrderInfo contains work order summary
+type WorkOrderInfo struct {
+        WONumber   string `json:"wo_number"`
+        Supervisor string `json:"supervisor"`
+}
+
+// MaterialTraceInfo contains material trace info
+type MaterialTraceInfo struct {
+        MaterialCode    string  `json:"material_code"`
+        MaterialName    string  `json:"material_name"`
+        LotNumber       string  `json:"lot_number"`
+        Quantity        float64 `json:"quantity"`
+        UOM             string  `json:"uom"`
+        Supplier        string  `json:"supplier"`
+        SupplierLot     string  `json:"supplier_lot"`
+}
+
+// MaterialLotInfo contains material lot info for forward trace
+type MaterialLotInfo struct {
+        LotNumber    string `json:"lot_number"`
+        MaterialCode string `json:"material_code"`
+        MaterialName string `json:"material_name"`
+        Supplier     string `json:"supplier"`
+}
+
+// ProductTraceInfo contains product trace info for forward trace
+type ProductTraceInfo struct {
+        ProductLot     string    `json:"product_lot"`
+        ProductName    string    `json:"product_name"`
+        WONumber       string    `json:"wo_number"`
+        QuantityUsed   float64   `json:"quantity_used"`
+        ProductionDate time.Time `json:"production_date"`
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package entity
+
+import (
+        "errors"
+        "time"
+
+        "github.com/google/uuid"
+)
+
+// WOStatus represents work order status
+type WOStatus string
+
+const (
+        WOStatusPlanned    WOStatus = "PLANNED"
+        WOStatusReleased   WOStatus = "RELEASED"
+        WOStatusInProgress WOStatus = "IN_PROGRESS"
+        WOStatusQCPending  WOStatus = "QC_PENDING"
+        WOStatusCompleted  WOStatus = "COMPLETED"
+        WOStatusCancelled  WOStatus = "CANCELLED"
+)
+
+// WOPriority represents work order priority
+type WOPriority string
+
+const (
+        WOPriorityLow    WOPriority = "LOW"
+        WOPriorityNormal WOPriority = "NORMAL"
+        WOPriorityHigh   WOPriority = "HIGH"
+        WOPriorityUrgent WOPriority = "URGENT"
+)
+
+// WorkOrder represents a manufacturing work order
+type WorkOrder struct {
+        ID                uuid.UUID   `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        WONumber          string      `json:"wo_number" gorm:"type:varchar(30);unique;not null"`
+        WODate            time.Time   `json:"wo_date" gorm:"type:date;not null"`
+        ProductID         uuid.UUID   `json:"product_id" gorm:"type:uuid;not null"`
+        BOMID             uuid.UUID   `json:"bom_id" gorm:"type:uuid;not null"`
+        Status            WOStatus    `json:"status" gorm:"type:varchar(30);default:'PLANNED'"`
+        Priority          WOPriority  `json:"priority" gorm:"type:varchar(20);default:'NORMAL'"`
+        PlannedQuantity   float64     `json:"planned_quantity" gorm:"type:decimal(15,4);not null"`
+        UOMID             uuid.UUID   `json:"uom_id" gorm:"type:uuid;not null"`
+        PlannedStartDate  *time.Time  `json:"planned_start_date"`
+        PlannedEndDate    *time.Time  `json:"planned_end_date"`
+        ActualStartDate   *time.Time  `json:"actual_start_date"`
+        ActualEndDate     *time.Time  `json:"actual_end_date"`
+        ActualQuantity    *float64    `json:"actual_quantity" gorm:"type:decimal(15,4)"`
+        GoodQuantity      *float64    `json:"good_quantity" gorm:"type:decimal(15,4)"`
+        RejectedQuantity  *float64    `json:"rejected_quantity" gorm:"type:decimal(15,4)"`
+        YieldPercentage   *float64    `json:"yield_percentage" gorm:"type:decimal(5,2)"`
+        BatchNumber       string      `json:"batch_number" gorm:"type:varchar(50)"`
+        OutputLotID       *uuid.UUID  `json:"output_lot_id" gorm:"type:uuid"`
+        SalesOrderID      *uuid.UUID  `json:"sales_order_id" gorm:"type:uuid"`
+        ProductionLine    string      `json:"production_line" gorm:"type:varchar(50)"`
+        Shift             string      `json:"shift" gorm:"type:varchar(20)"`
+        SupervisorID      *uuid.UUID  `json:"supervisor_id" gorm:"type:uuid"`
+        Notes             string      `json:"notes" gorm:"type:text"`
+        CreatedBy         *uuid.UUID  `json:"created_by" gorm:"type:uuid"`
+        UpdatedBy         *uuid.UUID  `json:"updated_by" gorm:"type:uuid"`
+        CreatedAt         time.Time   `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+        UpdatedAt         time.Time   `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
+
+        // Associations
+        Items          []WOLineItem       `json:"items,omitempty" gorm:"foreignKey:WorkOrderID"`
+        MaterialIssues []WOMaterialIssue  `json:"material_issues,omitempty" gorm:"foreignKey:WorkOrderID"`
+        BOM            *BOM               `json:"bom,omitempty" gorm:"foreignKey:BOMID"`
+}
+
+// TableName returns the table name
+func (WorkOrder) TableName() string <span class="cov0" title="0">{
+        return "work_orders"
+}</span>
+
+// WOLineItem represents a planned material for work order
+type WOLineItem struct {
+        ID             uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        WorkOrderID    uuid.UUID  `json:"work_order_id" gorm:"type:uuid;not null"`
+        BOMLineItemID  *uuid.UUID `json:"bom_line_item_id" gorm:"type:uuid"`
+        LineNumber     int        `json:"line_number" gorm:"not null"`
+        MaterialID     uuid.UUID  `json:"material_id" gorm:"type:uuid;not null"`
+        PlannedQuantity float64   `json:"planned_quantity" gorm:"type:decimal(15,4);not null"`
+        IssuedQuantity float64    `json:"issued_quantity" gorm:"type:decimal(15,4);default:0"`
+        UOMID          uuid.UUID  `json:"uom_id" gorm:"type:uuid;not null"`
+        IsCritical     bool       `json:"is_critical" gorm:"default:false"`
+        Notes          string     `json:"notes" gorm:"type:text"`
+        CreatedAt      time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+        UpdatedAt      time.Time  `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+// TableName returns the table name
+func (WOLineItem) TableName() string <span class="cov0" title="0">{
+        return "wo_line_items"
+}</span>
+
+// WOMaterialIssue represents an actual material issue to a work order
+type WOMaterialIssue struct {
+        ID             uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+        WorkOrderID    uuid.UUID  `json:"work_order_id" gorm:"type:uuid;not null"`
+        WOLineItemID   *uuid.UUID `json:"wo_line_item_id" gorm:"type:uuid"`
+        IssueNumber    string     `json:"issue_number" gorm:"type:varchar(30);not null"`
+        IssueDate      time.Time  `json:"issue_date" gorm:"default:CURRENT_TIMESTAMP"`
+        MaterialID     uuid.UUID  `json:"material_id" gorm:"type:uuid;not null"`
+        LotID          uuid.UUID  `json:"lot_id" gorm:"type:uuid;not null"`
+        LotNumber      string     `json:"lot_number" gorm:"type:varchar(50);not null"`
+        Quantity       float64    `json:"quantity" gorm:"type:decimal(15,4);not null"`
+        UOMID          uuid.UUID  `json:"uom_id" gorm:"type:uuid;not null"`
+        WMSMovementID  *uuid.UUID `json:"wms_movement_id" gorm:"type:uuid"`
+        IssuedBy       *uuid.UUID `json:"issued_by" gorm:"type:uuid"`
+        Notes          string     `json:"notes" gorm:"type:text"`
+        CreatedAt      time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+// TableName returns the table name
+func (WOMaterialIssue) TableName() string <span class="cov0" title="0">{
+        return "wo_material_issues"
+}</span>
+
+// Work Order business methods
+
+// CanBeReleased returns true if WO can be released
+func (w *WorkOrder) CanBeReleased() bool <span class="cov8" title="1">{
+        return w.Status == WOStatusPlanned
+}</span>
+
+// CanBeStarted returns true if WO can be started
+func (w *WorkOrder) CanBeStarted() bool <span class="cov8" title="1">{
+        return w.Status == WOStatusReleased
+}</span>
+
+// CanBeCompleted returns true if WO can be completed
+func (w *WorkOrder) CanBeCompleted() bool <span class="cov8" title="1">{
+        return w.Status == WOStatusInProgress || w.Status == WOStatusQCPending
+}</span>
+
+// CanBeCancelled returns true if WO can be cancelled
+func (w *WorkOrder) CanBeCancelled() bool <span class="cov8" title="1">{
+        return w.Status == WOStatusPlanned || w.Status == WOStatusReleased
+}</span>
+
+// Release releases the work order
+func (w *WorkOrder) Release() error <span class="cov8" title="1">{
+        if !w.CanBeReleased() </span><span class="cov0" title="0">{
+                return errors.New("work order cannot be released from current status")
+        }</span>
+        <span class="cov8" title="1">w.Status = WOStatusReleased
+        w.UpdatedAt = time.Now()
+        return nil</span>
+}
+
+// Start starts the work order
+func (w *WorkOrder) Start(supervisorID uuid.UUID) error <span class="cov8" title="1">{
+        if !w.CanBeStarted() </span><span class="cov8" title="1">{
+                return errors.New("work order cannot be started from current status")
+        }</span>
+        <span class="cov8" title="1">w.Status = WOStatusInProgress
+        w.SupervisorID = &amp;supervisorID
+        now := time.Now()
+        w.ActualStartDate = &amp;now
+        w.UpdatedAt = now
+        return nil</span>
+}
+
+// SendToQC sends the work order to QC
+func (w *WorkOrder) SendToQC() error <span class="cov0" title="0">{
+        if w.Status != WOStatusInProgress </span><span class="cov0" title="0">{
+                return errors.New("only in-progress work orders can be sent to QC")
+        }</span>
+        <span class="cov0" title="0">w.Status = WOStatusQCPending
+        w.UpdatedAt = time.Now()
+        return nil</span>
+}
+
+// Complete completes the work order
+func (w *WorkOrder) Complete(actualQty, goodQty, rejectedQty float64) error <span class="cov8" title="1">{
+        if !w.CanBeCompleted() </span><span class="cov0" title="0">{
+                return errors.New("work order cannot be completed from current status")
+        }</span>
+        <span class="cov8" title="1">w.Status = WOStatusCompleted
+        w.ActualQuantity = &amp;actualQty
+        w.GoodQuantity = &amp;goodQty
+        w.RejectedQuantity = &amp;rejectedQty
+        
+        // Calculate yield
+        if w.PlannedQuantity &gt; 0 </span><span class="cov8" title="1">{
+                yield := (goodQty / w.PlannedQuantity) * 100
+                w.YieldPercentage = &amp;yield
+        }</span>
+        
+        <span class="cov8" title="1">now := time.Now()
+        w.ActualEndDate = &amp;now
+        w.UpdatedAt = now
+        return nil</span>
+}
+
+// Cancel cancels the work order
+func (w *WorkOrder) Cancel() error <span class="cov8" title="1">{
+        if !w.CanBeCancelled() </span><span class="cov8" title="1">{
+                return errors.New("work order cannot be cancelled from current status")
+        }</span>
+        <span class="cov8" title="1">w.Status = WOStatusCancelled
+        w.UpdatedAt = time.Now()
+        return nil</span>
+}
+
+// GetOutstandingQuantity returns the remaining quantity to be issued
+func (item *WOLineItem) GetOutstandingQuantity() float64 <span class="cov0" title="0">{
+        return item.PlannedQuantity - item.IssuedQuantity
+}</span>
+
+// IsFullyIssued returns true if all planned quantity has been issued
+func (item *WOLineItem) IsFullyIssued() bool <span class="cov0" title="0">{
+        return item.IssuedQuantity &gt;= item.PlannedQuantity
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package event
+
+import (
+        "encoding/json"
+
+        "github.com/erp-cosmetics/shared/pkg/nats"
+        "go.uber.org/zap"
+)
+
+// Publisher handles event publishing
+type Publisher struct {
+        client *nats.Client
+        logger *zap.Logger
+}
+
+// NewPublisher creates a new event publisher
+func NewPublisher(client *nats.Client, logger *zap.Logger) *Publisher <span class="cov0" title="0">{
+        return &amp;Publisher{
+                client: client,
+                logger: logger,
+        }
+}</span>
+
+// Event subjects
+const (
+        SubjectBOMCreated     = "manufacturing.bom.created"
+        SubjectBOMApproved    = "manufacturing.bom.approved"
+        SubjectWOCreated      = "manufacturing.wo.created"
+        SubjectWOReleased     = "manufacturing.wo.released"
+        SubjectWOStarted      = "manufacturing.wo.started"
+        SubjectWOCompleted    = "manufacturing.wo.completed"
+        SubjectQCPassed       = "manufacturing.qc.passed"
+        SubjectQCFailed       = "manufacturing.qc.failed"
+        SubjectNCRCreated     = "manufacturing.ncr.created"
+)
+
+// BOMEvent represents a BOM event payload
+type BOMEvent struct {
+        BOMID     string `json:"bom_id"`
+        BOMNumber string `json:"bom_number"`
+        ProductID string `json:"product_id"`
+        Version   int    `json:"version"`
+        Status    string `json:"status"`
+}
+
+// WOEvent represents a work order event payload
+type WOEvent struct {
+        WOID            string  `json:"wo_id"`
+        WONumber        string  `json:"wo_number"`
+        ProductID       string  `json:"product_id"`
+        BOMID           string  `json:"bom_id"`
+        BatchNumber     string  `json:"batch_number"`
+        PlannedQuantity float64 `json:"planned_quantity"`
+        Status          string  `json:"status"`
+}
+
+// WOCompletedEvent represents a completed work order event
+type WOCompletedEvent struct {
+        WOID         string  `json:"wo_id"`
+        WONumber     string  `json:"wo_number"`
+        ProductID    string  `json:"product_id"`
+        BatchNumber  string  `json:"batch_number"`
+        GoodQuantity float64 `json:"good_quantity"`
+        OutputLotID  string  `json:"output_lot_id,omitempty"`
+}
+
+// QCEvent represents a QC event payload
+type QCEvent struct {
+        InspectionID     string `json:"inspection_id"`
+        InspectionNumber string `json:"inspection_number"`
+        InspectionType   string `json:"inspection_type"`
+        ReferenceType    string `json:"reference_type"`
+        ReferenceID      string `json:"reference_id"`
+        Result           string `json:"result"`
+        LotID            string `json:"lot_id,omitempty"`
+}
+
+// NCREvent represents an NCR event payload
+type NCREvent struct {
+        NCRID       string `json:"ncr_id"`
+        NCRNumber   string `json:"ncr_number"`
+        NCType      string `json:"nc_type"`
+        Severity    string `json:"severity"`
+        Description string `json:"description"`
+        LotID       string `json:"lot_id,omitempty"`
+}
+
+// Publish publishes an event
+func (p *Publisher) Publish(subject string, payload interface{}) error <span class="cov0" title="0">{
+        if p.client == nil </span><span class="cov0" title="0">{
+                p.logger.Warn("NATS client not available, skipping event publish",
+                        zap.String("subject", subject))
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">data, err := json.Marshal(payload)
+        if err != nil </span><span class="cov0" title="0">{
+                p.logger.Error("Failed to marshal event payload",
+                        zap.String("subject", subject),
+                        zap.Error(err))
+                return err
+        }</span>
+
+        <span class="cov0" title="0">if err := p.client.Publish(subject, data); err != nil </span><span class="cov0" title="0">{
+                p.logger.Error("Failed to publish event",
+                        zap.String("subject", subject),
+                        zap.Error(err))
+                return err
+        }</span>
+
+        <span class="cov0" title="0">p.logger.Info("Event published",
+                zap.String("subject", subject))
+        return nil</span>
+}
+
+// PublishBOMCreated publishes BOM created event
+func (p *Publisher) PublishBOMCreated(event BOMEvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectBOMCreated, event)
+}</span>
+
+// PublishBOMApproved publishes BOM approved event
+func (p *Publisher) PublishBOMApproved(event BOMEvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectBOMApproved, event)
+}</span>
+
+// PublishWOCreated publishes WO created event
+func (p *Publisher) PublishWOCreated(event WOEvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectWOCreated, event)
+}</span>
+
+// PublishWOReleased publishes WO released event
+func (p *Publisher) PublishWOReleased(event WOEvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectWOReleased, event)
+}</span>
+
+// PublishWOStarted publishes WO started event - triggers WMS material reservation
+func (p *Publisher) PublishWOStarted(event WOEvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectWOStarted, event)
+}</span>
+
+// PublishWOCompleted publishes WO completed event - triggers WMS finished goods receipt
+func (p *Publisher) PublishWOCompleted(event WOCompletedEvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectWOCompleted, event)
+}</span>
+
+// PublishQCPassed publishes QC passed event
+func (p *Publisher) PublishQCPassed(event QCEvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectQCPassed, event)
+}</span>
+
+// PublishQCFailed publishes QC failed event - triggers notification
+func (p *Publisher) PublishQCFailed(event QCEvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectQCFailed, event)
+}</span>
+
+// PublishNCRCreated publishes NCR created event - triggers notification
+func (p *Publisher) PublishNCRCreated(event NCREvent) error <span class="cov0" title="0">{
+        return p.Publish(SubjectNCRCreated, event)
+}</span>
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package postgres
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/google/uuid"
+        "gorm.io/gorm"
+)
+
+type bomRepository struct {
+        db *gorm.DB
+}
+
+// NewBOMRepository creates a new BOM repository
+func NewBOMRepository(db *gorm.DB) repository.BOMRepository <span class="cov0" title="0">{
+        return &amp;bomRepository{db: db}
+}</span>
+
+func (r *bomRepository) Create(ctx context.Context, bom *entity.BOM) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(bom).Error
+}</span>
+
+func (r *bomRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.BOM, error) <span class="cov0" title="0">{
+        var bom entity.BOM
+        err := r.db.WithContext(ctx).
+                Preload("Items").
+                First(&amp;bom, "id = ?", id).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;bom, nil</span>
+}
+
+func (r *bomRepository) GetByNumber(ctx context.Context, bomNumber string) (*entity.BOM, error) <span class="cov0" title="0">{
+        var bom entity.BOM
+        err := r.db.WithContext(ctx).
+                Preload("Items").
+                First(&amp;bom, "bom_number = ?", bomNumber).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;bom, nil</span>
+}
+
+func (r *bomRepository) GetByProductID(ctx context.Context, productID uuid.UUID) ([]*entity.BOM, error) <span class="cov0" title="0">{
+        var boms []*entity.BOM
+        err := r.db.WithContext(ctx).
+                Where("product_id = ?", productID).
+                Order("version DESC").
+                Find(&amp;boms).Error
+        return boms, err
+}</span>
+
+func (r *bomRepository) GetActiveBOMForProduct(ctx context.Context, productID uuid.UUID) (*entity.BOM, error) <span class="cov0" title="0">{
+        var bom entity.BOM
+        err := r.db.WithContext(ctx).
+                Preload("Items").
+                Where("product_id = ? AND status = ?", productID, entity.BOMStatusApproved).
+                Where("effective_from &lt;= ? OR effective_from IS NULL", time.Now()).
+                Where("effective_to &gt;= ? OR effective_to IS NULL", time.Now()).
+                Order("version DESC").
+                First(&amp;bom).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;bom, nil</span>
+}
+
+func (r *bomRepository) List(ctx context.Context, filter repository.BOMFilter) ([]*entity.BOM, int64, error) <span class="cov0" title="0">{
+        var boms []*entity.BOM
+        var total int64
+
+        query := r.db.WithContext(ctx).Model(&amp;entity.BOM{})
+
+        if filter.ProductID != nil </span><span class="cov0" title="0">{
+                query = query.Where("product_id = ?", *filter.ProductID)
+        }</span>
+        <span class="cov0" title="0">if filter.Status != nil </span><span class="cov0" title="0">{
+                query = query.Where("status = ?", *filter.Status)
+        }</span>
+        <span class="cov0" title="0">if filter.Search != "" </span><span class="cov0" title="0">{
+                search := "%" + filter.Search + "%"
+                query = query.Where("bom_number ILIKE ? OR name ILIKE ?", search, search)
+        }</span>
+
+        <span class="cov0" title="0">query.Count(&amp;total)
+
+        if filter.Page &gt; 0 &amp;&amp; filter.PageSize &gt; 0 </span><span class="cov0" title="0">{
+                offset := (filter.Page - 1) * filter.PageSize
+                query = query.Offset(offset).Limit(filter.PageSize)
+        }</span>
+
+        <span class="cov0" title="0">err := query.Order("created_at DESC").Find(&amp;boms).Error
+        return boms, total, err</span>
+}
+
+func (r *bomRepository) Update(ctx context.Context, bom *entity.BOM) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Save(bom).Error
+}</span>
+
+func (r *bomRepository) Delete(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Delete(&amp;entity.BOM{}, "id = ?", id).Error
+}</span>
+
+// Line items
+func (r *bomRepository) CreateLineItem(ctx context.Context, item *entity.BOMLineItem) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(item).Error
+}</span>
+
+func (r *bomRepository) GetLineItems(ctx context.Context, bomID uuid.UUID) ([]*entity.BOMLineItem, error) <span class="cov0" title="0">{
+        var items []*entity.BOMLineItem
+        err := r.db.WithContext(ctx).
+                Where("bom_id = ?", bomID).
+                Order("line_number ASC").
+                Find(&amp;items).Error
+        return items, err
+}</span>
+
+func (r *bomRepository) UpdateLineItem(ctx context.Context, item *entity.BOMLineItem) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Save(item).Error
+}</span>
+
+func (r *bomRepository) DeleteLineItem(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Delete(&amp;entity.BOMLineItem{}, "id = ?", id).Error
+}</span>
+
+// Versioning
+func (r *bomRepository) CreateVersion(ctx context.Context, version *entity.BOMVersion) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(version).Error
+}</span>
+
+func (r *bomRepository) GetVersions(ctx context.Context, bomID uuid.UUID) ([]*entity.BOMVersion, error) <span class="cov0" title="0">{
+        var versions []*entity.BOMVersion
+        err := r.db.WithContext(ctx).
+                Where("bom_id = ?", bomID).
+                Order("version DESC").
+                Find(&amp;versions).Error
+        return versions, err
+}</span>
+
+// WorkOrder Repository
+type workOrderRepository struct {
+        db *gorm.DB
+}
+
+// NewWorkOrderRepository creates a new work order repository
+func NewWorkOrderRepository(db *gorm.DB) repository.WorkOrderRepository <span class="cov0" title="0">{
+        return &amp;workOrderRepository{db: db}
+}</span>
+
+func (r *workOrderRepository) Create(ctx context.Context, wo *entity.WorkOrder) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(wo).Error
+}</span>
+
+func (r *workOrderRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.WorkOrder, error) <span class="cov0" title="0">{
+        var wo entity.WorkOrder
+        err := r.db.WithContext(ctx).
+                Preload("Items").
+                Preload("MaterialIssues").
+                First(&amp;wo, "id = ?", id).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;wo, nil</span>
+}
+
+func (r *workOrderRepository) GetByNumber(ctx context.Context, woNumber string) (*entity.WorkOrder, error) <span class="cov0" title="0">{
+        var wo entity.WorkOrder
+        err := r.db.WithContext(ctx).
+                Preload("Items").
+                First(&amp;wo, "wo_number = ?", woNumber).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;wo, nil</span>
+}
+
+func (r *workOrderRepository) List(ctx context.Context, filter repository.WOFilter) ([]*entity.WorkOrder, int64, error) <span class="cov0" title="0">{
+        var wos []*entity.WorkOrder
+        var total int64
+
+        query := r.db.WithContext(ctx).Model(&amp;entity.WorkOrder{})
+
+        if filter.ProductID != nil </span><span class="cov0" title="0">{
+                query = query.Where("product_id = ?", *filter.ProductID)
+        }</span>
+        <span class="cov0" title="0">if filter.BOMID != nil </span><span class="cov0" title="0">{
+                query = query.Where("bom_id = ?", *filter.BOMID)
+        }</span>
+        <span class="cov0" title="0">if filter.Status != nil </span><span class="cov0" title="0">{
+                query = query.Where("status = ?", *filter.Status)
+        }</span>
+        <span class="cov0" title="0">if filter.Priority != nil </span><span class="cov0" title="0">{
+                query = query.Where("priority = ?", *filter.Priority)
+        }</span>
+        <span class="cov0" title="0">if filter.Search != "" </span><span class="cov0" title="0">{
+                search := "%" + filter.Search + "%"
+                query = query.Where("wo_number ILIKE ? OR batch_number ILIKE ?", search, search)
+        }</span>
+
+        <span class="cov0" title="0">query.Count(&amp;total)
+
+        if filter.Page &gt; 0 &amp;&amp; filter.PageSize &gt; 0 </span><span class="cov0" title="0">{
+                offset := (filter.Page - 1) * filter.PageSize
+                query = query.Offset(offset).Limit(filter.PageSize)
+        }</span>
+
+        <span class="cov0" title="0">err := query.Order("created_at DESC").Find(&amp;wos).Error
+        return wos, total, err</span>
+}
+
+func (r *workOrderRepository) Update(ctx context.Context, wo *entity.WorkOrder) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Save(wo).Error
+}</span>
+
+func (r *workOrderRepository) Delete(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Delete(&amp;entity.WorkOrder{}, "id = ?", id).Error
+}</span>
+
+func (r *workOrderRepository) CreateLineItems(ctx context.Context, items []*entity.WOLineItem) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(&amp;items).Error
+}</span>
+
+func (r *workOrderRepository) GetLineItems(ctx context.Context, woID uuid.UUID) ([]*entity.WOLineItem, error) <span class="cov0" title="0">{
+        var items []*entity.WOLineItem
+        err := r.db.WithContext(ctx).
+                Where("work_order_id = ?", woID).
+                Order("line_number ASC").
+                Find(&amp;items).Error
+        return items, err
+}</span>
+
+func (r *workOrderRepository) UpdateLineItem(ctx context.Context, item *entity.WOLineItem) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Save(item).Error
+}</span>
+
+func (r *workOrderRepository) CreateMaterialIssue(ctx context.Context, issue *entity.WOMaterialIssue) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(issue).Error
+}</span>
+
+func (r *workOrderRepository) GetMaterialIssues(ctx context.Context, woID uuid.UUID) ([]*entity.WOMaterialIssue, error) <span class="cov0" title="0">{
+        var issues []*entity.WOMaterialIssue
+        err := r.db.WithContext(ctx).
+                Where("work_order_id = ?", woID).
+                Order("created_at ASC").
+                Find(&amp;issues).Error
+        return issues, err
+}</span>
+
+func (r *workOrderRepository) GenerateWONumber(ctx context.Context) (string, error) <span class="cov0" title="0">{
+        var count int64
+        year := time.Now().Year()
+        r.db.WithContext(ctx).Model(&amp;entity.WorkOrder{}).
+                Where("EXTRACT(YEAR FROM created_at) = ?", year).
+                Count(&amp;count)
+        return fmt.Sprintf("WO-%d-%04d", year, count+1), nil
+}</span>
+
+func (r *workOrderRepository) GenerateIssueNumber(ctx context.Context) (string, error) <span class="cov0" title="0">{
+        var count int64
+        year := time.Now().Year()
+        r.db.WithContext(ctx).Model(&amp;entity.WOMaterialIssue{}).
+                Where("EXTRACT(YEAR FROM created_at) = ?", year).
+                Count(&amp;count)
+        return fmt.Sprintf("ISS-%d-%04d", year, count+1), nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package postgres
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/google/uuid"
+        "gorm.io/gorm"
+)
+
+type qcRepository struct {
+        db *gorm.DB
+}
+
+// NewQCRepository creates a new QC repository
+func NewQCRepository(db *gorm.DB) repository.QCRepository <span class="cov0" title="0">{
+        return &amp;qcRepository{db: db}
+}</span>
+
+// Checkpoints
+func (r *qcRepository) GetCheckpoints(ctx context.Context) ([]*entity.QCCheckpoint, error) <span class="cov0" title="0">{
+        var checkpoints []*entity.QCCheckpoint
+        err := r.db.WithContext(ctx).
+                Where("is_active = ?", true).
+                Order("checkpoint_type, code").
+                Find(&amp;checkpoints).Error
+        return checkpoints, err
+}</span>
+
+func (r *qcRepository) GetCheckpointByID(ctx context.Context, id uuid.UUID) (*entity.QCCheckpoint, error) <span class="cov0" title="0">{
+        var checkpoint entity.QCCheckpoint
+        err := r.db.WithContext(ctx).First(&amp;checkpoint, "id = ?", id).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;checkpoint, nil</span>
+}
+
+func (r *qcRepository) GetCheckpointsByType(ctx context.Context, cpType entity.CheckpointType) ([]*entity.QCCheckpoint, error) <span class="cov0" title="0">{
+        var checkpoints []*entity.QCCheckpoint
+        err := r.db.WithContext(ctx).
+                Where("checkpoint_type = ? AND is_active = ?", cpType, true).
+                Find(&amp;checkpoints).Error
+        return checkpoints, err
+}</span>
+
+// Inspections
+func (r *qcRepository) CreateInspection(ctx context.Context, inspection *entity.QCInspection) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(inspection).Error
+}</span>
+
+func (r *qcRepository) GetInspectionByID(ctx context.Context, id uuid.UUID) (*entity.QCInspection, error) <span class="cov0" title="0">{
+        var inspection entity.QCInspection
+        err := r.db.WithContext(ctx).
+                Preload("Items").
+                First(&amp;inspection, "id = ?", id).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;inspection, nil</span>
+}
+
+func (r *qcRepository) GetInspectionByNumber(ctx context.Context, number string) (*entity.QCInspection, error) <span class="cov0" title="0">{
+        var inspection entity.QCInspection
+        err := r.db.WithContext(ctx).
+                Preload("Items").
+                First(&amp;inspection, "inspection_number = ?", number).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;inspection, nil</span>
+}
+
+func (r *qcRepository) ListInspections(ctx context.Context, filter repository.QCFilter) ([]*entity.QCInspection, int64, error) <span class="cov0" title="0">{
+        var inspections []*entity.QCInspection
+        var total int64
+
+        query := r.db.WithContext(ctx).Model(&amp;entity.QCInspection{})
+
+        if filter.InspectionType != nil </span><span class="cov0" title="0">{
+                query = query.Where("inspection_type = ?", *filter.InspectionType)
+        }</span>
+        <span class="cov0" title="0">if filter.Result != nil </span><span class="cov0" title="0">{
+                query = query.Where("result = ?", *filter.Result)
+        }</span>
+        <span class="cov0" title="0">if filter.ReferenceType != nil </span><span class="cov0" title="0">{
+                query = query.Where("reference_type = ?", *filter.ReferenceType)
+        }</span>
+        <span class="cov0" title="0">if filter.ReferenceID != nil </span><span class="cov0" title="0">{
+                query = query.Where("reference_id = ?", *filter.ReferenceID)
+        }</span>
+
+        <span class="cov0" title="0">query.Count(&amp;total)
+
+        if filter.Page &gt; 0 &amp;&amp; filter.PageSize &gt; 0 </span><span class="cov0" title="0">{
+                offset := (filter.Page - 1) * filter.PageSize
+                query = query.Offset(offset).Limit(filter.PageSize)
+        }</span>
+
+        <span class="cov0" title="0">err := query.Order("created_at DESC").Find(&amp;inspections).Error
+        return inspections, total, err</span>
+}
+
+func (r *qcRepository) UpdateInspection(ctx context.Context, inspection *entity.QCInspection) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Save(inspection).Error
+}</span>
+
+// Inspection items
+func (r *qcRepository) CreateInspectionItems(ctx context.Context, items []*entity.QCInspectionItem) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(&amp;items).Error
+}</span>
+
+func (r *qcRepository) GetInspectionItems(ctx context.Context, inspectionID uuid.UUID) ([]*entity.QCInspectionItem, error) <span class="cov0" title="0">{
+        var items []*entity.QCInspectionItem
+        err := r.db.WithContext(ctx).
+                Where("inspection_id = ?", inspectionID).
+                Order("item_number ASC").
+                Find(&amp;items).Error
+        return items, err
+}</span>
+
+func (r *qcRepository) GenerateInspectionNumber(ctx context.Context) (string, error) <span class="cov0" title="0">{
+        var count int64
+        year := time.Now().Year()
+        r.db.WithContext(ctx).Model(&amp;entity.QCInspection{}).
+                Where("EXTRACT(YEAR FROM created_at) = ?", year).
+                Count(&amp;count)
+        return fmt.Sprintf("QC-%d-%04d", year, count+1), nil
+}</span>
+
+// NCR Repository
+type ncrRepository struct {
+        db *gorm.DB
+}
+
+// NewNCRRepository creates a new NCR repository
+func NewNCRRepository(db *gorm.DB) repository.NCRRepository <span class="cov0" title="0">{
+        return &amp;ncrRepository{db: db}
+}</span>
+
+func (r *ncrRepository) Create(ctx context.Context, ncr *entity.NCR) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(ncr).Error
+}</span>
+
+func (r *ncrRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.NCR, error) <span class="cov0" title="0">{
+        var ncr entity.NCR
+        err := r.db.WithContext(ctx).First(&amp;ncr, "id = ?", id).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;ncr, nil</span>
+}
+
+func (r *ncrRepository) GetByNumber(ctx context.Context, ncrNumber string) (*entity.NCR, error) <span class="cov0" title="0">{
+        var ncr entity.NCR
+        err := r.db.WithContext(ctx).First(&amp;ncr, "ncr_number = ?", ncrNumber).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;ncr, nil</span>
+}
+
+func (r *ncrRepository) List(ctx context.Context, filter repository.NCRFilter) ([]*entity.NCR, int64, error) <span class="cov0" title="0">{
+        var ncrs []*entity.NCR
+        var total int64
+
+        query := r.db.WithContext(ctx).Model(&amp;entity.NCR{})
+
+        if filter.Status != nil </span><span class="cov0" title="0">{
+                query = query.Where("status = ?", *filter.Status)
+        }</span>
+        <span class="cov0" title="0">if filter.Severity != nil </span><span class="cov0" title="0">{
+                query = query.Where("severity = ?", *filter.Severity)
+        }</span>
+        <span class="cov0" title="0">if filter.NCType != nil </span><span class="cov0" title="0">{
+                query = query.Where("nc_type = ?", *filter.NCType)
+        }</span>
+
+        <span class="cov0" title="0">query.Count(&amp;total)
+
+        if filter.Page &gt; 0 &amp;&amp; filter.PageSize &gt; 0 </span><span class="cov0" title="0">{
+                offset := (filter.Page - 1) * filter.PageSize
+                query = query.Offset(offset).Limit(filter.PageSize)
+        }</span>
+
+        <span class="cov0" title="0">err := query.Order("created_at DESC").Find(&amp;ncrs).Error
+        return ncrs, total, err</span>
+}
+
+func (r *ncrRepository) Update(ctx context.Context, ncr *entity.NCR) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Save(ncr).Error
+}</span>
+
+func (r *ncrRepository) GenerateNCRNumber(ctx context.Context) (string, error) <span class="cov0" title="0">{
+        var count int64
+        year := time.Now().Year()
+        r.db.WithContext(ctx).Model(&amp;entity.NCR{}).
+                Where("EXTRACT(YEAR FROM created_at) = ?", year).
+                Count(&amp;count)
+        return fmt.Sprintf("NCR-%d-%04d", year, count+1), nil
+}</span>
+
+// Traceability Repository
+type traceabilityRepository struct {
+        db *gorm.DB
+}
+
+// NewTraceabilityRepository creates a new traceability repository
+func NewTraceabilityRepository(db *gorm.DB) repository.TraceabilityRepository <span class="cov0" title="0">{
+        return &amp;traceabilityRepository{db: db}
+}</span>
+
+func (r *traceabilityRepository) Create(ctx context.Context, trace *entity.BatchTraceability) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(trace).Error
+}</span>
+
+func (r *traceabilityRepository) CreateBatch(ctx context.Context, traces []*entity.BatchTraceability) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Create(&amp;traces).Error
+}</span>
+
+func (r *traceabilityRepository) GetByProductLot(ctx context.Context, productLotID uuid.UUID) ([]*entity.BatchTraceability, error) <span class="cov0" title="0">{
+        var traces []*entity.BatchTraceability
+        err := r.db.WithContext(ctx).
+                Where("product_lot_id = ?", productLotID).
+                Find(&amp;traces).Error
+        return traces, err
+}</span>
+
+func (r *traceabilityRepository) GetByWorkOrder(ctx context.Context, woID uuid.UUID) ([]*entity.BatchTraceability, error) <span class="cov0" title="0">{
+        var traces []*entity.BatchTraceability
+        err := r.db.WithContext(ctx).
+                Where("work_order_id = ?", woID).
+                Find(&amp;traces).Error
+        return traces, err
+}</span>
+
+func (r *traceabilityRepository) GetByMaterialLot(ctx context.Context, materialLotID uuid.UUID) ([]*entity.BatchTraceability, error) <span class="cov0" title="0">{
+        var traces []*entity.BatchTraceability
+        err := r.db.WithContext(ctx).
+                Where("material_lot_id = ?", materialLotID).
+                Find(&amp;traces).Error
+        return traces, err
+}</span>
+
+func (r *traceabilityRepository) UpdateProductLot(ctx context.Context, woID uuid.UUID, productLotID uuid.UUID, productLotNumber string) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).
+                Model(&amp;entity.BatchTraceability{}).
+                Where("work_order_id = ?", woID).
+                Updates(map[string]interface{}{
+                        "product_lot_id":     productLotID,
+                        "product_lot_number": productLotNumber,
+                }).Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package testmocks
+
+import (
+        "context"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/event"
+        "github.com/google/uuid"
+        "github.com/stretchr/testify/mock"
+)
+
+// MockBOMRepository
+type MockBOMRepository struct {
+        mock.Mock
+}
+
+func (m *MockBOMRepository) Create(ctx context.Context, bom *entity.BOM) error <span class="cov8" title="1">{
+        args := m.Called(ctx, bom)
+        return args.Error(0)
+}</span>
+
+func (m *MockBOMRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.BOM, error) <span class="cov8" title="1">{
+        args := m.Called(ctx, id)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov8" title="1">return args.Get(0).(*entity.BOM), args.Error(1)</span>
+}
+
+func (m *MockBOMRepository) GetByNumber(ctx context.Context, num string) (*entity.BOM, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, num)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*entity.BOM), args.Error(1)</span>
+}
+
+func (m *MockBOMRepository) GetActiveBOMForProduct(ctx context.Context, productID uuid.UUID) (*entity.BOM, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, productID)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*entity.BOM), args.Error(1)</span>
+}
+
+func (m *MockBOMRepository) Update(ctx context.Context, bom *entity.BOM) error <span class="cov0" title="0">{
+        args := m.Called(ctx, bom)
+        return args.Error(0)
+}</span>
+
+func (m *MockBOMRepository) List(ctx context.Context, filter repository.BOMFilter) ([]*entity.BOM, int64, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, filter)
+        return args.Get(0).([]*entity.BOM), args.Get(1).(int64), args.Error(2)
+}</span>
+
+func (m *MockBOMRepository) GetByProductID(ctx context.Context, id uuid.UUID) ([]*entity.BOM, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockBOMRepository) Delete(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockBOMRepository) CreateLineItem(ctx context.Context, item *entity.BOMLineItem) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockBOMRepository) GetLineItems(ctx context.Context, bomID uuid.UUID) ([]*entity.BOMLineItem, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockBOMRepository) UpdateLineItem(ctx context.Context, item *entity.BOMLineItem) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockBOMRepository) DeleteLineItem(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockBOMRepository) CreateVersion(ctx context.Context, v *entity.BOMVersion) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockBOMRepository) GetVersions(ctx context.Context, id uuid.UUID) ([]*entity.BOMVersion, error) <span class="cov0" title="0">{ return nil, nil }</span>
+
+// MockWorkOrderRepository
+type MockWorkOrderRepository struct {
+        mock.Mock
+}
+
+func (m *MockWorkOrderRepository) Create(ctx context.Context, wo *entity.WorkOrder) error <span class="cov8" title="1">{
+        args := m.Called(ctx, wo)
+        return args.Error(0)
+}</span>
+
+func (m *MockWorkOrderRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.WorkOrder, error) <span class="cov8" title="1">{
+        args := m.Called(ctx, id)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov8" title="1">return args.Get(0).(*entity.WorkOrder), args.Error(1)</span>
+}
+
+func (m *MockWorkOrderRepository) Update(ctx context.Context, wo *entity.WorkOrder) error <span class="cov8" title="1">{
+        args := m.Called(ctx, wo)
+        return args.Error(0)
+}</span>
+
+func (m *MockWorkOrderRepository) GenerateWONumber(ctx context.Context) (string, error) <span class="cov8" title="1">{
+        args := m.Called(ctx)
+        return args.String(0), args.Error(1)
+}</span>
+
+func (m *MockWorkOrderRepository) CreateLineItems(ctx context.Context, items []*entity.WOLineItem) error <span class="cov8" title="1">{
+        args := m.Called(ctx, items)
+        return args.Error(0)
+}</span>
+
+func (m *MockWorkOrderRepository) GetByNumber(ctx context.Context, num string) (*entity.WorkOrder, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockWorkOrderRepository) List(ctx context.Context, filter repository.WOFilter) ([]*entity.WorkOrder, int64, error) <span class="cov0" title="0">{ return nil, 0, nil }</span>
+func (m *MockWorkOrderRepository) Delete(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockWorkOrderRepository) GetLineItems(ctx context.Context, woID uuid.UUID) ([]*entity.WOLineItem, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockWorkOrderRepository) UpdateLineItem(ctx context.Context, item *entity.WOLineItem) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockWorkOrderRepository) CreateMaterialIssue(ctx context.Context, issue *entity.WOMaterialIssue) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockWorkOrderRepository) GetMaterialIssues(ctx context.Context, woID uuid.UUID) ([]*entity.WOMaterialIssue, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockWorkOrderRepository) GenerateIssueNumber(ctx context.Context) (string, error) <span class="cov0" title="0">{ return "", nil }</span>
+
+// MockTraceabilityRepository
+type MockTraceabilityRepository struct {
+        mock.Mock
+}
+
+func (m *MockTraceabilityRepository) CreateBatch(ctx context.Context, traces []*entity.BatchTraceability) error <span class="cov0" title="0">{
+        args := m.Called(ctx, traces)
+        return args.Error(0)
+}</span>
+
+func (m *MockTraceabilityRepository) GetByProductLot(ctx context.Context, lotID uuid.UUID) ([]*entity.BatchTraceability, error) <span class="cov8" title="1">{
+        args := m.Called(ctx, lotID)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov8" title="1">return args.Get(0).([]*entity.BatchTraceability), args.Error(1)</span>
+}
+
+func (m *MockTraceabilityRepository) GetByMaterialLot(ctx context.Context, lotID uuid.UUID) ([]*entity.BatchTraceability, error) <span class="cov8" title="1">{
+        args := m.Called(ctx, lotID)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov8" title="1">return args.Get(0).([]*entity.BatchTraceability), args.Error(1)</span>
+}
+
+func (m *MockTraceabilityRepository) Create(ctx context.Context, trace *entity.BatchTraceability) error <span class="cov0" title="0">{ return nil }</span>
+func (m *MockTraceabilityRepository) GetByWorkOrder(ctx context.Context, woID uuid.UUID) ([]*entity.BatchTraceability, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockTraceabilityRepository) UpdateProductLot(ctx context.Context, woID uuid.UUID, lotID uuid.UUID, lotNum string) error <span class="cov0" title="0">{ return nil }</span>
+
+// MockQCRepository
+type MockQCRepository struct {
+        mock.Mock
+}
+
+func (m *MockQCRepository) CreateInspection(ctx context.Context, ins *entity.QCInspection) error <span class="cov8" title="1">{
+        args := m.Called(ctx, ins)
+        return args.Error(0)
+}</span>
+
+func (m *MockQCRepository) GenerateInspectionNumber(ctx context.Context) (string, error) <span class="cov8" title="1">{
+        args := m.Called(ctx)
+        return args.String(0), args.Error(1)
+}</span>
+
+func (m *MockQCRepository) GetCheckpointByID(ctx context.Context, id uuid.UUID) (*entity.QCCheckpoint, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockQCRepository) GetCheckpoints(ctx context.Context) ([]*entity.QCCheckpoint, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockQCRepository) GetCheckpointsByType(ctx context.Context, cpType entity.CheckpointType) ([]*entity.QCCheckpoint, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, cpType)
+        return args.Get(0).([]*entity.QCCheckpoint), args.Error(1)
+}</span>
+func (m *MockQCRepository) GetInspectionByID(ctx context.Context, id uuid.UUID) (*entity.QCInspection, error) <span class="cov8" title="1">{
+        args := m.Called(ctx, id)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov8" title="1">return args.Get(0).(*entity.QCInspection), args.Error(1)</span>
+}
+func (m *MockQCRepository) GetInspectionByNumber(ctx context.Context, num string) (*entity.QCInspection, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockQCRepository) ListInspections(ctx context.Context, filter repository.QCFilter) ([]*entity.QCInspection, int64, error) <span class="cov0" title="0">{ return nil, 0, nil }</span>
+func (m *MockQCRepository) UpdateInspection(ctx context.Context, ins *entity.QCInspection) error <span class="cov8" title="1">{
+        args := m.Called(ctx, ins)
+        return args.Error(0)
+}</span>
+func (m *MockQCRepository) CreateInspectionItems(ctx context.Context, items []*entity.QCInspectionItem) error <span class="cov0" title="0">{
+        args := m.Called(ctx, items)
+        return args.Error(0)
+}</span>
+func (m *MockQCRepository) GetInspectionItems(ctx context.Context, id uuid.UUID) ([]*entity.QCInspectionItem, error) <span class="cov0" title="0">{ return nil, nil }</span>
+
+// MockNCRRepository
+type MockNCRRepository struct {
+        mock.Mock
+}
+
+func (m *MockNCRRepository) Create(ctx context.Context, ncr *entity.NCR) error <span class="cov0" title="0">{
+        args := m.Called(ctx, ncr)
+        return args.Error(0)
+}</span>
+
+func (m *MockNCRRepository) GenerateNCRNumber(ctx context.Context) (string, error) <span class="cov0" title="0">{
+        args := m.Called(ctx)
+        return args.String(0), args.Error(1)
+}</span>
+
+func (m *MockNCRRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.NCR, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockNCRRepository) GetByNumber(ctx context.Context, num string) (*entity.NCR, error) <span class="cov0" title="0">{ return nil, nil }</span>
+func (m *MockNCRRepository) List(ctx context.Context, filter repository.NCRFilter) ([]*entity.NCR, int64, error) <span class="cov0" title="0">{ return nil, 0, nil }</span>
+func (m *MockNCRRepository) Update(ctx context.Context, ncr *entity.NCR) error <span class="cov0" title="0">{ return nil }</span>
+
+// MockEventPublisher
+type MockEventPublisher struct {
+        mock.Mock
+}
+
+func (m *MockEventPublisher) PublishBOMCreated(e event.BOMEvent) error <span class="cov8" title="1">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+
+func (m *MockEventPublisher) PublishBOMApproved(e event.BOMEvent) error <span class="cov0" title="0">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+
+func (m *MockEventPublisher) PublishWOCreated(e event.WOEvent) error <span class="cov8" title="1">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+
+func (m *MockEventPublisher) PublishWOReleased(e event.WOEvent) error <span class="cov0" title="0">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+
+func (m *MockEventPublisher) PublishWOStarted(e event.WOEvent) error <span class="cov8" title="1">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+
+func (m *MockEventPublisher) PublishWOCompleted(e event.WOCompletedEvent) error <span class="cov0" title="0">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+
+func (m *MockEventPublisher) PublishQCPassed(e event.QCEvent) error <span class="cov0" title="0">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+
+func (m *MockEventPublisher) PublishQCFailed(e event.QCEvent) error <span class="cov8" title="1">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+
+func (m *MockEventPublisher) PublishNCRCreated(e event.NCREvent) error <span class="cov0" title="0">{
+        args := m.Called(e)
+        return args.Error(0)
+}</span>
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package testutils
+
+import (
+        "time"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/google/uuid"
+)
+
+// BOMBuilder helps creating BOM entities for testing
+type BOMBuilder struct {
+        bom *entity.BOM
+}
+
+func NewBOMBuilder() *BOMBuilder <span class="cov8" title="1">{
+        return &amp;BOMBuilder{
+                bom: &amp;entity.BOM{
+                        ID:                   uuid.New(),
+                        BOMNumber:            "BOM-" + uuid.New().String()[:8],
+                        ProductID:            uuid.New(),
+                        Version:              1,
+                        Name:                 "Test BOM",
+                        Status:               entity.BOMStatusApproved,
+                        BatchSize:            100,
+                        ConfidentialityLevel: entity.ConfidentialityInternal,
+                },
+        }
+}</span>
+
+func (b *BOMBuilder) WithProductID(id uuid.UUID) *BOMBuilder <span class="cov0" title="0">{
+        b.bom.ProductID = id
+        return b
+}</span>
+
+func (b *BOMBuilder) WithStatus(status entity.BOMStatus) *BOMBuilder <span class="cov0" title="0">{
+        b.bom.Status = status
+        return b
+}</span>
+
+func (b *BOMBuilder) WithItems(items []entity.BOMLineItem) *BOMBuilder <span class="cov8" title="1">{
+        b.bom.Items = items
+        return b
+}</span>
+
+func (b *BOMBuilder) Build() *entity.BOM <span class="cov8" title="1">{
+        return b.bom
+}</span>
+
+// WorkOrderBuilder helps creating WorkOrder entities for testing
+type WorkOrderBuilder struct {
+        wo *entity.WorkOrder
+}
+
+func NewWorkOrderBuilder() *WorkOrderBuilder <span class="cov8" title="1">{
+        return &amp;WorkOrderBuilder{
+                wo: &amp;entity.WorkOrder{
+                        ID:              uuid.New(),
+                        WONumber:        "WO-" + uuid.New().String()[:8],
+                        WODate:          time.Now(),
+                        ProductID:       uuid.New(),
+                        BOMID:           uuid.New(),
+                        Status:          entity.WOStatusPlanned,
+                        Priority:        entity.WOPriorityNormal,
+                        PlannedQuantity: 100,
+                        UOMID:           uuid.New(),
+                },
+        }
+}</span>
+
+func (b *WorkOrderBuilder) WithBOM(bomID uuid.UUID) *WorkOrderBuilder <span class="cov0" title="0">{
+        b.wo.BOMID = bomID
+        return b
+}</span>
+
+func (b *WorkOrderBuilder) WithStatus(status entity.WOStatus) *WorkOrderBuilder <span class="cov8" title="1">{
+        b.wo.Status = status
+        return b
+}</span>
+
+func (b *WorkOrderBuilder) WithItems(items []entity.WOLineItem) *WorkOrderBuilder <span class="cov0" title="0">{
+        b.wo.Items = items
+        return b
+}</span>
+
+func (b *WorkOrderBuilder) Build() *entity.WorkOrder <span class="cov8" title="1">{
+        return b.wo
+}</span>
+
+// QCInspectionBuilder helps creating QC entities for testing
+type QCInspectionBuilder struct {
+        ins *entity.QCInspection
+}
+
+func NewQCInspectionBuilder() *QCInspectionBuilder <span class="cov0" title="0">{
+        return &amp;QCInspectionBuilder{
+                ins: &amp;entity.QCInspection{
+                        ID:               uuid.New(),
+                        InspectionNumber: "QC-" + uuid.New().String()[:8],
+                        Result:           entity.InspectionResultPending,
+                },
+        }
+}</span>
+
+func (b *QCInspectionBuilder) Build() *entity.QCInspection <span class="cov0" title="0">{
+        return b.ins
+}</span>
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package bom
+
+import (
+        "context"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/event"
+        "github.com/google/uuid"
+)
+
+// EventPublisher defines event publishing interface for BOM
+type EventPublisher interface {
+        PublishBOMCreated(event event.BOMEvent) error
+        PublishBOMApproved(event event.BOMEvent) error
+}
+
+// CreateBOMUseCase handles BOM creation
+type CreateBOMUseCase struct {
+        repo          repository.BOMRepository
+        eventPub      EventPublisher
+        encryptionKey []byte
+}
+
+// NewCreateBOMUseCase creates a new CreateBOMUseCase
+func NewCreateBOMUseCase(repo repository.BOMRepository, eventPub EventPublisher, encryptionKey []byte) *CreateBOMUseCase <span class="cov8" title="1">{
+        return &amp;CreateBOMUseCase{
+                repo:          repo,
+                eventPub:      eventPub,
+                encryptionKey: encryptionKey,
+        }
+}</span>
+
+// CreateBOMInput is the input for creating a BOM
+type CreateBOMInput struct {
+        BOMNumber            string
+        ProductID            uuid.UUID
+        Version              int
+        Name                 string
+        Description          string
+        BatchSize            float64
+        BatchUnitID          uuid.UUID
+        ConfidentialityLevel entity.ConfidentialityLevel
+        LaborCost            float64
+        OverheadCost         float64
+        FormulaDetails       *entity.FormulaDetails
+        Items                []CreateBOMItemInput
+        CreatedBy            uuid.UUID
+}
+
+// CreateBOMItemInput is input for a BOM line item
+type CreateBOMItemInput struct {
+        LineNumber      int
+        MaterialID      uuid.UUID
+        ItemType        entity.BOMItemType
+        Quantity        float64
+        UOMID           uuid.UUID
+        QuantityMin     *float64
+        QuantityMax     *float64
+        IsCritical      bool
+        ScrapPercentage float64
+        UnitCost        float64
+        Notes           string
+}
+
+// Execute creates a new BOM
+func (uc *CreateBOMUseCase) Execute(ctx context.Context, input CreateBOMInput) (*entity.BOM, error) <span class="cov8" title="1">{
+        // Encrypt formula details if provided
+        var encryptedFormula []byte
+        var err error
+        if input.FormulaDetails != nil </span><span class="cov8" title="1">{
+                encryptedFormula, err = entity.EncryptFormula(input.FormulaDetails, uc.encryptionKey)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+
+        <span class="cov8" title="1">bom := &amp;entity.BOM{
+                BOMNumber:            input.BOMNumber,
+                ProductID:            input.ProductID,
+                Version:              input.Version,
+                Name:                 input.Name,
+                Description:          input.Description,
+                Status:               entity.BOMStatusDraft,
+                BatchSize:            input.BatchSize,
+                BatchUnitID:          input.BatchUnitID,
+                FormulaDetails:       encryptedFormula,
+                ConfidentialityLevel: input.ConfidentialityLevel,
+                LaborCost:            input.LaborCost,
+                OverheadCost:         input.OverheadCost,
+                CreatedBy:            &amp;input.CreatedBy,
+                UpdatedBy:            &amp;input.CreatedBy,
+        }
+
+        // Create line items
+        var items []entity.BOMLineItem
+        var materialCost float64
+        for _, item := range input.Items </span><span class="cov0" title="0">{
+                totalCost := item.Quantity * item.UnitCost
+                materialCost += totalCost
+                items = append(items, entity.BOMLineItem{
+                        LineNumber:      item.LineNumber,
+                        MaterialID:      item.MaterialID,
+                        ItemType:        item.ItemType,
+                        Quantity:        item.Quantity,
+                        UOMID:           item.UOMID,
+                        QuantityMin:     item.QuantityMin,
+                        QuantityMax:     item.QuantityMax,
+                        IsCritical:      item.IsCritical,
+                        ScrapPercentage: item.ScrapPercentage,
+                        UnitCost:        item.UnitCost,
+                        TotalCost:       totalCost,
+                        Notes:           item.Notes,
+                })
+        }</span>
+        <span class="cov8" title="1">bom.Items = items
+        bom.MaterialCost = materialCost
+        bom.TotalCost = materialCost + bom.LaborCost + bom.OverheadCost
+
+        if err := uc.repo.Create(ctx, bom); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Publish event
+        <span class="cov8" title="1">uc.eventPub.PublishBOMCreated(event.BOMEvent{
+                BOMID:     bom.ID.String(),
+                BOMNumber: bom.BOMNumber,
+                ProductID: bom.ProductID.String(),
+                Version:   bom.Version,
+                Status:    string(bom.Status),
+        })
+
+        return bom, nil</span>
+}
+
+// GetBOMUseCase handles getting a BOM
+type GetBOMUseCase struct {
+        repo          repository.BOMRepository
+        encryptionKey []byte
+}
+
+// NewGetBOMUseCase creates a new GetBOMUseCase
+func NewGetBOMUseCase(repo repository.BOMRepository, encryptionKey []byte) *GetBOMUseCase <span class="cov8" title="1">{
+        return &amp;GetBOMUseCase{
+                repo:          repo,
+                encryptionKey: encryptionKey,
+        }
+}</span>
+
+// BOMResponse is the response for getting a BOM
+type BOMResponse struct {
+        BOM            *entity.BOM
+        FormulaDetails *entity.FormulaDetails // Decrypted, only if user has permission
+        CanViewFormula bool
+}
+
+// Execute gets a BOM by ID
+func (uc *GetBOMUseCase) Execute(ctx context.Context, id uuid.UUID, canViewFormula bool) (*BOMResponse, error) <span class="cov8" title="1">{
+        bom, err := uc.repo.GetByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrBOMNotFound
+        }</span>
+
+        <span class="cov8" title="1">response := &amp;BOMResponse{
+                BOM:            bom,
+                CanViewFormula: canViewFormula,
+        }
+
+        // Decrypt formula if user has permission
+        if canViewFormula &amp;&amp; len(bom.FormulaDetails) &gt; 0 </span><span class="cov8" title="1">{
+                formula, err := entity.DecryptFormula(bom.FormulaDetails, uc.encryptionKey)
+                if err == nil </span><span class="cov8" title="1">{
+                        response.FormulaDetails = formula
+                }</span>
+        }
+
+        <span class="cov8" title="1">return response, nil</span>
+}
+
+// ListBOMsUseCase handles listing BOMs
+type ListBOMsUseCase struct {
+        repo repository.BOMRepository
+}
+
+// NewListBOMsUseCase creates a new ListBOMsUseCase
+func NewListBOMsUseCase(repo repository.BOMRepository) *ListBOMsUseCase <span class="cov0" title="0">{
+        return &amp;ListBOMsUseCase{repo: repo}
+}</span>
+
+// Execute lists BOMs
+func (uc *ListBOMsUseCase) Execute(ctx context.Context, filter repository.BOMFilter) ([]*entity.BOM, int64, error) <span class="cov0" title="0">{
+        return uc.repo.List(ctx, filter)
+}</span>
+
+// ApproveBOMUseCase handles BOM approval
+type ApproveBOMUseCase struct {
+        repo     repository.BOMRepository
+        eventPub EventPublisher
+}
+
+// NewApproveBOMUseCase creates a new ApproveBOMUseCase
+func NewApproveBOMUseCase(repo repository.BOMRepository, eventPub EventPublisher) *ApproveBOMUseCase <span class="cov0" title="0">{
+        return &amp;ApproveBOMUseCase{repo: repo, eventPub: eventPub}
+}</span>
+
+// Execute approves a BOM
+func (uc *ApproveBOMUseCase) Execute(ctx context.Context, bomID uuid.UUID, approverID uuid.UUID) (*entity.BOM, error) <span class="cov0" title="0">{
+        bom, err := uc.repo.GetByID(ctx, bomID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrBOMNotFound
+        }</span>
+
+        // Submit if in draft
+        <span class="cov0" title="0">if bom.IsDraft() </span><span class="cov0" title="0">{
+                if err := bom.Submit(); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+
+        <span class="cov0" title="0">if err := bom.Approve(approverID); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := uc.repo.Update(ctx, bom); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Publish event
+        <span class="cov0" title="0">uc.eventPub.PublishBOMApproved(event.BOMEvent{
+                BOMID:     bom.ID.String(),
+                BOMNumber: bom.BOMNumber,
+                ProductID: bom.ProductID.String(),
+                Version:   bom.Version,
+                Status:    string(bom.Status),
+        })
+
+        return bom, nil</span>
+}
+
+// GetActiveBOMUseCase gets the active BOM for a product
+type GetActiveBOMUseCase struct {
+        repo repository.BOMRepository
+}
+
+// NewGetActiveBOMUseCase creates a new GetActiveBOMUseCase
+func NewGetActiveBOMUseCase(repo repository.BOMRepository) *GetActiveBOMUseCase <span class="cov0" title="0">{
+        return &amp;GetActiveBOMUseCase{repo: repo}
+}</span>
+
+// Execute gets the active BOM for a product
+func (uc *GetActiveBOMUseCase) Execute(ctx context.Context, productID uuid.UUID) (*entity.BOM, error) <span class="cov0" title="0">{
+        return uc.repo.GetActiveBOMForProduct(ctx, productID)
+}</span>
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package ncr
+
+import (
+        "context"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/event"
+        "github.com/google/uuid"
+)
+
+// CreateNCRUseCase handles NCR creation
+type CreateNCRUseCase struct {
+        repo     repository.NCRRepository
+        eventPub *event.Publisher
+}
+
+// NewCreateNCRUseCase creates a new CreateNCRUseCase
+func NewCreateNCRUseCase(repo repository.NCRRepository, eventPub *event.Publisher) *CreateNCRUseCase <span class="cov0" title="0">{
+        return &amp;CreateNCRUseCase{repo: repo, eventPub: eventPub}
+}</span>
+
+// CreateNCRInput is the input for creating an NCR
+type CreateNCRInput struct {
+        NCType           entity.NCType
+        Severity         entity.NCRSeverity
+        ReferenceType    string
+        ReferenceID      *uuid.UUID
+        ProductID        *uuid.UUID
+        MaterialID       *uuid.UUID
+        LotID            *uuid.UUID
+        LotNumber        string
+        Description      string
+        QuantityAffected *float64
+        UOMID            *uuid.UUID
+        ImmediateAction  string
+        CreatedBy        uuid.UUID
+}
+
+// Execute creates a new NCR
+func (uc *CreateNCRUseCase) Execute(ctx context.Context, input CreateNCRInput) (*entity.NCR, error) <span class="cov0" title="0">{
+        ncrNumber, err := uc.repo.GenerateNCRNumber(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">ncr := &amp;entity.NCR{
+                NCRNumber:        ncrNumber,
+                NCType:           input.NCType,
+                Severity:         input.Severity,
+                Status:           entity.NCRStatusOpen,
+                ReferenceType:    input.ReferenceType,
+                ReferenceID:      input.ReferenceID,
+                ProductID:        input.ProductID,
+                MaterialID:       input.MaterialID,
+                LotID:            input.LotID,
+                LotNumber:        input.LotNumber,
+                Description:      input.Description,
+                QuantityAffected: input.QuantityAffected,
+                UOMID:            input.UOMID,
+                ImmediateAction:  input.ImmediateAction,
+                CreatedBy:        &amp;input.CreatedBy,
+                UpdatedBy:        &amp;input.CreatedBy,
+        }
+
+        if err := uc.repo.Create(ctx, ncr); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Publish event - triggers notification
+        <span class="cov0" title="0">ncrEvent := event.NCREvent{
+                NCRID:       ncr.ID.String(),
+                NCRNumber:   ncr.NCRNumber,
+                NCType:      string(ncr.NCType),
+                Severity:    string(ncr.Severity),
+                Description: ncr.Description,
+        }
+        if ncr.LotID != nil </span><span class="cov0" title="0">{
+                ncrEvent.LotID = ncr.LotID.String()
+        }</span>
+        <span class="cov0" title="0">uc.eventPub.PublishNCRCreated(ncrEvent)
+
+        return ncr, nil</span>
+}
+
+// GetNCRUseCase handles getting an NCR
+type GetNCRUseCase struct {
+        repo repository.NCRRepository
+}
+
+// NewGetNCRUseCase creates a new GetNCRUseCase
+func NewGetNCRUseCase(repo repository.NCRRepository) *GetNCRUseCase <span class="cov0" title="0">{
+        return &amp;GetNCRUseCase{repo: repo}
+}</span>
+
+// Execute gets an NCR by ID
+func (uc *GetNCRUseCase) Execute(ctx context.Context, id uuid.UUID) (*entity.NCR, error) <span class="cov0" title="0">{
+        return uc.repo.GetByID(ctx, id)
+}</span>
+
+// ListNCRsUseCase handles listing NCRs
+type ListNCRsUseCase struct {
+        repo repository.NCRRepository
+}
+
+// NewListNCRsUseCase creates a new ListNCRsUseCase
+func NewListNCRsUseCase(repo repository.NCRRepository) *ListNCRsUseCase <span class="cov0" title="0">{
+        return &amp;ListNCRsUseCase{repo: repo}
+}</span>
+
+// Execute lists NCRs
+func (uc *ListNCRsUseCase) Execute(ctx context.Context, filter repository.NCRFilter) ([]*entity.NCR, int64, error) <span class="cov0" title="0">{
+        return uc.repo.List(ctx, filter)
+}</span>
+
+// CloseNCRUseCase handles closing an NCR
+type CloseNCRUseCase struct {
+        repo repository.NCRRepository
+}
+
+// NewCloseNCRUseCase creates a new CloseNCRUseCase
+func NewCloseNCRUseCase(repo repository.NCRRepository) *CloseNCRUseCase <span class="cov0" title="0">{
+        return &amp;CloseNCRUseCase{repo: repo}
+}</span>
+
+// CloseNCRInput is input for closing an NCR
+type CloseNCRInput struct {
+        NCRID            uuid.UUID
+        RootCause        string
+        CorrectiveAction string
+        PreventiveAction string
+        Disposition      *entity.Disposition
+        DispositionQty   *float64
+        ClosureNotes     string
+        ClosedBy         uuid.UUID
+}
+
+// Execute closes an NCR
+func (uc *CloseNCRUseCase) Execute(ctx context.Context, input CloseNCRInput) (*entity.NCR, error) <span class="cov0" title="0">{
+        ncr, err := uc.repo.GetByID(ctx, input.NCRID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrNCRNotFound
+        }</span>
+
+        <span class="cov0" title="0">if !ncr.CanBeClosed() </span><span class="cov0" title="0">{
+                return nil, entity.ErrNCRAlreadyClosed
+        }</span>
+
+        <span class="cov0" title="0">ncr.RootCause = input.RootCause
+        ncr.CorrectiveAction = input.CorrectiveAction
+        ncr.PreventiveAction = input.PreventiveAction
+        ncr.Disposition = input.Disposition
+        ncr.DispositionQuantity = input.DispositionQty
+
+        if err := ncr.Close(input.ClosedBy, input.ClosureNotes); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := uc.repo.Update(ctx, ncr); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return ncr, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package qc
+
+import (
+        "context"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/event"
+        "github.com/google/uuid"
+)
+
+// GetCheckpointsUseCase handles getting QC checkpoints
+type GetCheckpointsUseCase struct {
+        repo repository.QCRepository
+}
+
+// NewGetCheckpointsUseCase creates a new GetCheckpointsUseCase
+func NewGetCheckpointsUseCase(repo repository.QCRepository) *GetCheckpointsUseCase <span class="cov0" title="0">{
+        return &amp;GetCheckpointsUseCase{repo: repo}
+}</span>
+
+// Execute gets all active checkpoints
+func (uc *GetCheckpointsUseCase) Execute(ctx context.Context) ([]*entity.QCCheckpoint, error) <span class="cov0" title="0">{
+        return uc.repo.GetCheckpoints(ctx)
+}</span>
+
+// EventPublisher defines event publishing interface for QC
+type EventPublisher interface {
+        PublishQCPassed(event event.QCEvent) error
+        PublishQCFailed(event event.QCEvent) error
+}
+
+// CreateInspectionUseCase handles creating QC inspections
+type CreateInspectionUseCase struct {
+        repo     repository.QCRepository
+        eventPub EventPublisher
+}
+
+// NewCreateInspectionUseCase creates a new CreateInspectionUseCase
+func NewCreateInspectionUseCase(repo repository.QCRepository, eventPub EventPublisher) *CreateInspectionUseCase <span class="cov8" title="1">{
+        return &amp;CreateInspectionUseCase{repo: repo, eventPub: eventPub}
+}</span>
+
+// CreateInspectionInput is the input for creating an inspection
+type CreateInspectionInput struct {
+        InspectionType    entity.CheckpointType
+        CheckpointID      *uuid.UUID
+        ReferenceType     entity.ReferenceType
+        ReferenceID       uuid.UUID
+        ProductID         *uuid.UUID
+        MaterialID        *uuid.UUID
+        LotID             *uuid.UUID
+        LotNumber         string
+        InspectedQuantity float64
+        SampleSize        *int
+        InspectorID       uuid.UUID
+        InspectorName     string
+        Items             []CreateInspectionItemInput
+}
+
+// CreateInspectionItemInput is input for an inspection item
+type CreateInspectionItemInput struct {
+        ItemNumber    int
+        TestName      string
+        TestMethod    string
+        Specification string
+        TargetValue   string
+        MinValue      string
+        MaxValue      string
+        ActualValue   string
+        UOM           string
+        Result        entity.ItemResult
+        Notes         string
+}
+
+// Execute creates a new inspection
+func (uc *CreateInspectionUseCase) Execute(ctx context.Context, input CreateInspectionInput) (*entity.QCInspection, error) <span class="cov8" title="1">{
+        // Generate inspection number
+        inspNumber, err := uc.repo.GenerateInspectionNumber(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">inspection := &amp;entity.QCInspection{
+                InspectionNumber:  inspNumber,
+                InspectionType:    input.InspectionType,
+                CheckpointID:      input.CheckpointID,
+                ReferenceType:     input.ReferenceType,
+                ReferenceID:       input.ReferenceID,
+                ProductID:         input.ProductID,
+                MaterialID:        input.MaterialID,
+                LotID:             input.LotID,
+                LotNumber:         input.LotNumber,
+                InspectedQuantity: input.InspectedQuantity,
+                SampleSize:        input.SampleSize,
+                Result:            entity.InspectionResultPending,
+                InspectorID:       input.InspectorID,
+                InspectorName:     input.InspectorName,
+        }
+
+        if err := uc.repo.CreateInspection(ctx, inspection); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Create inspection items
+        <span class="cov8" title="1">var items []*entity.QCInspectionItem
+        for _, item := range input.Items </span><span class="cov0" title="0">{
+                items = append(items, &amp;entity.QCInspectionItem{
+                        InspectionID:  inspection.ID,
+                        ItemNumber:    item.ItemNumber,
+                        TestName:      item.TestName,
+                        TestMethod:    item.TestMethod,
+                        Specification: item.Specification,
+                        TargetValue:   item.TargetValue,
+                        MinValue:      item.MinValue,
+                        MaxValue:      item.MaxValue,
+                        ActualValue:   item.ActualValue,
+                        UOM:           item.UOM,
+                        Result:        item.Result,
+                        Notes:         item.Notes,
+                })
+        }</span>
+        <span class="cov8" title="1">if len(items) &gt; 0 </span><span class="cov0" title="0">{
+                if err := uc.repo.CreateInspectionItems(ctx, items); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+
+        <span class="cov8" title="1">return inspection, nil</span>
+}
+
+// GetInspectionUseCase handles getting an inspection
+type GetInspectionUseCase struct {
+        repo repository.QCRepository
+}
+
+// NewGetInspectionUseCase creates a new GetInspectionUseCase
+func NewGetInspectionUseCase(repo repository.QCRepository) *GetInspectionUseCase <span class="cov0" title="0">{
+        return &amp;GetInspectionUseCase{repo: repo}
+}</span>
+
+// Execute gets an inspection by ID
+func (uc *GetInspectionUseCase) Execute(ctx context.Context, id uuid.UUID) (*entity.QCInspection, error) <span class="cov0" title="0">{
+        return uc.repo.GetInspectionByID(ctx, id)
+}</span>
+
+// ListInspectionsUseCase handles listing inspections
+type ListInspectionsUseCase struct {
+        repo repository.QCRepository
+}
+
+// NewListInspectionsUseCase creates a new ListInspectionsUseCase
+func NewListInspectionsUseCase(repo repository.QCRepository) *ListInspectionsUseCase <span class="cov0" title="0">{
+        return &amp;ListInspectionsUseCase{repo: repo}
+}</span>
+
+// Execute lists inspections
+func (uc *ListInspectionsUseCase) Execute(ctx context.Context, filter repository.QCFilter) ([]*entity.QCInspection, int64, error) <span class="cov0" title="0">{
+        return uc.repo.ListInspections(ctx, filter)
+}</span>
+
+// ApproveInspectionUseCase handles approving/rejecting inspections
+type ApproveInspectionUseCase struct {
+        repo     repository.QCRepository
+        eventPub EventPublisher
+}
+
+// NewApproveInspectionUseCase creates a new ApproveInspectionUseCase
+func NewApproveInspectionUseCase(repo repository.QCRepository, eventPub EventPublisher) *ApproveInspectionUseCase <span class="cov8" title="1">{
+        return &amp;ApproveInspectionUseCase{repo: repo, eventPub: eventPub}
+}</span>
+
+// ApproveInspectionInput is input for approving an inspection
+type ApproveInspectionInput struct {
+        InspectionID     uuid.UUID
+        Result           entity.InspectionResult
+        AcceptedQuantity *float64
+        RejectedQuantity *float64
+        ApproverID       uuid.UUID
+        Notes            string
+}
+
+// Execute approves or rejects an inspection
+func (uc *ApproveInspectionUseCase) Execute(ctx context.Context, input ApproveInspectionInput) (*entity.QCInspection, error) <span class="cov8" title="1">{
+        inspection, err := uc.repo.GetInspectionByID(ctx, input.InspectionID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrQCInspectionNotFound
+        }</span>
+
+        <span class="cov8" title="1">if !inspection.CanBeApproved() </span><span class="cov0" title="0">{
+                return nil, entity.ErrQCAlreadyApproved
+        }</span>
+
+        <span class="cov8" title="1">inspection.AcceptedQuantity = input.AcceptedQuantity
+        inspection.RejectedQuantity = input.RejectedQuantity
+        inspection.Notes = input.Notes
+
+        switch input.Result </span>{
+        case entity.InspectionResultPassed:<span class="cov0" title="0">
+                inspection.Pass(input.ApproverID)</span>
+        case entity.InspectionResultFailed:<span class="cov8" title="1">
+                inspection.Fail(input.ApproverID)</span>
+        case entity.InspectionResultConditional:<span class="cov0" title="0">
+                inspection.ConditionalPass(input.ApproverID)</span>
+        }
+
+        <span class="cov8" title="1">inspection.CalculateScore()
+
+        if err := uc.repo.UpdateInspection(ctx, inspection); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Publish event
+        <span class="cov8" title="1">qcEvent := event.QCEvent{
+                InspectionID:     inspection.ID.String(),
+                InspectionNumber: inspection.InspectionNumber,
+                InspectionType:   string(inspection.InspectionType),
+                ReferenceType:    string(inspection.ReferenceType),
+                ReferenceID:      inspection.ReferenceID.String(),
+                Result:           string(inspection.Result),
+        }
+        if inspection.LotID != nil </span><span class="cov0" title="0">{
+                qcEvent.LotID = inspection.LotID.String()
+        }</span>
+
+        <span class="cov8" title="1">if input.Result == entity.InspectionResultPassed </span><span class="cov0" title="0">{
+                uc.eventPub.PublishQCPassed(qcEvent)
+        }</span> else<span class="cov8" title="1"> if input.Result == entity.InspectionResultFailed </span><span class="cov8" title="1">{
+                uc.eventPub.PublishQCFailed(qcEvent)
+        }</span>
+
+        <span class="cov8" title="1">return inspection, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package traceability
+
+import (
+        "context"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/google/uuid"
+)
+
+// TraceBackwardUseCase handles backward tracing (product lot → material lots)
+type TraceBackwardUseCase struct {
+        repo   repository.TraceabilityRepository
+        woRepo repository.WorkOrderRepository
+}
+
+// NewTraceBackwardUseCase creates a new TraceBackwardUseCase
+func NewTraceBackwardUseCase(repo repository.TraceabilityRepository, woRepo repository.WorkOrderRepository) *TraceBackwardUseCase <span class="cov8" title="1">{
+        return &amp;TraceBackwardUseCase{
+                repo:   repo,
+                woRepo: woRepo,
+        }
+}</span>
+
+// Execute traces backward from a product lot to material lots
+func (uc *TraceBackwardUseCase) Execute(ctx context.Context, productLotID uuid.UUID) (*entity.BackwardTraceResult, error) <span class="cov8" title="1">{
+        traces, err := uc.repo.GetByProductLot(ctx, productLotID)
+        if err != nil || len(traces) == 0 </span><span class="cov0" title="0">{
+                return nil, entity.ErrTraceNotFound
+        }</span>
+
+        // Get work order info
+        <span class="cov8" title="1">woID := traces[0].WorkOrderID
+        wo, err := uc.woRepo.GetByID(ctx, woID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">result := &amp;entity.BackwardTraceResult{
+                FinishedLot: entity.FinishedLotInfo{
+                        LotNumber:        traces[0].ProductLotNumber,
+                        ProductCode:      "", // Would need to join with master data
+                        ProductName:      "", // Would need to join with master data
+                        Quantity:         0,
+                        ManufacturedDate: wo.CreatedAt,
+                },
+                WorkOrder: entity.WorkOrderInfo{
+                        WONumber:   wo.WONumber,
+                        Supervisor: "", // Would need to join with user service
+                },
+                MaterialsUsed: []entity.MaterialTraceInfo{},
+        }
+
+        if wo.GoodQuantity != nil </span><span class="cov0" title="0">{
+                result.FinishedLot.Quantity = *wo.GoodQuantity
+        }</span>
+        <span class="cov8" title="1">if wo.ActualEndDate != nil </span><span class="cov0" title="0">{
+                result.FinishedLot.ManufacturedDate = *wo.ActualEndDate
+        }</span>
+
+        <span class="cov8" title="1">for _, trace := range traces </span><span class="cov8" title="1">{
+                result.MaterialsUsed = append(result.MaterialsUsed, entity.MaterialTraceInfo{
+                        MaterialCode: "", // Would need to join with master data
+                        MaterialName: "", // Would need to join with master data
+                        LotNumber:    trace.MaterialLotNumber,
+                        Quantity:     trace.MaterialQuantity,
+                        UOM:          "", // Would need to join with master data
+                        Supplier:     "", // Would need to join with supplier service
+                        SupplierLot:  trace.SupplierLotNumber,
+                })
+        }</span>
+
+        <span class="cov8" title="1">return result, nil</span>
+}
+
+// TraceForwardUseCase handles forward tracing (material lot → product lots)
+type TraceForwardUseCase struct {
+        repo repository.TraceabilityRepository
+}
+
+// NewTraceForwardUseCase creates a new TraceForwardUseCase
+func NewTraceForwardUseCase(repo repository.TraceabilityRepository) *TraceForwardUseCase <span class="cov8" title="1">{
+        return &amp;TraceForwardUseCase{repo: repo}
+}</span>
+
+// Execute traces forward from a material lot to product lots
+func (uc *TraceForwardUseCase) Execute(ctx context.Context, materialLotID uuid.UUID) (*entity.ForwardTraceResult, error) <span class="cov8" title="1">{
+        traces, err := uc.repo.GetByMaterialLot(ctx, materialLotID)
+        if err != nil || len(traces) == 0 </span><span class="cov0" title="0">{
+                return nil, entity.ErrTraceNotFound
+        }</span>
+
+        <span class="cov8" title="1">result := &amp;entity.ForwardTraceResult{
+                MaterialLot: entity.MaterialLotInfo{
+                        LotNumber:    traces[0].MaterialLotNumber,
+                        MaterialCode: "", // Would need to join with master data
+                        MaterialName: "", // Would need to join with master data
+                        Supplier:     "", // Would need to join with supplier service
+                },
+                UsedInProducts: []entity.ProductTraceInfo{},
+                TotalQtyUsed:   0,
+        }
+
+        for _, trace := range traces </span><span class="cov8" title="1">{
+                result.UsedInProducts = append(result.UsedInProducts, entity.ProductTraceInfo{
+                        ProductLot:     trace.ProductLotNumber,
+                        ProductName:    "", // Would need to join with master data
+                        WONumber:       "", // Would need to join with WO
+                        QuantityUsed:   trace.MaterialQuantity,
+                        ProductionDate: trace.TraceDate,
+                })
+                result.TotalQtyUsed += trace.MaterialQuantity
+        }</span>
+
+        <span class="cov8" title="1">return result, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package workorder
+
+import (
+        "context"
+
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/entity"
+        "github.com/erp-cosmetics/manufacturing-service/internal/domain/repository"
+        "github.com/erp-cosmetics/manufacturing-service/internal/infrastructure/event"
+        "github.com/google/uuid"
+)
+
+// EventPublisher defines event publishing interface for work order
+type EventPublisher interface {
+        PublishWOCreated(event event.WOEvent) error
+        PublishWOReleased(event event.WOEvent) error
+        PublishWOStarted(event event.WOEvent) error
+        PublishWOCompleted(event event.WOCompletedEvent) error
+}
+
+// CreateWOUseCase handles work order creation
+type CreateWOUseCase struct {
+        woRepo   repository.WorkOrderRepository
+        bomRepo  repository.BOMRepository
+        eventPub EventPublisher
+}
+
+// NewCreateWOUseCase creates a new CreateWOUseCase
+func NewCreateWOUseCase(woRepo repository.WorkOrderRepository, bomRepo repository.BOMRepository, eventPub EventPublisher) *CreateWOUseCase <span class="cov8" title="1">{
+        return &amp;CreateWOUseCase{
+                woRepo:   woRepo,
+                bomRepo:  bomRepo,
+                eventPub: eventPub,
+        }
+}</span>
+
+// CreateWOInput is the input for creating a work order
+type CreateWOInput struct {
+        ProductID        uuid.UUID
+        BOMID            uuid.UUID
+        PlannedQuantity  float64
+        UOMID            uuid.UUID
+        PlannedStartDate string
+        PlannedEndDate   string
+        BatchNumber      string
+        SalesOrderID     *uuid.UUID
+        ProductionLine   string
+        Shift            string
+        Priority         entity.WOPriority
+        Notes            string
+        CreatedBy        uuid.UUID
+}
+
+// Execute creates a new work order
+func (uc *CreateWOUseCase) Execute(ctx context.Context, input CreateWOInput) (*entity.WorkOrder, error) <span class="cov8" title="1">{
+        // Validate BOM exists and is approved
+        bom, err := uc.bomRepo.GetByID(ctx, input.BOMID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrBOMNotFound
+        }</span>
+        <span class="cov8" title="1">if !bom.IsActive() </span><span class="cov0" title="0">{
+                return nil, entity.ErrBOMNotPendingApproval
+        }</span>
+
+        // Generate WO number
+        <span class="cov8" title="1">woNumber, err := uc.woRepo.GenerateWONumber(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">wo := &amp;entity.WorkOrder{
+                WONumber:        woNumber,
+                ProductID:       input.ProductID,
+                BOMID:           input.BOMID,
+                Status:          entity.WOStatusPlanned,
+                Priority:        input.Priority,
+                PlannedQuantity: input.PlannedQuantity,
+                UOMID:           input.UOMID,
+                BatchNumber:     input.BatchNumber,
+                SalesOrderID:    input.SalesOrderID,
+                ProductionLine:  input.ProductionLine,
+                Shift:           input.Shift,
+                Notes:           input.Notes,
+                CreatedBy:       &amp;input.CreatedBy,
+                UpdatedBy:       &amp;input.CreatedBy,
+        }
+
+        if err := uc.woRepo.Create(ctx, wo); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Create line items from BOM
+        <span class="cov8" title="1">var woItems []*entity.WOLineItem
+        ratio := input.PlannedQuantity / bom.BatchSize
+        for i, bomItem := range bom.Items </span><span class="cov8" title="1">{
+                woItems = append(woItems, &amp;entity.WOLineItem{
+                        WorkOrderID:     wo.ID,
+                        BOMLineItemID:   &amp;bomItem.ID,
+                        LineNumber:      i + 1,
+                        MaterialID:      bomItem.MaterialID,
+                        PlannedQuantity: bomItem.Quantity * ratio,
+                        IssuedQuantity:  0,
+                        UOMID:           bomItem.UOMID,
+                        IsCritical:      bomItem.IsCritical,
+                })
+        }</span>
+        <span class="cov8" title="1">if err := uc.woRepo.CreateLineItems(ctx, woItems); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Publish event
+        <span class="cov8" title="1">uc.eventPub.PublishWOCreated(event.WOEvent{
+                WOID:            wo.ID.String(),
+                WONumber:        wo.WONumber,
+                ProductID:       wo.ProductID.String(),
+                BOMID:           wo.BOMID.String(),
+                BatchNumber:     wo.BatchNumber,
+                PlannedQuantity: wo.PlannedQuantity,
+                Status:          string(wo.Status),
+        })
+
+        return wo, nil</span>
+}
+
+// GetWOUseCase handles getting a work order
+type GetWOUseCase struct {
+        repo repository.WorkOrderRepository
+}
+
+// NewGetWOUseCase creates a new GetWOUseCase
+func NewGetWOUseCase(repo repository.WorkOrderRepository) *GetWOUseCase <span class="cov0" title="0">{
+        return &amp;GetWOUseCase{repo: repo}
+}</span>
+
+// Execute gets a work order by ID
+func (uc *GetWOUseCase) Execute(ctx context.Context, id uuid.UUID) (*entity.WorkOrder, error) <span class="cov0" title="0">{
+        return uc.repo.GetByID(ctx, id)
+}</span>
+
+// ListWOsUseCase handles listing work orders
+type ListWOsUseCase struct {
+        repo repository.WorkOrderRepository
+}
+
+// NewListWOsUseCase creates a new ListWOsUseCase
+func NewListWOsUseCase(repo repository.WorkOrderRepository) *ListWOsUseCase <span class="cov0" title="0">{
+        return &amp;ListWOsUseCase{repo: repo}
+}</span>
+
+// Execute lists work orders
+func (uc *ListWOsUseCase) Execute(ctx context.Context, filter repository.WOFilter) ([]*entity.WorkOrder, int64, error) <span class="cov0" title="0">{
+        return uc.repo.List(ctx, filter)
+}</span>
+
+// ReleaseWOUseCase handles releasing a work order
+type ReleaseWOUseCase struct {
+        repo     repository.WorkOrderRepository
+        eventPub EventPublisher
+}
+
+// NewReleaseWOUseCase creates a new ReleaseWOUseCase
+func NewReleaseWOUseCase(repo repository.WorkOrderRepository, eventPub EventPublisher) *ReleaseWOUseCase <span class="cov0" title="0">{
+        return &amp;ReleaseWOUseCase{repo: repo, eventPub: eventPub}
+}</span>
+
+// Execute releases a work order
+func (uc *ReleaseWOUseCase) Execute(ctx context.Context, woID uuid.UUID, updatedBy uuid.UUID) (*entity.WorkOrder, error) <span class="cov0" title="0">{
+        wo, err := uc.repo.GetByID(ctx, woID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrWONotFound
+        }</span>
+
+        <span class="cov0" title="0">if err := wo.Release(); err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrWOCannotRelease
+        }</span>
+        <span class="cov0" title="0">wo.UpdatedBy = &amp;updatedBy
+
+        if err := uc.repo.Update(ctx, wo); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">uc.eventPub.PublishWOReleased(event.WOEvent{
+                WOID:            wo.ID.String(),
+                WONumber:        wo.WONumber,
+                ProductID:       wo.ProductID.String(),
+                BOMID:           wo.BOMID.String(),
+                BatchNumber:     wo.BatchNumber,
+                PlannedQuantity: wo.PlannedQuantity,
+                Status:          string(wo.Status),
+        })
+
+        return wo, nil</span>
+}
+
+// StartWOUseCase handles starting a work order
+type StartWOUseCase struct {
+        repo     repository.WorkOrderRepository
+        eventPub EventPublisher
+}
+
+// NewStartWOUseCase creates a new StartWOUseCase
+func NewStartWOUseCase(repo repository.WorkOrderRepository, eventPub EventPublisher) *StartWOUseCase <span class="cov8" title="1">{
+        return &amp;StartWOUseCase{repo: repo, eventPub: eventPub}
+}</span>
+
+// Execute starts a work order
+func (uc *StartWOUseCase) Execute(ctx context.Context, woID uuid.UUID, supervisorID uuid.UUID) (*entity.WorkOrder, error) <span class="cov8" title="1">{
+        wo, err := uc.repo.GetByID(ctx, woID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrWONotFound
+        }</span>
+
+        <span class="cov8" title="1">if err := wo.Start(supervisorID); err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrWOCannotStart
+        }</span>
+
+        <span class="cov8" title="1">if err := uc.repo.Update(ctx, wo); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // This event triggers WMS to reserve materials
+        <span class="cov8" title="1">uc.eventPub.PublishWOStarted(event.WOEvent{
+                WOID:            wo.ID.String(),
+                WONumber:        wo.WONumber,
+                ProductID:       wo.ProductID.String(),
+                BOMID:           wo.BOMID.String(),
+                BatchNumber:     wo.BatchNumber,
+                PlannedQuantity: wo.PlannedQuantity,
+                Status:          string(wo.Status),
+        })
+
+        return wo, nil</span>
+}
+
+// CompleteWOUseCase handles completing a work order
+type CompleteWOUseCase struct {
+        repo      repository.WorkOrderRepository
+        traceRepo repository.TraceabilityRepository
+        eventPub  EventPublisher
+}
+
+// NewCompleteWOUseCase creates a new CompleteWOUseCase
+func NewCompleteWOUseCase(repo repository.WorkOrderRepository, traceRepo repository.TraceabilityRepository, eventPub EventPublisher) *CompleteWOUseCase <span class="cov0" title="0">{
+        return &amp;CompleteWOUseCase{
+                repo:      repo,
+                traceRepo: traceRepo,
+                eventPub:  eventPub,
+        }
+}</span>
+
+// CompleteWOInput is the input for completing a work order
+type CompleteWOInput struct {
+        WOID             uuid.UUID
+        ActualQuantity   float64
+        GoodQuantity     float64
+        RejectedQuantity float64
+        Notes            string
+        UpdatedBy        uuid.UUID
+}
+
+// Execute completes a work order
+func (uc *CompleteWOUseCase) Execute(ctx context.Context, input CompleteWOInput) (*entity.WorkOrder, error) <span class="cov0" title="0">{
+        wo, err := uc.repo.GetByID(ctx, input.WOID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrWONotFound
+        }</span>
+
+        <span class="cov0" title="0">if err := wo.Complete(input.ActualQuantity, input.GoodQuantity, input.RejectedQuantity); err != nil </span><span class="cov0" title="0">{
+                return nil, entity.ErrWOCannotComplete
+        }</span>
+        <span class="cov0" title="0">wo.Notes = input.Notes
+        wo.UpdatedBy = &amp;input.UpdatedBy
+
+        if err := uc.repo.Update(ctx, wo); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // This event triggers WMS to receive finished goods
+        <span class="cov0" title="0">uc.eventPub.PublishWOCompleted(event.WOCompletedEvent{
+                WOID:         wo.ID.String(),
+                WONumber:     wo.WONumber,
+                ProductID:    wo.ProductID.String(),
+                BatchNumber:  wo.BatchNumber,
+                GoodQuantity: input.GoodQuantity,
+        })
+
+        return wo, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

@@ -10,18 +10,23 @@ import (
 	"github.com/google/uuid"
 )
 
+// EventPublisher defines event publishing interface for issue
+type EventPublisher interface {
+	PublishStockIssued(event *event.StockIssuedEvent) error
+}
+
 // CreateGoodsIssueUseCase handles goods issue creation with FEFO
 type CreateGoodsIssueUseCase struct {
 	issueRepo repository.GoodsIssueRepository
 	stockRepo repository.StockRepository
-	eventPub  *event.Publisher
+	eventPub  EventPublisher
 }
 
 // NewCreateGoodsIssueUseCase creates a new use case
 func NewCreateGoodsIssueUseCase(
 	issueRepo repository.GoodsIssueRepository,
 	stockRepo repository.StockRepository,
-	eventPub *event.Publisher,
+	eventPub EventPublisher,
 ) *CreateGoodsIssueUseCase {
 	return &CreateGoodsIssueUseCase{
 		issueRepo: issueRepo,

@@ -24,14 +24,20 @@ func (uc *GetCheckpointsUseCase) Execute(ctx context.Context) ([]*entity.QCCheck
 	return uc.repo.GetCheckpoints(ctx)
 }
 
+// EventPublisher defines event publishing interface for QC
+type EventPublisher interface {
+	PublishQCPassed(event event.QCEvent) error
+	PublishQCFailed(event event.QCEvent) error
+}
+
 // CreateInspectionUseCase handles creating QC inspections
 type CreateInspectionUseCase struct {
 	repo     repository.QCRepository
-	eventPub *event.Publisher
+	eventPub EventPublisher
 }
 
 // NewCreateInspectionUseCase creates a new CreateInspectionUseCase
-func NewCreateInspectionUseCase(repo repository.QCRepository, eventPub *event.Publisher) *CreateInspectionUseCase {
+func NewCreateInspectionUseCase(repo repository.QCRepository, eventPub EventPublisher) *CreateInspectionUseCase {
 	return &CreateInspectionUseCase{repo: repo, eventPub: eventPub}
 }
 
@@ -156,11 +162,11 @@ func (uc *ListInspectionsUseCase) Execute(ctx context.Context, filter repository
 // ApproveInspectionUseCase handles approving/rejecting inspections
 type ApproveInspectionUseCase struct {
 	repo     repository.QCRepository
-	eventPub *event.Publisher
+	eventPub EventPublisher
 }
 
 // NewApproveInspectionUseCase creates a new ApproveInspectionUseCase
-func NewApproveInspectionUseCase(repo repository.QCRepository, eventPub *event.Publisher) *ApproveInspectionUseCase {
+func NewApproveInspectionUseCase(repo repository.QCRepository, eventPub EventPublisher) *ApproveInspectionUseCase {
 	return &ApproveInspectionUseCase{repo: repo, eventPub: eventPub}
 }
 

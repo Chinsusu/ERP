@@ -9,15 +9,21 @@ import (
 	"github.com/google/uuid"
 )
 
+// EventPublisher defines event publishing interface for BOM
+type EventPublisher interface {
+	PublishBOMCreated(event event.BOMEvent) error
+	PublishBOMApproved(event event.BOMEvent) error
+}
+
 // CreateBOMUseCase handles BOM creation
 type CreateBOMUseCase struct {
 	repo          repository.BOMRepository
-	eventPub      *event.Publisher
+	eventPub      EventPublisher
 	encryptionKey []byte
 }
 
 // NewCreateBOMUseCase creates a new CreateBOMUseCase
-func NewCreateBOMUseCase(repo repository.BOMRepository, eventPub *event.Publisher, encryptionKey []byte) *CreateBOMUseCase {
+func NewCreateBOMUseCase(repo repository.BOMRepository, eventPub EventPublisher, encryptionKey []byte) *CreateBOMUseCase {
 	return &CreateBOMUseCase{
 		repo:          repo,
 		eventPub:      eventPub,
@@ -189,11 +195,11 @@ func (uc *ListBOMsUseCase) Execute(ctx context.Context, filter repository.BOMFil
 // ApproveBOMUseCase handles BOM approval
 type ApproveBOMUseCase struct {
 	repo     repository.BOMRepository
-	eventPub *event.Publisher
+	eventPub EventPublisher
 }
 
 // NewApproveBOMUseCase creates a new ApproveBOMUseCase
-func NewApproveBOMUseCase(repo repository.BOMRepository, eventPub *event.Publisher) *ApproveBOMUseCase {
+func NewApproveBOMUseCase(repo repository.BOMRepository, eventPub EventPublisher) *ApproveBOMUseCase {
 	return &ApproveBOMUseCase{repo: repo, eventPub: eventPub}
 }
 
