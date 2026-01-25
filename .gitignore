@@ -17,6 +17,7 @@ vendor/
 # Build outputs
 dist/
 build/
+bin/
 *.exe
 *.dll
 *.so
@@ -26,6 +27,7 @@ build/
 *.test
 coverage/
 *.out
+coverage.out
 
 # Logs
 *.log
