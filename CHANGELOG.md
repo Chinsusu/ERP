@@ -65,6 +65,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Password verification issue (minor - can be fixed with password reset)
 - Deploy remaining services: User, Procurement, Notification, File, Reporting
 
+**Password Verification Fix** ✅:
+- ✅ **Generated New Password Hash**: Used Python bcrypt to create hash for `Admin@123456`
+- ✅ **Updated Database**: Updated user_credentials table with new password hash
+- ✅ **Verified Login**: Successfully tested login with new credentials
+- ✅ **JWT Tokens**: Access token and refresh token generation working
+
+**Nginx Routing Fix** ✅:
+- ✅ **Fixed proxy_pass Configuration**: Changed from `http://$api_gateway_upstream/` to `http://$api_gateway_upstream`
+  - Removed trailing slash to preserve full `/api/v1/auth/login` path
+  - API Gateway expects full path including `/api` prefix
+- ✅ **Restarted Nginx**: Loaded new configuration successfully
+- ✅ **Verified Public URL**: Login working via https://erp.xelu.top
+- ✅ **End-to-End Flow**: Cloudflare Tunnel → Nginx → API Gateway → Auth Service → Database
+
+**Final Verification** ✅:
+- ✅ **Local Login**: `POST http://localhost/api/v1/auth/login` → Success
+- ✅ **Public Login**: `POST https://erp.xelu.top/api/v1/auth/login` → Success
+- ✅ **JWT Tokens**: Access & refresh tokens generated correctly
+- ✅ **User Data**: Super Admin role with *:*:* permissions
+
+**Deployment Status: 100% AUTH SERVICE COMPLETE!**
+
+**Working Credentials**:
+- Email: admin@company.vn
+- Password: Admin@123456
+- Role: Super Admin
+- Permissions: Full Access (*:*:*)
+
+**Public Access**: https://erp.xelu.top ✅ FULLY OPERATIONAL
+
 ### Added - Phase 12: Production Deployment - 2026-01-25
 
 **Deployment Progress: 92% Complete**
