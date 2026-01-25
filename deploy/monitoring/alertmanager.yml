@@ -1,0 +1,127 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'erp-alerts@company.vn'
+  smtp_auth_username: 'erp-alerts@company.vn'
+  smtp_auth_password: '<SMTP_APP_PASSWORD>'
+  smtp_require_tls: true
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Routing tree
+route:
+  group_by: ['alertname', 'severity', 'component']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default'
+  
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      repeat_interval: 1h
+      continue: false
+    
+    # Warning alerts - less frequent
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      repeat_interval: 4h
+      continue: false
+    
+    # Business alerts - during business hours only
+    - match:
+        component: business
+      receiver: 'business-alerts'
+      repeat_interval: 12h
+      # Only send during business hours (8 AM - 6 PM, Mon-Fri)
+      active_time_intervals:
+        - business_hours
+
+# Time intervals
+time_intervals:
+  - name: business_hours
+    time_intervals:
+      - weekdays: ['monday:friday']
+        times:
+          - start_time: '08:00'
+            end_time: '18:00'
+        location: 'Asia/Ho_Chi_Minh'
+
+# Inhibition rules
+inhibit_rules:
+  # If service is down, don't alert on high error rate for that service
+  - source_matchers:
+      - alertname = ServiceDown
+    target_matchers:
+      - alertname = HighErrorRate
+    equal:
+      - job
+
+  # If disk is low, don't alert on database issues
+  - source_matchers:
+      - alertname = DiskSpaceLow
+    target_matchers:
+      - component = database
+
+# Receivers
+receivers:
+  - name: 'default'
+    email_configs:
+      - to: 'it-team@company.vn'
+        headers:
+          Subject: '[ERP Alert] {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>ERP Alert</h2>
+          <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>Severity:</strong> {{ .GroupLabels.severity }}</p>
+          <p><strong>Summary:</strong> {{ .CommonAnnotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          {{ if .CommonAnnotations.runbook }}
+          <p><strong>Runbook:</strong> {{ .CommonAnnotations.runbook }}</p>
+          {{ end }}
+          <p><a href="{{ .ExternalURL }}">View in AlertManager</a></p>
+
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'it-lead@company.vn,devops@company.vn'
+        headers:
+          Subject: '🚨 [CRITICAL] {{ .GroupLabels.alertname }}'
+        html: |
+          <h2 style="color:red;">CRITICAL ALERT</h2>
+          <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>Component:</strong> {{ .GroupLabels.component }}</p>
+          <p><strong>Summary:</strong> {{ .CommonAnnotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          {{ if .CommonAnnotations.runbook }}
+          <p><strong>Immediate Action:</strong> {{ .CommonAnnotations.runbook }}</p>
+          {{ end }}
+          <p><a href="{{ .ExternalURL }}">View in AlertManager</a></p>
+    # Webhook for Slack/Telegram can be added here
+    # webhook_configs:
+    #   - url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'it-team@company.vn'
+        headers:
+          Subject: '⚠️ [WARNING] {{ .GroupLabels.alertname }}'
+
+  - name: 'business-alerts'
+    email_configs:
+      - to: 'operations@company.vn,warehouse@company.vn'
+        headers:
+          Subject: '[Business Alert] {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>Business Alert</h2>
+          <p><strong>Module:</strong> {{ .GroupLabels.module }}</p>
+          <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>Summary:</strong> {{ .CommonAnnotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          {{ if .CommonAnnotations.action }}
+          <p><strong>Recommended Action:</strong> {{ .CommonAnnotations.action }}</p>
+          {{ end }}

@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Phase 11: Monitoring & Maintenance - 2026-01-25
+
+**Complete Monitoring & Alerting Setup (~1,100 LOC)**
+
+**Monitoring & Alerting**:
+- **Alert Rules** (261 lines): erp-alerts.yml
+  - 10+ technical alerts (ServiceDown, HighErrorRate, DatabaseConnectionHigh, Memory/Disk)
+  - 10+ business alerts (LowStock, LotsExpiring, CertificateExpiring, FailedWorkOrders)
+  - Severity-based routing (critical vs warning)
+- **AlertManager Config** (127 lines): Email notifications with routing
+  - Critical alerts → IT Lead + DevOps (1h repeat)
+  - Warning alerts → IT Team (4h repeat)
+  - Business alerts → Operations (business hours only)
+  - Inhibition rules to prevent alert storms
+- **Grafana Dashboard** (326 lines): ERP Overview dashboard
+  - 10 panels: Service Health, Request Rate, Response Time, Error Rate
+  - Database Connections, CPU/Memory Usage by Service
+  - Business metrics: Low Stock Alerts, Expiring Lots
+- **Maintenance Guide** (343 lines): Comprehensive operations manual
+  - Daily checklists (AM/PM), Weekly/Monthly tasks
+  - Incident Management (P1/P2/P3 severity levels)
+  - Troubleshooting guide (common issues + solutions)
+  - Backup verification procedures
+
+**Total Lines**: 1,057 lines of monitoring configuration and documentation
+
+---
+
 ### Added - Phase 9-10: Documentation & Deployment - 2026-01-25
 
 **Complete Documentation & Deployment Package (~1,700 LOC)**

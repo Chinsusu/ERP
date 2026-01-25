@@ -1,0 +1,261 @@
+groups:
+  # ==========================================
+  # TECHNICAL ALERTS (Critical)
+  # ==========================================
+  - name: erp-technical-critical
+    rules:
+      # Service availability
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Service {{ $labels.job }} is DOWN"
+          description: "{{ $labels.job }} has been unavailable for more than 1 minute. Immediate action required."
+          runbook: "Check service logs: docker logs {{ $labels.job }}"
+
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m])) by (service)
+            /
+            sum(rate(http_requests_total[5m])) by (service)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: application
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+          runbook: "Check error logs and recent deployments"
+
+      # Response time degradation
+      - alert: HighResponseTime
+        expr: |
+          histogram_quantile(0.95, 
+            rate(http_request_duration_seconds_bucket[5m])
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: critical
+          component: performance
+        annotations:
+          summary: "High response time detected"
+          description: "p95 response time is {{ $value }}s (threshold: 500ms)"
+          runbook: "Investigate slow queries and resource usage"
+
+      # Database connections
+      - alert: DatabaseConnectionHigh
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High database connection count"
+          description: "{{ $value }} active connections (threshold: 80)"
+          runbook: "Check for connection leaks and long-running queries"
+
+      # Memory usage
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            container_memory_usage_bytes{name=~"erp-.*"}
+            /
+            container_spec_memory_limit_bytes{name=~"erp-.*"}
+          ) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High memory usage on {{ $labels.name }}"
+          description: "Memory usage is {{ $value | humanizePercentage }} (threshold: 85%)"
+
+      # Disk space
+      - alert: DiskSpaceLow
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint="/"}
+            /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) < 0.15
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Low disk space"
+          description: "Only {{ $value | humanizePercentage }} free (threshold: 15%)"
+          runbook: "Clean old logs and backups: ./scripts/cleanup-backups.sh"
+
+  # ==========================================
+  # TECHNICAL ALERTS (Warning)
+  # ==========================================
+  - name: erp-technical-warning
+    rules:
+      # Slow database queries
+      - alert: SlowDatabaseQueries
+        expr: |
+          rate(pg_stat_statements_mean_exec_time[5m]) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query time is {{ $value }}ms (threshold: 1000ms)"
+
+      # Redis memory usage
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.80
+        for: 10m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Redis memory usage high"
+          description: "{{ $value | humanizePercentage }} used (threshold: 80%)"
+
+      # NATS queue depth
+      - alert: NATSQueueBacklog
+        expr: nats_jetstream_stream_messages > 10000
+        for: 10m
+        labels:
+          severity: warning
+          component: messaging
+        annotations:
+          summary: "NATS queue backlog detected"
+          description: "{{ $value }} messages pending (threshold: 10000)"
+
+  # ==========================================
+  # BUSINESS ALERTS (Warning)
+  # ==========================================
+  - name: erp-business
+    rules:
+      # Low stock alert
+      - alert: LowStockAlert
+        expr: wms_stock_available_quantity < wms_material_reorder_point
+        for: 1h
+        labels:
+          severity: warning
+          component: business
+          module: wms
+        annotations:
+          summary: "Low stock for {{ $labels.material_code }}"
+          description: "Available: {{ $value }}, Reorder point: {{ $labels.reorder_point }}"
+          action: "Create purchase requisition"
+
+      # Lots expiring soon
+      - alert: LotsExpiringSoon
+        expr: wms_lots_expiring_count{days="30"} > 0
+        for: 1d
+        labels:
+          severity: warning
+          component: business
+          module: wms
+        annotations:
+          summary: "{{ $value }} lots expiring in 30 days"
+          description: "Review expiring inventory and prioritize usage (FEFO)"
+          action: "Check WMS → Expiring Lots report"
+
+      # Critical: Lots expiring very soon
+      - alert: LotsExpiringCritical
+        expr: wms_lots_expiring_count{days="7"} > 0
+        for: 12h
+        labels:
+          severity: critical
+          component: business
+          module: wms
+        annotations:
+          summary: "URGENT: {{ $value }} lots expiring in 7 days"
+          description: "Immediate action required to prevent waste"
+          action: "Expedite usage or consider disposal"
+
+      # GMP Certificate expiring
+      - alert: CertificateExpiring
+        expr: supplier_certification_days_until_expiry{cert_type="GMP"} < 30
+        for: 1d
+        labels:
+          severity: warning
+          component: business
+          module: supplier
+        annotations:
+          summary: "GMP certificate expiring for {{ $labels.supplier_name }}"
+          description: "Expires in {{ $value }} days"
+          action: "Contact supplier for renewal"
+
+      # Critical: Certificate expiring very soon
+      - alert: CertificateExpiringCritical
+        expr: supplier_certification_days_until_expiry{cert_type="GMP"} < 7
+        for: 6h
+        labels:
+          severity: critical
+          component: business
+          module: supplier
+        annotations:
+          summary: "URGENT: GMP cert expires in {{ $value }} days - {{ $labels.supplier_name }}"
+          description: "Cannot create new POs after expiry"
+          action: "Block new POs if not renewed"
+
+      # Old pending approvals
+      - alert: PendingApprovalsOld
+        expr: procurement_pending_approvals_age_days > 7
+        for: 1d
+        labels:
+          severity: warning
+          component: business
+          module: procurement
+        annotations:
+          summary: "Old pending approvals detected"
+          description: "{{ $value }} PRs/POs pending approval for >7 days"
+          action: "Review approval queue and escalate"
+
+      # Failed work orders
+      - alert: HighWorkOrderFailureRate
+        expr: |
+          (
+            sum(rate(manufacturing_work_orders_total{status="FAILED"}[1d]))
+            /
+            sum(rate(manufacturing_work_orders_total[1d]))
+          ) > 0.1
+        for: 1d
+        labels:
+          severity: warning
+          component: business
+          module: manufacturing
+        annotations:
+          summary: "High work order failure rate"
+          description: "{{ $value | humanizePercentage }} WOs failed (threshold: 10%)"
+          action: "Review failure reasons and address root causes"
+
+      # Excessive NCRs (Non-Conformance Reports)
+      - alert: HighNCRRate
+        expr: |
+          sum(rate(manufacturing_ncr_total[7d])) > 10
+        for: 1d
+        labels:
+          severity: warning
+          component: business
+          module: manufacturing
+        annotations:
+          summary: "High NCR generation rate"
+          description: "{{ $value }} NCRs in last 7 days (threshold: 10)"
+          action: "Quality investigation required"
+
+      # Overdue sales orders
+      - alert: OverdueSalesOrders
+        expr: sales_orders_overdue_count > 5
+        for: 6h
+        labels:
+          severity: warning
+          component: business
+          module: sales
+        annotations:
+          summary: "{{ $value }} sales orders overdue"
+          description: "Orders not delivered by promised date"
+          action: "Contact customers and expedite shipments"
