@@ -1,3 +1,8 @@
 export { default as api } from './axios'
 export { authApi } from './auth.api'
 export { userApi } from './user.api'
+export { materialApi } from './material.api'
+export { supplierApi } from './supplier.api'
+export { procurementApi } from './procurement.api'
+export { wmsApi } from './wms.api'
+export { manufacturingApi } from './manufacturing.api'

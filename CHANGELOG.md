@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Frontend Business Modules (Phase 5.2) - 2026-01-25
+
+**Business Module Pages (~15 files, ~2,500 LOC)**
+- Materials: List, Detail (tabs with suppliers), Form (create/edit)
+- Suppliers: List (with ratings), Detail (contacts, certifications, evaluations), Form
+- Procurement: Purchase Requisitions list, Purchase Orders list
+- WMS: Stock overview (dashboard with stats), GRN list
+- Manufacturing: BOM list, Work Orders (with progress bars)
+
+**API Layer (~5 files, ~400 LOC)**
+- `material.api.ts` - Materials CRUD with filters
+- `supplier.api.ts` - Suppliers with contacts, certifications, evaluations
+- `procurement.api.ts` - PR and PO operations
+- `wms.api.ts` - Stock, lots, GRN, movements
+- `manufacturing.api.ts` - BOM, work orders, QC, traceability
+
+**TypeScript Types**
+- `business.types.ts` - 25+ interfaces (Material, Supplier, PR, PO, Stock, BOM, WorkOrder, etc.)
+
+**Composables**
+- `useApi.ts` - TanStack Query wrappers (useApiQuery, usePaginatedQuery, useApiMutation)
+
+**Mock Data System**
+- `src/mocks/data.ts` - 50+ mock records for testing
+- `src/mocks/handlers.ts` - Axios interceptors for mock API
+- Auto-enabled in DEV mode (set VITE_USE_MOCKS=false to disable)
+
+**Common Features**
+- Server-side pagination with DataTable
+- Filter bars with search, dropdowns
+- Status tags with color severity
+- Action buttons (view, edit)
+- Responsive card layouts
+
+**Build Output**
+- Production build: 5.05s, 30+ assets
+- Total frontend files: 55+
+
+---
+
 ### Added - Frontend Setup (Phase 5.1) - VUE 3 + PRIMEVUE
 
 **Implementation Complete (~35 files, ~3,000 LOC)**

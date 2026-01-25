@@ -10,6 +10,13 @@ const api = axios.create({
     }
 })
 
+// Enable mock handlers in development if no real API
+if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCKS !== 'false') {
+    import('@/mocks/handlers').then(({ setupMockHandlers }) => {
+        setupMockHandlers(api)
+    })
+}
+
 // Request interceptor - attach JWT token
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {

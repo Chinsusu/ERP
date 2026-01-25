@@ -41,12 +41,30 @@ const routes: RouteRecordRaw[] = [
                 meta: { title: 'Users', permission: 'user:user:read' }
             },
 
-            // Master Data
+            // Master Data - Materials
             {
                 path: 'materials',
                 name: 'Materials',
                 component: () => import('@/pages/materials/MaterialsPage.vue'),
                 meta: { title: 'Materials', permission: 'master_data:material:read' }
+            },
+            {
+                path: 'materials/new',
+                name: 'MaterialCreate',
+                component: () => import('@/pages/materials/MaterialFormPage.vue'),
+                meta: { title: 'New Material', permission: 'master_data:material:create' }
+            },
+            {
+                path: 'materials/:id',
+                name: 'MaterialDetail',
+                component: () => import('@/pages/materials/MaterialDetailPage.vue'),
+                meta: { title: 'Material Details', permission: 'master_data:material:read' }
+            },
+            {
+                path: 'materials/:id/edit',
+                name: 'MaterialEdit',
+                component: () => import('@/pages/materials/MaterialFormPage.vue'),
+                meta: { title: 'Edit Material', permission: 'master_data:material:update' }
             },
 
             // Suppliers
@@ -55,6 +73,24 @@ const routes: RouteRecordRaw[] = [
                 name: 'Suppliers',
                 component: () => import('@/pages/suppliers/SuppliersPage.vue'),
                 meta: { title: 'Suppliers', permission: 'supplier:supplier:read' }
+            },
+            {
+                path: 'suppliers/new',
+                name: 'SupplierCreate',
+                component: () => import('@/pages/suppliers/SupplierFormPage.vue'),
+                meta: { title: 'New Supplier', permission: 'supplier:supplier:create' }
+            },
+            {
+                path: 'suppliers/:id',
+                name: 'SupplierDetail',
+                component: () => import('@/pages/suppliers/SupplierDetailPage.vue'),
+                meta: { title: 'Supplier Details', permission: 'supplier:supplier:read' }
+            },
+            {
+                path: 'suppliers/:id/edit',
+                name: 'SupplierEdit',
+                component: () => import('@/pages/suppliers/SupplierFormPage.vue'),
+                meta: { title: 'Edit Supplier', permission: 'supplier:supplier:update' }
             },
 
             // Procurement
