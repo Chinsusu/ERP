@@ -66,7 +66,7 @@ func main() {
 
 	// Connect to NATS
 	var publisher *event.Publisher
-	nc, err := nats.Connect(cfg.NATSURL)
+	nc, err := nats.Connect(cfg.NATSUrl)
 	if err != nil {
 		zapLogger.Warn("Failed to connect to NATS, events will not be published", zap.Error(err))
 	} else {
@@ -128,7 +128,7 @@ func main() {
 
 	// Create HTTP server
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%s", cfg.HTTPPort),
+		Addr:    fmt.Sprintf(":%s", cfg.Port),
 		Handler: router,
 	}
 
@@ -140,7 +140,7 @@ func main() {
 
 	// Start HTTP server
 	go func() {
-		zapLogger.Info("Starting HTTP server", zap.String("port", cfg.HTTPPort))
+		zapLogger.Info("Starting HTTP server", zap.String("port", cfg.Port))
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errChan <- fmt.Errorf("HTTP server error: %w", err)
 		}
@@ -160,7 +160,7 @@ func main() {
 	}()
 
 	zapLogger.Info("Marketing Service started successfully",
-		zap.String("http_port", cfg.HTTPPort),
+		zap.String("http_port", cfg.Port),
 		zap.String("grpc_port", cfg.GRPCPort),
 	)
 

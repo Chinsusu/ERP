@@ -11,6 +11,7 @@ CREATE DATABASE marketing_db;
 CREATE DATABASE finance_db;
 CREATE DATABASE reporting_db;
 CREATE DATABASE notification_db;
+CREATE DATABASE file_db;
 CREATE DATABASE ai_db;
 
 -- Create service-specific users (optional, for better security)

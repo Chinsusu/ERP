@@ -1,6 +1,9 @@
 package config
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/erp-cosmetics/shared/pkg/config"
 )
 
@@ -59,13 +62,26 @@ type MinIOConfig struct {
 
 // Helper functions
 func getEnvOrDefault(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
 	return defaultValue
 }
 
 func getEnvAsBoolOrDefault(key string, defaultValue bool) bool {
-	return defaultValue
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value == "true" || value == "1" || value == "yes"
 }
 
 func getEnvAsInt64OrDefault(key string, defaultValue int64) int64 {
-	return defaultValue
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	var res int64
+	fmt.Sscanf(value, "%d", &res)
+	return res
 }

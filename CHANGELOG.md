@@ -14,10 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Config Management**: Migrated all microservices to use environment variables exclusively, removing the mandatory `.env` file requirement.
+- **Service Alignment**: Refactored `marketing-service` to use the shared configuration library and standardized port naming.
 
 ### Fixed
-- Repaired corrupted import blocks in `auth-service`, `user-service`, and system health handlers.
-- Resolved `shared/pkg/response` import path mismatches across the monorepo.
+- **System Health**: Achieved 100% healthy status across all 13 microservices.
+- **File Service**: Repaired environment variable helpers and corrected MinIO connection strings.
+- **Marketing Service**: Fixed `mapstructure` tags, missing imports, and compilation errors.
+- **Import Repairs**: Resolved corrupted import blocks in several services caused by automation errors.
 
 ## [1.1.0] - 2026-01-26
 
