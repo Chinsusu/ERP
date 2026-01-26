@@ -7,6 +7,12 @@ export async function authGuard(
     next: NavigationGuardNext
 ) {
     const authStore = useAuthStore()
+
+    // Initialize store if needed (e.g. on page refresh)
+    if (!authStore.initialized && authStore.accessToken) {
+        await authStore.initialize()
+    }
+
     const requiresAuth = to.meta.requiresAuth !== false
     const requiredPermission = to.meta.permission as string | undefined
 

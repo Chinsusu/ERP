@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
     const accessToken = ref<string | null>(localStorage.getItem('access_token'))
     const refreshToken = ref<string | null>(localStorage.getItem('refresh_token'))
     const loading = ref(false)
+    const initialized = ref(false)
 
     // Getters
     const isAuthenticated = computed(() => !!accessToken.value && !!user.value)
@@ -72,6 +73,27 @@ export const useAuthStore = defineStore('auth', () => {
         loading.value = value
     }
 
+    async function initialize() {
+        if (initialized.value || !accessToken.value) {
+            initialized.value = true
+            return
+        }
+
+        try {
+            const { userApi } = await import('@/api/user.api')
+            const response = await userApi.getCurrentUser()
+            if (response.success) {
+                user.value = response.data
+            }
+        } catch (error) {
+            console.error('Failed to initialize auth store:', error)
+            // If token is invalid, logout
+            logout()
+        } finally {
+            initialized.value = true
+        }
+    }
+
     return {
         // State
         user,
@@ -89,6 +111,8 @@ export const useAuthStore = defineStore('auth', () => {
         setUser,
         setTokens,
         logout,
-        setLoading
+        setLoading,
+        initialize,
+        initialized
     }
 })
