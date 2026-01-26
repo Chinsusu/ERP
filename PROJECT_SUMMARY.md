@@ -180,4 +180,4 @@ Document management with MinIO storage.
 ---
 
 **Repository**: https://github.com/Chinsusu/ERP  
-**Updated**: 2026-01-25T10:15:00Z
+**Updated**: 2026-01-26T04:30:00Z

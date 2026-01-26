@@ -21,8 +21,7 @@ services:
     container_name: erp-cloudflared
     restart: always
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
-    networks:
-      - erp-network
+    network_mode: "service:nginx"
     depends_on:
       - nginx
 
@@ -199,7 +198,7 @@ services:
     image: nginx:alpine
     container_name: erp-nginx
     volumes:
-      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./deploy/nginx/nginx-fixed.conf:/etc/nginx/nginx.conf
     # No need to expose ports - Cloudflare Tunnel handles this
     # ports:
     #   - "80:80"
