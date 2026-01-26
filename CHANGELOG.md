@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-01-26
+
+### Added - Infrastructure Consolidation
+- **Unified Docker Stack**: Consolidated 13 microservices and infrastructure into a single `docker-compose.yml`.
+- **NATS Multi-instance Support**: Added JetStream and connection retry logic to the shared NATS client.
+- **Sequential Build System**: Added a scriptable build process to manage limited host disk space (25GB).
+
+### Changed
+- **Config Management**: Migrated all microservices to use environment variables exclusively, removing the mandatory `.env` file requirement.
+
+### Fixed
+- Repaired corrupted import blocks in `auth-service`, `user-service`, and system health handlers.
+- Resolved `shared/pkg/response` import path mismatches across the monorepo.
+
 ## [1.1.0] - 2026-01-26
 
 ### Added - Phase 13: Vuexy Redesign & VyVy's ERP Branding

@@ -1,8 +1,8 @@
 # VyVy's ERP System - Project Summary
 
-**Updated**: January 26, 2026  
+**Updated**: January 26, 2026 (Consolidated Stack)  
 **Repository**: https://github.com/Chinsusu/ERP  
-**Status**: 13 Services + Redesigned Frontend + VyVy's ERP Branding (Phase 1-13 Complete)
+**Status**: 13 Services + Redesigned Frontend + Consolidated Docker Stack (Phase 1-13 + Infrastructure Complete)
 
 ---
 
@@ -27,7 +27,7 @@ Complete ERP system for cosmetics manufacturing with Clean Architecture, microse
 | **Notification Service** | 40 files | ✅ **NEW** |
 | **Reporting Service** | 35 files | ✅ **NEW** |
 | **File Service** | 20 files | ✅ **NEW** |
-| **Frontend (Vue 3)** | 55+ files | ✅ Phase 5.2 |
+| **Frontend (Vue 3)** | 55+ files | ✅ Containerized (Nginx) |
 
 **Total**: ~665+ files, ~58,200+ LOC
 
@@ -126,10 +126,8 @@ Document management with MinIO storage.
 
 | Version | Description |
 |---------|-------------|
-| **v0.14.0** | **File Service (Phase 6.3)** |
-| **v0.13.0** | **Reporting Service (Phase 6.2)** |
-| **v0.12.0** | **Notification Service (Phase 6.1)** |
-| v0.11.0 | Marketing Service (Phase 4.2) |
+| **v1.2.0** | **Infrastructure Consolidation (Docker Compose)** |
+| **v1.1.0** | **Phase 13: Vuexy Redesign & VyVy's ERP Branding** |
 | v0.10.0 | Sales Service (Phase 4.1) |
 | v0.9.0 | Manufacturing Service |
 | v0.8.0 | WMS Service (CRITICAL) |
