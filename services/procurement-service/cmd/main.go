@@ -13,6 +13,7 @@ import (
 	"github.com/erp-cosmetics/procurement-service/internal/delivery/http/handler"
 	"github.com/erp-cosmetics/procurement-service/internal/delivery/http/router"
 	"github.com/erp-cosmetics/procurement-service/internal/infrastructure/event"
+	"github.com/erp-cosmetics/procurement-service/internal/infrastructure/subscriber"
 	"github.com/erp-cosmetics/procurement-service/internal/infrastructure/persistence/postgres"
 	"github.com/erp-cosmetics/procurement-service/internal/usecase/po"
 	"github.com/erp-cosmetics/procurement-service/internal/usecase/pr"
@@ -84,6 +85,13 @@ func main() {
 	cancelPOUC := po.NewCancelPOUseCase(poRepo, eventPub)
 	closePOUC := po.NewClosePOUseCase(poRepo, eventPub)
 	getPOReceiptsUC := po.NewGetPOReceiptsUseCase(poRepo)
+	updateReceivedQtyUC := po.NewUpdateReceivedQtyUseCase(poRepo, eventPub)
+
+	// Initialize event subscriber
+	eventSub := subscriber.NewEventSubscriber(natsClient, updateReceivedQtyUC, log)
+	if err := eventSub.Subscribe(context.Background()); err != nil {
+		log.Error("Failed to start event subscriber", zap.Error(err))
+	}
 
 	// Initialize handlers
 	prHandler := handler.NewPRHandler(createPRUC, getPRUC, listPRsUC, submitPRUC, approvePRUC, rejectPRUC)

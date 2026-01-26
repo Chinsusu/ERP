@@ -468,7 +468,6 @@ type Config struct {
 
 // Load loads configuration
 func Load() (*Config, error) <span class="cov0" title="0">{
-        viper.SetConfigFile(".env")
         viper.AutomaticEnv()
 
         viper.SetDefault("SERVICE_NAME", "wms-service")

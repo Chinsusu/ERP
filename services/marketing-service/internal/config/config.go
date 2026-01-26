@@ -39,15 +39,7 @@ type Config struct {
 
 // LoadConfig loads configuration from environment
 func LoadConfig() (*Config, error) {
-	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		// If .env file doesn't exist, continue with env vars
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return nil, err
-		}
-	}
 
 	config := &Config{}
 	if err := viper.Unmarshal(config); err != nil {

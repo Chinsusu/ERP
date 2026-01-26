@@ -35,7 +35,6 @@ type Config struct {
 
 // Load loads configuration
 func Load() (*Config, error) {
-	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()
 
 	viper.SetDefault("SERVICE_NAME", "procurement-service")
@@ -57,12 +56,6 @@ func Load() (*Config, error) {
 	viper.SetDefault("REDIS_DB", 0)
 
 	viper.SetDefault("NATS_URL", "nats://localhost:4222")
-
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return nil, err
-		}
-	}
 
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {

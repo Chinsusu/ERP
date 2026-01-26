@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 type UserHandler struct {
 	createUC *user.CreateUserUseCase
 	getUC    *user.GetUserUseCase

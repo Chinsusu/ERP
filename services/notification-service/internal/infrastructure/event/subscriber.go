@@ -81,14 +81,9 @@ func (s *Subscriber) SubscribeAll() error {
 		subject := sub.subject
 		handler := sub.handler
 
-		_, err := s.client.Subscribe(subject, func(msg []byte) {
+		_, err := s.client.Subscribe(subject, "notification-service", func(msg []byte) error {
 			s.logger.Info("Received event", zap.String("subject", subject))
-			if err := handler(msg); err != nil {
-				s.logger.Error("Failed to handle event",
-					zap.String("subject", subject),
-					zap.Error(err),
-				)
-			}
+			return handler(msg)
 		})
 		if err != nil {
 			s.logger.Error("Failed to subscribe to event",

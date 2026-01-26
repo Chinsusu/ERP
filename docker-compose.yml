@@ -215,8 +215,10 @@ services:
   # ====================
   api-gateway:
     build:
-      context: ./services/api-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: api-gateway
     container_name: erp-api-gateway
     environment:
       - PORT=${API_GATEWAY_PORT:-8080}
@@ -242,8 +244,10 @@ services:
   # ====================
   auth-service:
     build:
-      context: ./services/auth-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: auth-service
     container_name: erp-auth-service
     environment:
       - PORT=${AUTH_SERVICE_PORT:-8081}
@@ -277,8 +281,10 @@ services:
   # ====================
   user-service:
     build:
-      context: ./services/user-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: user-service
     container_name: erp-user-service
     environment:
       - PORT=${USER_SERVICE_PORT:-8082}
@@ -314,5 +320,312 @@ services:
     depends_on:
       - api-gateway
 
-  # Additional services will be added as they are developed
-  # Following the same pattern above
+  # ====================
+  # Master Data Service
+  # ====================
+  master-data-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: master-data-service
+    container_name: erp-master-data-service
+    environment:
+      - PORT=${MASTER_DATA_SERVICE_PORT:-8083}
+      - GRPC_PORT=${MASTER_DATA_GRPC_PORT:-9083}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${MASTER_DATA_DB_NAME:-master_data_db}
+      - NATS_URL=${NATS_URL:-nats://nats:4222}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  # ====================
+  # Supplier Service
+  # ====================
+  supplier-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: supplier-service
+    container_name: erp-supplier-service
+    environment:
+      - PORT=${SUPPLIER_SERVICE_PORT:-8084}
+      - GRPC_PORT=${SUPPLIER_GRPC_PORT:-9084}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${SUPPLIER_DB_NAME:-supplier_db}
+      - NATS_URL=${NATS_URL:-nats://nats:4222}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  # ====================
+  # Procurement Service
+  # ====================
+  procurement-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: procurement-service
+    container_name: erp-procurement-service
+    environment:
+      - PORT=${PROCUREMENT_SERVICE_PORT:-8085}
+      - GRPC_PORT=${PROCUREMENT_GRPC_PORT:-9085}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${PROCUREMENT_DB_NAME:-procurement_db}
+      - NATS_URL=${NATS_URL:-nats://nats:4222}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  # ====================
+  # WMS Service
+  # ====================
+  wms-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: wms-service
+    container_name: erp-wms-service
+    environment:
+      - PORT=${WMS_SERVICE_PORT:-8086}
+      - GRPC_PORT=${WMS_GRPC_PORT:-9086}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${WMS_DB_NAME:-wms_db}
+      - NATS_URL=${NATS_URL:-nats://nats:4222}
+      - ENABLE_FEFO=${ENABLE_FEFO:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  # ====================
+  # Manufacturing Service
+  # ====================
+  manufacturing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: manufacturing-service
+    container_name: erp-manufacturing-service
+    environment:
+      - PORT=${MANUFACTURING_SERVICE_PORT:-8087}
+      - GRPC_PORT=${MANUFACTURING_GRPC_PORT:-9087}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${MANUFACTURING_DB_NAME:-manufacturing_db}
+      - BOM_ENCRYPTION_KEY=${BOM_ENCRYPTION_KEY}
+      - NATS_URL=${NATS_URL:-nats://nats:4222}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  # ====================
+  # Sales Service
+  # ====================
+  sales-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: sales-service
+    container_name: erp-sales-service
+    environment:
+      - PORT=${SALES_SERVICE_PORT:-8088}
+      - GRPC_PORT=${SALES_GRPC_PORT:-9088}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${SALES_DB_NAME:-sales_db}
+      - NATS_URL=${NATS_URL:-nats://nats:4222}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  # ====================
+  # Marketing Service
+  # ====================
+  marketing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: marketing-service
+    container_name: erp-marketing-service
+    environment:
+      - PORT=${MARKETING_SERVICE_PORT:-8089}
+      - HTTP_PORT=${MARKETING_SERVICE_PORT:-8089}
+      - GRPC_PORT=${MARKETING_GRPC_PORT:-9089}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${MARKETING_DB_NAME:-marketing_db}
+      - NATS_URL=${NATS_URL:-nats://nats:4222}
+      - AUTO_APPROVE_MEGA_KOLS=${AUTO_APPROVE_MEGA_KOLS:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  # ====================
+  # Notification Service
+  # ====================
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: notification-service
+    container_name: erp-notification-service
+    environment:
+      - PORT=${NOTIFICATION_SERVICE_PORT:-8090}
+      - GRPC_PORT=${NOTIFICATION_GRPC_PORT:-9090}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${NOTIFICATION_DB_NAME:-notification_db}
+      - NATS_URL=${NATS_URL:-nats://nats:4222}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  # ====================
+  # File Service
+  # ====================
+  file-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: file-service
+    container_name: erp-file-service
+    environment:
+      - PORT=${FILE_SERVICE_PORT:-8091}
+      - GRPC_PORT=${FILE_GRPC_PORT:-9091}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${FILE_DB_NAME:-file_db}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT:-minio:9000}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-admin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-miniopassword}
+      - MINIO_USE_SSL=${MINIO_USE_SSL:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  # ====================
+  # Reporting Service
+  # ====================
+  reporting-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: reporting-service
+    container_name: erp-reporting-service
+    environment:
+      - PORT=${REPORTING_SERVICE_PORT:-8092}
+      - GRPC_PORT=${REPORTING_GRPC_PORT:-9092}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DB_HOST=${POSTGRES_HOST:-postgres}
+      - DB_PORT=${POSTGRES_PORT:-5432}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_NAME=${REPORTING_DB_NAME:-reporting_db}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    networks:
+      - erp-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy

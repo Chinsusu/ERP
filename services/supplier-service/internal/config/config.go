@@ -44,7 +44,6 @@ type Config struct {
 
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
-	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()
 
 	// Set defaults
@@ -94,12 +93,6 @@ func Load() (*Config, error) {
 	viper.BindEnv("AUTO_BLOCK_ON_GMP_EXPIRY")
 
 	// Read config file (if exists)
-	if err := viper.ReadInConfig(); err != nil {
-		// It's okay if there is no config file
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return nil, err
-		}
-	}
 
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {

@@ -38,7 +38,6 @@ type Config struct {
 
 // LoadConfig loads configuration from environment
 func LoadConfig() (*Config, error) {
-	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()
 
 	// Set defaults
@@ -61,9 +60,6 @@ func LoadConfig() (*Config, error) {
 	viper.SetDefault("ALLOW_NEGATIVE_STOCK", false)
 
 	// Read config file (optional)
-	if err := viper.ReadInConfig(); err != nil {
-		// Config file not found, using defaults and env vars
-	}
 
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 type DepartmentHandler struct {
 	createUC  *department.CreateDepartmentUseCase
 	getTreeUC *department.GetDepartmentTreeUseCase

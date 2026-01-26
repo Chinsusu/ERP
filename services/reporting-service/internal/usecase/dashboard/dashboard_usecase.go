@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/erp-cosmetics/reporting-service/internal/domain/entity"
 	"github.com/erp-cosmetics/reporting-service/internal/domain/repository"
@@ -273,6 +274,3 @@ func (uc *useCase) UpdateWidget(ctx context.Context, widgetID uuid.UUID, input *
 func (uc *useCase) RemoveWidget(ctx context.Context, widgetID uuid.UUID) error {
 	return uc.widgetRepo.Delete(ctx, widgetID)
 }
-
-// Need to import fmt
-import "fmt"

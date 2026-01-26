@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"github.com/erp-cosmetics/auth-service/internal/delivery/http/dto"
 	"github.com/erp-cosmetics/auth-service/internal/usecase/auth"
 	"github.com/erp-cosmetics/shared/pkg/middleware"

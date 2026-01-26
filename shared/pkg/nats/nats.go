@@ -26,9 +26,18 @@ type Config struct {
 
 // NewClient creates a new NATS client
 func NewClient(cfg *Config) (*Client, error) {
+	// Set defaults if not provided
+	if cfg.MaxReconnects == 0 {
+		cfg.MaxReconnects = -1 // Infinite retries
+	}
+	if cfg.ReconnectWait == 0 {
+		cfg.ReconnectWait = 2 * time.Second
+	}
+
 	opts := []nats.Option{
 		nats.MaxReconnects(cfg.MaxReconnects),
 		nats.ReconnectWait(cfg.ReconnectWait),
+		nats.RetryOnFailedConnect(true),
 		nats.DisconnectErrHandler(func(nc *nats.Conn, err error) {
 			if err != nil {
 				cfg.Logger.Error("NATS disconnected", zap.Error(err))

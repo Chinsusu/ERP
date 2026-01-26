@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 type HealthHandler struct{}
 
 func NewHealthHandler() *HealthHandler {

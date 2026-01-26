@@ -2,6 +2,7 @@ package report
 
 import (
 	"context"
+	"fmt"
 	"encoding/json"
 
 	"github.com/erp-cosmetics/reporting-service/internal/domain/entity"
@@ -235,5 +236,3 @@ func min(a, b int) int {
 	}
 	return b
 }
-
-import "fmt"

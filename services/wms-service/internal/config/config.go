@@ -42,7 +42,6 @@ type Config struct {
 
 // Load loads configuration
 func Load() (*Config, error) {
-	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()
 
 	viper.SetDefault("SERVICE_NAME", "wms-service")
@@ -70,12 +69,6 @@ func Load() (*Config, error) {
 	viper.SetDefault("LOW_STOCK_CHECK_INTERVAL", "1h")
 	viper.SetDefault("COLD_STORAGE_MIN_TEMP", 2)
 	viper.SetDefault("COLD_STORAGE_MAX_TEMP", 8)
-
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return nil, err
-		}
-	}
 
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {

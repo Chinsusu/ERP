@@ -77,11 +77,11 @@ func (s *EventSubscriber) Subscribe(ctx context.Context) error {
 }
 
 func (s *EventSubscriber) subscribeToGRNCompleted(ctx context.Context) error {
-	return s.client.Subscribe("wms.grn.completed", func(msg []byte) {
+	_, err := s.client.Subscribe("wms.grn.completed", "procurement-service", func(msg []byte) error {
 		var event GRNCompletedEvent
 		if err := json.Unmarshal(msg, &event); err != nil {
 			s.logger.Error("Failed to unmarshal GRN completed event", zap.Error(err))
-			return
+			return err
 		}
 
 		s.logger.Info("Received GRN completed event",
@@ -94,7 +94,7 @@ func (s *EventSubscriber) subscribeToGRNCompleted(ctx context.Context) error {
 		lineItemID, err := uuid.Parse(event.POLineItemID)
 		if err != nil {
 			s.logger.Error("Invalid PO line item ID", zap.String("id", event.POLineItemID), zap.Error(err))
-			return
+			return err
 		}
 
 		var grnID *uuid.UUID
@@ -111,7 +111,7 @@ func (s *EventSubscriber) subscribeToGRNCompleted(ctx context.Context) error {
 				zap.String("po_line_item_id", event.POLineItemID),
 				zap.Error(err),
 			)
-			return
+			return err
 		}
 
 		s.logger.Info("PO received quantity updated from GRN",
@@ -119,15 +119,17 @@ func (s *EventSubscriber) subscribeToGRNCompleted(ctx context.Context) error {
 			zap.String("po_line_item_id", event.POLineItemID),
 			zap.Float64("accepted_qty", event.AcceptedQty),
 		)
+		return nil
 	})
+	return err
 }
 
 func (s *EventSubscriber) subscribeToSupplierBlocked(ctx context.Context) error {
-	return s.client.Subscribe("supplier.blocked", func(msg []byte) {
+	_, err := s.client.Subscribe("supplier.blocked", "procurement-service", func(msg []byte) error {
 		var event SupplierBlockedEvent
 		if err := json.Unmarshal(msg, &event); err != nil {
 			s.logger.Error("Failed to unmarshal supplier blocked event", zap.Error(err))
-			return
+			return err
 		}
 
 		s.logger.Warn("Supplier blocked - check pending POs",
@@ -140,5 +142,7 @@ func (s *EventSubscriber) subscribeToSupplierBlocked(ctx context.Context) error 
 		// 1. Find all confirmed POs for this supplier
 		// 2. Send notification to procurement team
 		// 3. Optionally flag POs for review
+		return nil
 	})
+	return err
 }

@@ -41,7 +41,7 @@ func (r *Router) Setup() *gin.Engine {
 
 	// Middleware
 	router.Use(gin.Recovery())
-	router.Use(middleware.CORS())
+	router.Use(middleware.CORS("*"))
 	router.Use(middleware.Logger(r.logger))
 
 	// Health check

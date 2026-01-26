@@ -8,7 +8,8 @@ import (
 	"github.com/erp-cosmetics/shared/pkg/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-)
+
+	"github.com/erp-cosmetics/shared/pkg/errors")
 
 // ReportHandler handles report requests
 type ReportHandler struct {
@@ -29,20 +30,20 @@ func (h *ReportHandler) ListDefinitions(c *gin.Context) {
 	if reportType != "" {
 		reports, err := h.reportUC.ListByType(c.Request.Context(), reportType)
 		if err != nil {
-			response.Error(c, http.StatusInternalServerError, "Failed to list reports", err.Error())
+			response.Error(c, errors.New("ERROR", "Failed to list reports", http.StatusInternalServerError))
 			return
 		}
-		response.Success(c, http.StatusOK, "Reports retrieved", reports)
+		response.Success(c, reports)
 		return
 	}
 
 	output, err := h.reportUC.ListDefinitions(c.Request.Context(), page, pageSize)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to list reports", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to list reports", http.StatusInternalServerError))
 		return
 	}
 
-	response.SuccessWithPagination(c, http.StatusOK, "Reports retrieved", output.Reports, output.Total, page, pageSize)
+	response.SuccessWithMeta(c, output.Reports, response.NewMeta(page, pageSize, output.Total))
 }
 
 // GetDefinition handles GET /api/v1/reports/:id
@@ -55,20 +56,20 @@ func (h *ReportHandler) GetDefinition(c *gin.Context) {
 		// Try as code
 		report, err := h.reportUC.GetDefinitionByCode(c.Request.Context(), idStr)
 		if err != nil {
-			response.Error(c, http.StatusNotFound, "Report not found", err.Error())
+			response.Error(c, errors.New("ERROR", "Report not found", http.StatusNotFound))
 			return
 		}
-		response.Success(c, http.StatusOK, "Report retrieved", report)
+		response.Success(c, report)
 		return
 	}
 
 	reportDef, err := h.reportUC.GetDefinition(c.Request.Context(), id)
 	if err != nil {
-		response.Error(c, http.StatusNotFound, "Report not found", err.Error())
+		response.Error(c, errors.New("ERROR", "Report not found", http.StatusNotFound))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Report retrieved", reportDef)
+	response.Success(c, reportDef)
 }
 
 // Execute handles POST /api/v1/reports/:id/execute
@@ -98,18 +99,18 @@ func (h *ReportHandler) Execute(c *gin.Context) {
 
 	execution, err := h.reportUC.Execute(c.Request.Context(), &input)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to execute report", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to execute report", http.StatusInternalServerError))
 		return
 	}
 
-	response.Success(c, http.StatusAccepted, "Report execution started", execution)
+	response.Success(c, execution)
 }
 
 // ListExecutions handles GET /api/v1/reports/:id/executions
 func (h *ReportHandler) ListExecutions(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid report ID", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid report ID", http.StatusBadRequest))
 		return
 	}
 
@@ -118,35 +119,35 @@ func (h *ReportHandler) ListExecutions(c *gin.Context) {
 
 	output, err := h.reportUC.ListExecutions(c.Request.Context(), id, page, pageSize)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to list executions", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to list executions", http.StatusInternalServerError))
 		return
 	}
 
-	response.SuccessWithPagination(c, http.StatusOK, "Executions retrieved", output.Executions, output.Total, page, pageSize)
+	response.SuccessWithMeta(c, output.Executions, response.NewMeta(page, pageSize, output.Total))
 }
 
 // GetExecution handles GET /api/v1/reports/executions/:id
 func (h *ReportHandler) GetExecution(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid execution ID", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid execution ID", http.StatusBadRequest))
 		return
 	}
 
 	execution, err := h.reportUC.GetExecution(c.Request.Context(), id)
 	if err != nil {
-		response.Error(c, http.StatusNotFound, "Execution not found", err.Error())
+		response.Error(c, errors.New("ERROR", "Execution not found", http.StatusNotFound))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Execution retrieved", execution)
+	response.Success(c, execution)
 }
 
 // Download handles GET /api/v1/reports/executions/:id/download
 func (h *ReportHandler) Download(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid execution ID", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid execution ID", http.StatusBadRequest))
 		return
 	}
 
@@ -154,7 +155,7 @@ func (h *ReportHandler) Download(c *gin.Context) {
 
 	data, filename, err := h.reportUC.Export(c.Request.Context(), id, format)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to export report", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to export report", http.StatusInternalServerError))
 		return
 	}
 

@@ -16,7 +16,7 @@ COPY services/${SERVICE}/ ./services/${SERVICE}/
 WORKDIR /build/services/${SERVICE}
 
 # Download dependencies
-RUN go mod download
+RUN go mod tidy && go mod download
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/main.go

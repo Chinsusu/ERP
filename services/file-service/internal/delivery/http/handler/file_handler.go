@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/erp-cosmetics/file-service/internal/usecase/file"
+	"github.com/erp-cosmetics/shared/pkg/errors"
 	"github.com/erp-cosmetics/shared/pkg/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -24,7 +25,7 @@ func NewFileHandler(uc file.UseCase) *FileHandler {
 func (h *FileHandler) Upload(c *gin.Context) {
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "No file provided", err.Error())
+		response.Error(c, errors.BadRequest("No file provided"))
 		return
 	}
 
@@ -48,7 +49,7 @@ func (h *FileHandler) Upload(c *gin.Context) {
 	// Open file
 	src, err := fileHeader.Open()
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Failed to read file", err.Error())
+		response.Error(c, errors.BadRequest("Failed to read file"))
 		return
 	}
 	defer src.Close()
@@ -75,24 +76,24 @@ func (h *FileHandler) Upload(c *gin.Context) {
 
 	result, err := h.fileUC.Upload(c.Request.Context(), input)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to upload file", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusCreated, "File uploaded", result)
+	response.Success(c, result)
 }
 
 // UploadMultiple handles POST /api/v1/files/upload/multiple
 func (h *FileHandler) UploadMultiple(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid form", err.Error())
+		response.Error(c, errors.BadRequest("Invalid form"))
 		return
 	}
 
 	files := form.File["files"]
 	if len(files) == 0 {
-		response.Error(c, http.StatusBadRequest, "No files provided", "")
+		response.Error(c, errors.BadRequest("No files provided"))
 		return
 	}
 
@@ -181,37 +182,37 @@ func (h *FileHandler) UploadMultiple(c *gin.Context) {
 		}
 	}
 
-	response.Success(c, http.StatusOK, "Files processed", results)
+	response.Success(c, results)
 }
 
 // Get handles GET /api/v1/files/:id
 func (h *FileHandler) Get(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid file ID", err.Error())
+		response.Error(c, errors.BadRequest("Invalid file ID"))
 		return
 	}
 
 	file, err := h.fileUC.GetByID(c.Request.Context(), id)
 	if err != nil {
-		response.Error(c, http.StatusNotFound, "File not found", err.Error())
+		response.Error(c, errors.NotFound("File"))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "File retrieved", file)
+	response.Success(c, file)
 }
 
 // Download handles GET /api/v1/files/:id/download
 func (h *FileHandler) Download(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid file ID", err.Error())
+		response.Error(c, errors.BadRequest("Invalid file ID"))
 		return
 	}
 
 	reader, file, err := h.fileUC.Download(c.Request.Context(), id)
 	if err != nil {
-		response.Error(c, http.StatusNotFound, "File not found", err.Error())
+		response.Error(c, errors.NotFound("File"))
 		return
 	}
 	defer reader.Close()
@@ -226,33 +227,33 @@ func (h *FileHandler) Download(c *gin.Context) {
 func (h *FileHandler) GetDownloadURL(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid file ID", err.Error())
+		response.Error(c, errors.BadRequest("Invalid file ID"))
 		return
 	}
 
 	url, err := h.fileUC.GetDownloadURL(c.Request.Context(), id)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to generate URL", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Download URL generated", gin.H{"url": url})
+	response.Success(c, gin.H{"url": url})
 }
 
 // Delete handles DELETE /api/v1/files/:id
 func (h *FileHandler) Delete(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid file ID", err.Error())
+		response.Error(c, errors.BadRequest("Invalid file ID"))
 		return
 	}
 
 	if err := h.fileUC.Delete(c.Request.Context(), id); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to delete file", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "File deleted", nil)
+	response.Success(c, nil)
 }
 
 // GetByEntity handles GET /api/v1/files/entity/:type/:id
@@ -260,26 +261,26 @@ func (h *FileHandler) GetByEntity(c *gin.Context) {
 	entityType := c.Param("type")
 	entityID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid entity ID", err.Error())
+		response.Error(c, errors.BadRequest("Invalid entity ID"))
 		return
 	}
 
 	files, err := h.fileUC.GetByEntity(c.Request.Context(), entityType, entityID)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to get files", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Files retrieved", files)
+	response.Success(c, files)
 }
 
 // ListCategories handles GET /api/v1/files/categories
 func (h *FileHandler) ListCategories(c *gin.Context) {
 	categories, err := h.fileUC.ListCategories(c.Request.Context())
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to list categories", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Categories retrieved", categories)
+	response.Success(c, categories)
 }

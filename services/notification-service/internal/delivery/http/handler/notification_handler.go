@@ -9,7 +9,8 @@ import (
 	"github.com/erp-cosmetics/shared/pkg/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-)
+
+	"github.com/erp-cosmetics/shared/pkg/errors")
 
 // NotificationHandler handles notification-related requests
 type NotificationHandler struct {
@@ -29,17 +30,17 @@ func NewNotificationHandler(notificationUC notification.UseCase, templateUC temp
 func (h *NotificationHandler) SendNotification(c *gin.Context) {
 	var input notification.SendNotificationInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid request body", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid request body", http.StatusBadRequest))
 		return
 	}
 
 	output, err := h.notificationUC.Send(c.Request.Context(), &input)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to send notification", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to send notification", http.StatusInternalServerError))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Notification sent", output)
+	response.Success(c, output)
 }
 
 // ListTemplates handles GET /api/v1/notifications/templates
@@ -56,11 +57,11 @@ func (h *NotificationHandler) ListTemplates(c *gin.Context) {
 
 	output, err := h.templateUC.List(c.Request.Context(), page, pageSize)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to list templates", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to list templates", http.StatusInternalServerError))
 		return
 	}
 
-	response.SuccessWithPagination(c, http.StatusOK, "Templates retrieved", output.Templates, output.Total, page, pageSize)
+	response.SuccessWithMeta(c, output.Templates, response.NewMeta(page, pageSize, output.Total))
 }
 
 // GetTemplate handles GET /api/v1/notifications/templates/:id
@@ -68,24 +69,24 @@ func (h *NotificationHandler) GetTemplate(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid template ID", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid template ID", http.StatusBadRequest))
 		return
 	}
 
 	tmpl, err := h.templateUC.GetByID(c.Request.Context(), id)
 	if err != nil {
-		response.Error(c, http.StatusNotFound, "Template not found", err.Error())
+		response.Error(c, errors.New("ERROR", "Template not found", http.StatusNotFound))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Template retrieved", tmpl)
+	response.Success(c, tmpl)
 }
 
 // CreateTemplate handles POST /api/v1/notifications/templates
 func (h *NotificationHandler) CreateTemplate(c *gin.Context) {
 	var input template.CreateTemplateInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid request body", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid request body", http.StatusBadRequest))
 		return
 	}
 
@@ -98,11 +99,11 @@ func (h *NotificationHandler) CreateTemplate(c *gin.Context) {
 
 	tmpl, err := h.templateUC.Create(c.Request.Context(), &input)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to create template", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to create template", http.StatusInternalServerError))
 		return
 	}
 
-	response.Success(c, http.StatusCreated, "Template created", tmpl)
+	response.Success(c, tmpl)
 }
 
 // UpdateTemplate handles PUT /api/v1/notifications/templates/:id
@@ -110,24 +111,24 @@ func (h *NotificationHandler) UpdateTemplate(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid template ID", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid template ID", http.StatusBadRequest))
 		return
 	}
 
 	var input template.UpdateTemplateInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid request body", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid request body", http.StatusBadRequest))
 		return
 	}
 	input.ID = id
 
 	tmpl, err := h.templateUC.Update(c.Request.Context(), &input)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to update template", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to update template", http.StatusInternalServerError))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Template updated", tmpl)
+	response.Success(c, tmpl)
 }
 
 // DeleteTemplate handles DELETE /api/v1/notifications/templates/:id
@@ -135,14 +136,14 @@ func (h *NotificationHandler) DeleteTemplate(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid template ID", err.Error())
+		response.Error(c, errors.New("ERROR", "Invalid template ID", http.StatusBadRequest))
 		return
 	}
 
 	if err := h.templateUC.Delete(c.Request.Context(), id); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to delete template", err.Error())
+		response.Error(c, errors.New("ERROR", "Failed to delete template", http.StatusInternalServerError))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Template deleted", nil)
+	response.Success(c, nil)
 }

@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	user_notification "github.com/erp-cosmetics/notification-service/internal/usecase/user_notification"
+	"github.com/erp-cosmetics/shared/pkg/errors"
 	"github.com/erp-cosmetics/shared/pkg/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -27,7 +28,7 @@ func (h *UserNotificationHandler) ListNotifications(c *gin.Context) {
 	// Get user ID from context (set by auth middleware)
 	userIDVal, exists := c.Get("user_id")
 	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not authenticated", "")
+		response.Error(c, errors.Unauthorized("User not authenticated"))
 		return
 	}
 
@@ -39,11 +40,11 @@ func (h *UserNotificationHandler) ListNotifications(c *gin.Context) {
 		var err error
 		userID, err = uuid.Parse(v)
 		if err != nil {
-			response.Error(c, http.StatusBadRequest, "Invalid user ID", err.Error())
+			response.Error(c, errors.BadRequest("Invalid user ID"))
 			return
 		}
 	default:
-		response.Error(c, http.StatusBadRequest, "Invalid user ID type", "")
+		response.Error(c, errors.BadRequest("Invalid user ID type"))
 		return
 	}
 
@@ -59,7 +60,7 @@ func (h *UserNotificationHandler) ListNotifications(c *gin.Context) {
 
 	output, err := h.userNotificationUC.GetByUserID(c.Request.Context(), userID, page, pageSize)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to list notifications", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
@@ -78,17 +79,17 @@ func (h *UserNotificationHandler) ListNotifications(c *gin.Context) {
 func (h *UserNotificationHandler) CreateNotification(c *gin.Context) {
 	var input user_notification.CreateInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid request body", err.Error())
+		response.Error(c, errors.BadRequest("Invalid request body"))
 		return
 	}
 
 	notification, err := h.userNotificationUC.Create(c.Request.Context(), &input)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to create notification", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusCreated, "Notification created", notification)
+	response.Success(c, notification)
 }
 
 // MarkAsRead handles PATCH /api/v1/notifications/in-app/:id/read
@@ -96,16 +97,16 @@ func (h *UserNotificationHandler) MarkAsRead(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid notification ID", err.Error())
+		response.Error(c, errors.BadRequest("Invalid notification ID"))
 		return
 	}
 
 	if err := h.userNotificationUC.MarkAsRead(c.Request.Context(), id); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to mark as read", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Notification marked as read", nil)
+	response.Success(c, nil)
 }
 
 // MarkAllAsRead handles PATCH /api/v1/notifications/in-app/read-all
@@ -113,7 +114,7 @@ func (h *UserNotificationHandler) MarkAllAsRead(c *gin.Context) {
 	// Get user ID from context
 	userIDVal, exists := c.Get("user_id")
 	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not authenticated", "")
+		response.Error(c, errors.Unauthorized("User not authenticated"))
 		return
 	}
 
@@ -125,20 +126,20 @@ func (h *UserNotificationHandler) MarkAllAsRead(c *gin.Context) {
 		var err error
 		userID, err = uuid.Parse(v)
 		if err != nil {
-			response.Error(c, http.StatusBadRequest, "Invalid user ID", err.Error())
+			response.Error(c, errors.BadRequest("Invalid user ID"))
 			return
 		}
 	default:
-		response.Error(c, http.StatusBadRequest, "Invalid user ID type", "")
+		response.Error(c, errors.BadRequest("Invalid user ID type"))
 		return
 	}
 
 	if err := h.userNotificationUC.MarkAllAsRead(c.Request.Context(), userID); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to mark all as read", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "All notifications marked as read", nil)
+	response.Success(c, nil)
 }
 
 // DeleteNotification handles DELETE /api/v1/notifications/in-app/:id
@@ -146,16 +147,16 @@ func (h *UserNotificationHandler) DeleteNotification(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "Invalid notification ID", err.Error())
+		response.Error(c, errors.BadRequest("Invalid notification ID"))
 		return
 	}
 
 	if err := h.userNotificationUC.Delete(c.Request.Context(), id); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to delete notification", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Notification deleted", nil)
+	response.Success(c, nil)
 }
 
 // GetUnreadCount handles GET /api/v1/notifications/in-app/unread-count
@@ -163,7 +164,7 @@ func (h *UserNotificationHandler) GetUnreadCount(c *gin.Context) {
 	// Get user ID from context
 	userIDVal, exists := c.Get("user_id")
 	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not authenticated", "")
+		response.Error(c, errors.Unauthorized("User not authenticated"))
 		return
 	}
 
@@ -175,19 +176,19 @@ func (h *UserNotificationHandler) GetUnreadCount(c *gin.Context) {
 		var err error
 		userID, err = uuid.Parse(v)
 		if err != nil {
-			response.Error(c, http.StatusBadRequest, "Invalid user ID", err.Error())
+			response.Error(c, errors.BadRequest("Invalid user ID"))
 			return
 		}
 	default:
-		response.Error(c, http.StatusBadRequest, "Invalid user ID type", "")
+		response.Error(c, errors.BadRequest("Invalid user ID type"))
 		return
 	}
 
 	count, err := h.userNotificationUC.CountUnread(c.Request.Context(), userID)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Failed to get unread count", err.Error())
+		response.Error(c, errors.Internal(err))
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Unread count retrieved", gin.H{"unread_count": count})
+	response.Success(c, gin.H{"unread_count": count})
 }
