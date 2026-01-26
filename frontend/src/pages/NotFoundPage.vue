@@ -34,7 +34,7 @@ function goHome() {
 .error-code {
   font-size: 8rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #e91e63, #9c27b0);
+  background: linear-gradient(135deg, #7367f0, #9e95f5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1;

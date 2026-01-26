@@ -39,7 +39,7 @@ func Load() (*Config, error) {
 		SMTPUsername:  getEnvOrDefault("SMTP_USERNAME", ""),
 		SMTPPassword:  getEnvOrDefault("SMTP_PASSWORD", ""),
 		SMTPFromEmail: getEnvOrDefault("SMTP_FROM_EMAIL", "noreply@erp-cosmetics.local"),
-		SMTPFromName:  getEnvOrDefault("SMTP_FROM_NAME", "ERP Cosmetics System"),
+		SMTPFromName:  getEnvOrDefault("SMTP_FROM_NAME", "VyVy's ERP System"),
 		SMTPUseTLS:    getEnvAsBoolOrDefault("SMTP_USE_TLS", true),
 
 		// Email settings

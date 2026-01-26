@@ -35,7 +35,7 @@ const mainContentStyle = computed(() => ({
       
       <!-- Footer -->
       <footer class="app-footer">
-        <span>&copy; 2026 ERP Cosmetics. All rights reserved.</span>
+        <span>&copy; 2026 VyVy's ERP. All rights reserved.</span>
       </footer>
     </div>
   </div>

@@ -42,69 +42,60 @@ async function handleLogin() {
 
 <template>
   <div class="login-page">
-    <div class="login-container">
-      <!-- Brand Section -->
-      <div class="brand-section">
-        <div class="brand-content">
-          <i class="pi pi-sparkles brand-icon"></i>
-          <h1 class="brand-title">ERP Cosmetics</h1>
-          <p class="brand-subtitle">Comprehensive ERP Solution for Natural Cosmetics Manufacturing</p>
-        </div>
-        <div class="brand-features">
-          <div class="feature">
-            <i class="pi pi-check-circle"></i>
-            <span>Lot Traceability</span>
-          </div>
-          <div class="feature">
-            <i class="pi pi-check-circle"></i>
-            <span>FEFO Inventory</span>
-          </div>
-          <div class="feature">
-            <i class="pi pi-check-circle"></i>
-            <span>GMP Compliance</span>
-          </div>
-          <div class="feature">
-            <i class="pi pi-check-circle"></i>
-            <span>Formula Protection</span>
-          </div>
+    <!-- Branding Logo (Top Left) -->
+    <div class="brand-logo">
+      <img src="@/assets/logo.svg" alt="Logo" class="logo-img" />
+      <span class="logo-text">VyVy's ERP</span>
+    </div>
+
+    <div class="login-wrapper">
+      <!-- Left Section: Illustration -->
+      <div class="illustration-section">
+        <div class="illustration-content">
+          <img src="@/assets/images/login-illustration.png" alt="Login Illustration" class="main-img" />
         </div>
       </div>
 
-      <!-- Login Form Section -->
+      <!-- Right Section: Login Form -->
       <div class="form-section">
-        <div class="login-form">
+        <div class="form-container">
           <div class="form-header">
-            <h2>Welcome Back</h2>
-            <p>Sign in to continue to your dashboard</p>
+            <h2 class="welcome-title">Welcome to VyVy's ERP! 👋</h2>
+            <p class="welcome-subtitle">Please sign-in to your account and start the adventure</p>
           </div>
 
-          <Message v-if="error" severity="error" :closable="false" class="mb-3">
+          <Message v-if="error" severity="error" :closable="false" class="mb-4">
             {{ error }}
           </Message>
 
-          <form @submit.prevent="handleLogin">
+          <form @submit.prevent="handleLogin" class="auth-form">
             <div class="form-group">
-              <label for="email">Email</label>
+              <label for="email" class="form-label">Email</label>
               <InputText
                 id="email"
                 v-model="email"
                 type="email"
-                placeholder="Enter your email"
-                class="w-full"
+                placeholder="admin@company.vn"
+                class="w-full custom-input"
                 :disabled="loading"
               />
             </div>
 
             <div class="form-group">
-              <label for="password">Password</label>
+              <div class="label-wrapper">
+                <label for="password" class="form-label">Password</label>
+                <RouterLink to="/forgot-password" class="forgot-link">
+                  Forgot Password?
+                </RouterLink>
+              </div>
               <Password
                 id="password"
                 v-model="password"
-                placeholder="Enter your password"
+                placeholder="12345678"
                 :feedback="false"
                 toggleMask
-                class="w-full"
-                inputClass="w-full"
+                class="w-full custom-password"
+                inputClass="w-full custom-input"
                 :disabled="loading"
               />
             </div>
@@ -112,11 +103,8 @@ async function handleLogin() {
             <div class="form-options">
               <div class="remember-me">
                 <Checkbox v-model="rememberMe" :binary="true" inputId="rememberMe" />
-                <label for="rememberMe">Remember me</label>
+                <label for="rememberMe" class="remember-label">Remember Me</label>
               </div>
-              <RouterLink to="/forgot-password" class="forgot-link">
-                Forgot password?
-              </RouterLink>
             </div>
 
             <Button
@@ -129,7 +117,11 @@ async function handleLogin() {
           </form>
 
           <div class="form-footer">
-            <p>Demo credentials: <strong>admin@company.vn</strong> / <strong>admin123</strong></p>
+            <p>New on our platform? <RouterLink to="/register" class="create-account">Create an account</RouterLink></p>
+          </div>
+          
+          <div class="demo-info">
+            <p>Demo: <strong>admin@company.vn</strong> / <strong>12345678</strong></p>
           </div>
         </div>
       </div>
@@ -140,117 +132,139 @@ async function handleLogin() {
 <style scoped>
 .login-page {
   min-height: 100vh;
+  background-color: #f8f7fa;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  padding: 1rem;
 }
 
-.login-container {
+/* Brand Logo (Top Left Overlay) */
+.brand-logo {
+  position: absolute;
+  top: 1.5rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 10;
+}
+
+.logo-img {
+  width: 32px;
+  height: 32px;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #5e5873;
+  letter-spacing: -0.5px;
+}
+
+.login-wrapper {
   display: flex;
   width: 100%;
-  max-width: 1000px;
-  background: var(--surface-card);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  height: 100vh;
+  box-shadow: none;
 }
 
-/* Brand Section */
-.brand-section {
-  flex: 1;
-  padding: 3rem;
-  background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.brand-content {
-  margin-bottom: 2rem;
-}
-
-.brand-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.brand-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.brand-subtitle {
-  font-size: 1rem;
-  opacity: 0.9;
-  line-height: 1.6;
-}
-
-.brand-features {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.feature {
+/* Illustration Section (Left 70%) */
+.illustration-section {
+  flex: 2.2;
+  background-color: #f8f7fa;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.95rem;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
 }
 
-.feature i {
-  font-size: 1rem;
+.illustration-content {
+  width: 100%;
+  max-width: 700px;
+  text-align: center;
 }
 
-/* Form Section */
+.main-img {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  filter: drop-shadow(0 20px 50px rgba(0,0,0,0.1));
+}
+
+/* Form Section (Right 30%) */
 .form-section {
   flex: 1;
-  padding: 3rem;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 3rem;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.03);
 }
 
-.login-form {
+.form-container {
   width: 100%;
-  max-width: 360px;
+  max-width: 400px;
 }
 
 .form-header {
-  text-align: center;
   margin-bottom: 2rem;
 }
 
-.form-header h2 {
-  font-size: 1.75rem;
+.welcome-title {
+  font-size: 1.625rem;
   font-weight: 600;
+  color: #5e5873;
   margin-bottom: 0.5rem;
-  color: var(--text-color);
 }
 
-.form-header p {
-  color: var(--text-color-secondary);
+.welcome-subtitle {
+  color: #6e6b7b;
+  font-size: 0.9375rem;
 }
 
 .form-group {
   margin-bottom: 1.25rem;
 }
 
-.form-group label {
+.form-label {
   display: block;
-  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--text-color);
+  color: #5e5873;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
 }
 
-.form-options {
+.label-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0.375rem;
+}
+
+.forgot-link {
+  font-size: 0.8125rem;
+  color: #7367f0;
+  text-decoration: none;
+}
+
+:deep(.custom-input) {
+  border-radius: 0.375rem !important;
+  border: 1px solid #d8d6de !important;
+  padding: 0.572rem 1rem !important;
+  font-size: 0.9375rem !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.custom-input:focus) {
+  border-color: #7367f0 !important;
+  box-shadow: 0 3px 10px 0 rgba(34, 41, 47, 0.1) !important;
+}
+
+.form-options {
   margin-bottom: 1.5rem;
 }
 
@@ -260,65 +274,81 @@ async function handleLogin() {
   gap: 0.5rem;
 }
 
-.remember-me label {
-  font-size: 0.875rem;
-  color: var(--text-color-secondary);
+.remember-label {
+  font-size: 0.9375rem;
+  color: #6e6b7b;
   cursor: pointer;
 }
 
-.forgot-link {
-  font-size: 0.875rem;
-  color: var(--primary-color);
-}
-
 .login-btn {
-  background: linear-gradient(90deg, #e91e63, #9c27b0);
-  border: none;
-  padding: 0.875rem;
-  font-weight: 600;
+  background: #7367f0 !important;
+  border: none !important;
+  padding: 0.75rem !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+  box-shadow: 0 8px 25px -8px rgba(115, 103, 240, 0.48) !important;
+  border-radius: 0.375rem !important;
 }
 
 .login-btn:hover {
-  background: linear-gradient(90deg, #c2185b, #7b1fa2);
+  background: #6558d3 !important;
+  box-shadow: 0 8px 25px -8px rgba(115, 103, 240, 0.6) !important;
 }
 
 .form-footer {
   margin-top: 1.5rem;
   text-align: center;
+  font-size: 0.9375rem;
+  color: #6e6b7b;
+}
+
+.create-account {
+  color: #7367f0;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.demo-info {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f8f7fa;
+  border-radius: 0.375rem;
+  text-align: center;
   font-size: 0.8125rem;
-  color: var(--text-color-secondary);
+  color: #a5a3ae;
 }
 
-.form-footer strong {
-  color: var(--text-color);
-}
-
-.w-full {
-  width: 100%;
-}
-
-.mb-3 {
-  margin-bottom: 1rem;
+.demo-info strong {
+  color: #6e6b7b;
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .login-container {
-    flex-direction: column;
+@media (max-width: 1200px) {
+  .illustration-section {
+    flex: 1.5;
   }
+}
 
-  .brand-section {
-    padding: 2rem;
+@media (max-width: 992px) {
+  .illustration-section {
+    display: none;
   }
-
-  .brand-features {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-  }
-
+  
   .form-section {
-    padding: 2rem;
+    flex: 1;
+    box-shadow: none;
+  }
+
+  .brand-logo {
+    position: static;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 </style>

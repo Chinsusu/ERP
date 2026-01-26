@@ -111,7 +111,7 @@ function goToLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #25293c 0%, #2f3349 50%, #25293c 100%);
   padding: 1rem;
 }
 
@@ -123,8 +123,8 @@ function goToLogin() {
 .forgot-form {
   background: var(--surface-card);
   padding: 2.5rem;
-  border-radius: 20px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px 0 rgba(47, 43, 61, 0.18);
 }
 
 .form-header {
@@ -138,7 +138,7 @@ function goToLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e91e63, #9c27b0);
+  background: linear-gradient(135deg, #7367f0, #9e95f5);
   border-radius: 50%;
   margin: 0 auto 1rem;
 }
@@ -173,14 +173,16 @@ function goToLogin() {
 }
 
 .submit-btn {
-  background: linear-gradient(90deg, #e91e63, #9c27b0);
-  border: none;
+  background: var(--primary-color) !important;
+  border: none !important;
   padding: 0.875rem;
   font-weight: 600;
+  box-shadow: 0 2px 6px 0 rgba(115, 103, 240, 0.5);
 }
 
 .submit-btn:hover {
-  background: linear-gradient(90deg, #c2185b, #7b1fa2);
+  background: var(--primary-hover) !important;
+  transform: translateY(-1px);
 }
 
 .form-footer {
@@ -212,14 +214,14 @@ function goToLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(76, 175, 80, 0.15);
+  background: rgba(40, 199, 111, 0.15);
   border-radius: 50%;
   margin: 0 auto 1.5rem;
 }
 
 .success-icon i {
   font-size: 2.5rem;
-  color: #4caf50;
+  color: #28c76f;
 }
 
 .success-content h2 {

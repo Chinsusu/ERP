@@ -5,7 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0] - 2026-01-26
+
+### Added - Phase 13: Vuexy Redesign & VyVy's ERP Branding
+
+**Deployment Progress: 100% Complete** (Phase 1-13)
+
+**Frontend Vuexy Redesign** ✅:
+- ✅ **Sidebar Overhaul**: 
+  - Switched to **Vuexy Light Theme** (White background, refined borders).
+  - Implemented **Pill-shaped active menu items** with purple gradients.
+  - Added **Section Headers** (e.g., "APPS & PAGES") for better categorization.
+  - Custom scrollbar and transition effects.
+- ✅ **Login Page Redesign**:
+  - Implemented **Vuexy Split-Screen Layout** (Illustration panel + clean Form panel).
+  - Integrated custom **3D Mascot Illustration**.
+  - Removed social login elements for a minimalist, enterprise look.
+  - Improved form validation and UI feedback.
+- ✅ **Dashboard Refinement**:
+  - Updated with **Vuexy-style Cards** (Soft shadows, rounded corners, better spacing).
+  - Improved typography and stats layout.
+
+**Rebranding - VyVy's ERP** ✅:
+- ✅ **Project Renaming**: Renamed "ERP Cosmetics" to "**VyVy's ERP**" globally.
+- ✅ **UI Branding**: Updated logo text, browser titles, footer copyright, and login headers.
+- ✅ **Notification Branding**: Updated default SMTP sender name.
+
+**Authentication & Security** ✅:
+- ✅ **Password Reset**: Standardized administrator credentials to `12345678` for verified initial access.
+- ✅ **Backend Sync**: Verified and updated Bcrypt hashes in `auth_db` for compatibility.
+
+## [1.0.1] - 2026-01-25
 
 ### Added - Phase 12.1: Auth Service Deployment - 2026-01-25
 

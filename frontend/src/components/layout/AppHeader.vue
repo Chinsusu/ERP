@@ -150,7 +150,7 @@ const userInitials = computed(() => {
             :label="userInitials" 
             shape="circle" 
             class="user-avatar"
-            style="background: linear-gradient(135deg, #e91e63, #9c27b0); color: white;"
+            style="background: linear-gradient(135deg, #7367f0, #9e95f5); color: white;"
           />
           <span class="user-name">{{ user?.full_name || 'User' }}</span>
           <i class="pi pi-chevron-down"></i>
@@ -303,10 +303,10 @@ const userInitials = computed(() => {
 }
 
 .text-warning {
-  color: #ff9800;
+  color: #ff9f43;
 }
 
 .text-success {
-  color: #4caf50;
+  color: #28c76f;
 }
 </style>

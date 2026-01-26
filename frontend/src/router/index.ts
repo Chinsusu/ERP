@@ -222,8 +222,8 @@ router.beforeEach(authGuard)
 
 // Set page title
 router.afterEach((to) => {
-    const title = to.meta.title as string || 'ERP Cosmetics'
-    document.title = `${title} | ERP Cosmetics`
+    const title = to.meta.title as string || "VyVy's ERP"
+    document.title = `${title} | VyVy's ERP`
 })
 
 export default router

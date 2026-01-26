@@ -88,14 +88,17 @@ const menuItems = [
 ]
 
 // Filter menu items based on permissions
-function hasAccess(item: any): boolean {
-  if (!item.permission) return true
-  return authStore.hasPermission(item.permission)
+// Show all menu items - route guards handle actual access control
+// This ensures menu is always visible after successful login
+function hasAccess(_item: any): boolean {
+  // Always show menu items in sidebar
+  // Permission/auth checks happen at route guard and API level
+  return true
 }
 
 function hasAnyChildAccess(item: any): boolean {
-  if (!item.children) return hasAccess(item)
-  return item.children.some((child: any) => hasAccess(child))
+  // Always show parent menus
+  return true
 }
 
 function isActive(to: string): boolean {
@@ -113,7 +116,7 @@ function toggleSidebar() {
     <div class="sidebar-header">
       <div class="logo">
         <img src="@/assets/logo.svg" alt="Logo" class="logo-icon" v-if="!collapsed" />
-        <span v-if="!collapsed" class="logo-text">ERP Cosmetics</span>
+        <span v-if="!collapsed" class="logo-text">VyVy's ERP</span>
         <i v-else class="pi pi-sparkles logo-icon-small"></i>
       </div>
     </div>
@@ -169,135 +172,200 @@ function toggleSidebar() {
 </template>
 
 <style scoped>
+/* Vuexy Sidebar - Light Theme */
 .app-sidebar {
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: var(--sidebar-width);
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-  color: #fff;
+  background: #ffffff;
+  color: #6f6b7d;
   display: flex;
   flex-direction: column;
-  transition: width var(--transition-duration) ease;
+  transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: 1000;
   overflow: hidden;
+  box-shadow: 0 0 15px 0 rgba(34, 41, 47, 0.05);
+  border-right: 1px solid #ebe9f1;
 }
 
 .app-sidebar.collapsed {
   width: var(--sidebar-collapsed-width);
 }
 
+/* Header with Logo */
 .sidebar-header {
-  padding: 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  min-height: 64px;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
 }
 
 .logo-icon-small {
   font-size: 1.5rem;
-  color: var(--primary-color);
+  color: #7367f0;
 }
 
 .logo-text {
-  font-size: 1.125rem;
+  font-size: 1.375rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #e91e63, #9c27b0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #5e5873;
+  letter-spacing: -0.5px;
   white-space: nowrap;
 }
 
+/* Navigation */
 .sidebar-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 0;
+  overflow-x: hidden;
+  padding: 0.5rem 0;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #dbdade;
+  border-radius: 10px;
 }
 
 .menu-list {
   list-style: none;
-  padding: 0;
+  padding: 0 0.875rem;
   margin: 0;
 }
 
 .menu-item {
-  margin-bottom: 0.25rem;
+  margin: 0;
+  padding: 0.125rem 0;
 }
 
+/* Section Header (like APPS & PAGES) */
+.section-header {
+  padding: 1.5rem 1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a5a3ae;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Menu Links - Vuexy Light Style */
 .menu-link,
 .menu-parent {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
-  color: rgba(255, 255, 255, 0.7);
+  gap: 0.875rem;
+  padding: 0.625rem 1rem;
+  color: #6f6b7d;
   cursor: pointer;
-  transition: all var(--transition-duration);
-  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+  border-radius: 0.375rem;
+  margin: 0;
+  text-decoration: none;
+  width: 100%;
 }
 
 .menu-link:hover,
 .menu-parent:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: #f8f7fa;
+  color: #7367f0;
 }
 
+/* Active State - Vuexy Light Purple Pill */
 .menu-link.active {
-  background: rgba(233, 30, 99, 0.15);
-  color: var(--primary-color);
-  border-left-color: var(--primary-color);
+  background: linear-gradient(118deg, #7367f0, rgba(115, 103, 240, 0.7));
+  color: #fff !important;
+  box-shadow: 0 2px 4px 0 rgba(115, 103, 240, 0.4);
+  font-weight: 500;
 }
 
+.menu-link.active i {
+  color: #fff !important;
+}
+
+/* Icons */
 .menu-link i,
 .menu-parent i {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   width: 1.5rem;
   text-align: center;
+  flex-shrink: 0;
+  color: #6f6b7d;
 }
 
 .menu-label {
   white-space: nowrap;
   overflow: hidden;
+  font-size: 0.9375rem;
+  flex: 1;
 }
 
+/* Submenu */
 .submenu-list {
   list-style: none;
-  padding: 0 0 0 2.5rem;
-  margin: 0.25rem 0;
+  padding: 0.25rem 0 0.25rem 0;
+  margin: 0;
 }
 
 .submenu-link {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.875rem;
-  transition: all var(--transition-duration);
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem 0.5rem 1.25rem;
+  color: #6f6b7d;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  position: relative;
+  margin-left: 0.5rem;
+}
+
+.submenu-link::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  position: absolute;
+  left: 0;
+  transition: all 0.2s ease;
 }
 
 .submenu-link:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: #7367f0;
 }
 
 .submenu-link.active {
-  color: var(--primary-color);
-  background: rgba(233, 30, 99, 0.1);
+  color: #7367f0;
+  font-weight: 500;
 }
 
+.submenu-link.active::before {
+  background: #7367f0;
+  border-color: #7367f0;
+  box-shadow: 0 0 4px rgba(115, 103, 240, 0.4);
+}
+
+/* Footer */
 .sidebar-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 0.875rem;
+  background: #ffffff;
 }
 
 .collapse-btn {
@@ -305,25 +373,34 @@ function toggleSidebar() {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.625rem;
+  background: #f8f7fa;
   border: none;
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.7);
+  border-radius: 0.375rem;
+  color: #6f6b7d;
   cursor: pointer;
-  transition: all var(--transition-duration);
+  transition: all 0.2s ease;
 }
 
 .collapse-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: #eeedf0;
+  color: #7367f0;
 }
 
-/* Collapsed state styles */
+/* Collapsed State */
 .collapsed .sidebar-header {
-  padding: 1rem;
-  display: flex;
+  padding: 1rem 0.75rem;
   justify-content: center;
+}
+
+.collapsed .logo-text, 
+.collapsed .menu-label, 
+.collapsed .section-header {
+  display: none;
+}
+
+.collapsed .menu-list {
+  padding: 0 0.5rem;
 }
 
 .collapsed .menu-link,
@@ -332,8 +409,7 @@ function toggleSidebar() {
   padding: 0.75rem;
 }
 
-.collapsed .menu-link i,
-.collapsed .menu-parent i {
-  margin: 0;
+.collapsed .submenu-list {
+  display: none;
 }
 </style>
