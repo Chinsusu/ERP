@@ -6,7 +6,7 @@ export const userApi = {
      * Get current logged in user profile
      */
     async getCurrentUser(): Promise<ApiResponse<User>> {
-        const response = await api.get<ApiResponse<User>>('/v1/users/me')
+        const response = await api.get<ApiResponse<User>>('/users/me')
         return response.data
     },
 
@@ -14,7 +14,7 @@ export const userApi = {
      * Get paginated list of users
      */
     async getUsers(params?: PaginationParams): Promise<PaginatedResponse<User>> {
-        const response = await api.get<PaginatedResponse<User>>('/v1/users', { params })
+        const response = await api.get<PaginatedResponse<User>>('/users', { params })
         return response.data
     },
 
@@ -22,7 +22,7 @@ export const userApi = {
      * Get user by ID
      */
     async getUserById(id: string): Promise<ApiResponse<User>> {
-        const response = await api.get<ApiResponse<User>>(`/v1/users/${id}`)
+        const response = await api.get<ApiResponse<User>>(`/users/${id}`)
         return response.data
     },
 
@@ -30,7 +30,7 @@ export const userApi = {
      * Update user
      */
     async updateUser(id: string, data: Partial<User>): Promise<ApiResponse<User>> {
-        const response = await api.put<ApiResponse<User>>(`/v1/users/${id}`, data)
+        const response = await api.put<ApiResponse<User>>(`/users/${id}`, data)
         return response.data
     },
 
@@ -38,7 +38,7 @@ export const userApi = {
      * Delete user
      */
     async deleteUser(id: string): Promise<ApiResponse<null>> {
-        const response = await api.delete<ApiResponse<null>>(`/v1/users/${id}`)
+        const response = await api.delete<ApiResponse<null>>(`/users/${id}`)
         return response.data
     },
 
@@ -46,7 +46,7 @@ export const userApi = {
      * Update current user profile
      */
     async updateProfile(data: Partial<User>): Promise<ApiResponse<User>> {
-        const response = await api.put<ApiResponse<User>>('/v1/users/me', data)
+        const response = await api.put<ApiResponse<User>>('/users/me', data)
         return response.data
     }
 }

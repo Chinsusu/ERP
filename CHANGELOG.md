@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-01-26
+
+### Fixed - Frontend-Backend API Connectivity
+- **Docker Compose**: Exposed port 80 for localhost access via Nginx
+- **Axios BaseURL**: Fixed from `/api` to `/api/v1` to match backend routes
+- **Procurement API**: Corrected endpoints from `/procurement/requisitions` to `/purchase-requisitions` and `/orders` to `/purchase-orders`
+- **API Gateway**: Updated `routes.yaml` to use separate routes for `/purchase-requisitions` and `/purchase-orders`
+- **Auth Types**: Added `LoginUser` type to handle backend response where `roles` is `string[]` instead of `Role[]`
+- **Auth Store**: Fixed initialization to normalize user data with default roles/permissions when `/users/me` response is incomplete
+- **useAuth Composable**: Updated to convert `LoginUser` to normalized `User` format for RBAC
+
+### Verified
+- ✅ Login: Works with `admin@company.vn` / `12345678`
+- ✅ Dashboard: Displays correctly with stats
+- ✅ Materials page: Loads without redirect (empty data - no seed)
+- ✅ Suppliers page: Displays 4 suppliers with full data
+- ✅ Navigation: No longer redirects to Dashboard
+
+### Files Modified
+- `docker-compose.yml` - Added port 80 exposure
+- `frontend/src/api/axios.ts` - Fixed baseURL
+- `frontend/src/api/auth.api.ts` - Removed /v1 prefix
+- `frontend/src/api/user.api.ts` - Removed /v1 prefix
+- `frontend/src/api/procurement.api.ts` - Fixed endpoint paths
+- `frontend/src/types/auth.types.ts` - Added LoginUser type
+- `frontend/src/composables/useAuth.ts` - User normalization
+- `frontend/src/stores/auth.store.ts` - Fixed initialization
+- `services/api-gateway/config/routes.yaml` - Updated procurement routes
+
 ## [1.2.2] - 2026-01-26
 
 ### Fixed - Frontend Stability & Authorization

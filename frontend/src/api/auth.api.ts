@@ -6,7 +6,7 @@ export const authApi = {
      * Login with email and password
      */
     async login(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-        const response = await api.post<ApiResponse<LoginResponse>>('/v1/auth/login', data)
+        const response = await api.post<ApiResponse<LoginResponse>>('/auth/login', data)
         return response.data
     },
 
@@ -14,7 +14,7 @@ export const authApi = {
      * Logout current user
      */
     async logout(): Promise<ApiResponse<null>> {
-        const response = await api.post<ApiResponse<null>>('/v1/auth/logout')
+        const response = await api.post<ApiResponse<null>>('/auth/logout')
         return response.data
     },
 
@@ -22,7 +22,7 @@ export const authApi = {
      * Refresh access token using refresh token
      */
     async refreshToken(refreshToken: string): Promise<ApiResponse<RefreshTokenResponse>> {
-        const response = await api.post<ApiResponse<RefreshTokenResponse>>('/v1/auth/refresh', {
+        const response = await api.post<ApiResponse<RefreshTokenResponse>>('/auth/refresh', {
             refresh_token: refreshToken
         })
         return response.data
@@ -32,7 +32,7 @@ export const authApi = {
      * Request password reset email
      */
     async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<null>> {
-        const response = await api.post<ApiResponse<null>>('/v1/auth/forgot-password', data)
+        const response = await api.post<ApiResponse<null>>('/auth/forgot-password', data)
         return response.data
     },
 
@@ -40,7 +40,7 @@ export const authApi = {
      * Verify current token is valid
      */
     async verifyToken(): Promise<ApiResponse<{ valid: boolean }>> {
-        const response = await api.get<ApiResponse<{ valid: boolean }>>('/v1/auth/verify')
+        const response = await api.get<ApiResponse<{ valid: boolean }>>('/auth/verify')
         return response.data
     }
 }

@@ -22,10 +22,29 @@ export function useAuth() {
             authStore.setLoading(true)
 
             const response = await authApi.login(data)
-            const { access_token, refresh_token, user } = response.data
+            const { access_token, refresh_token, user: loginUser } = response.data
 
             authStore.setTokens(access_token, refresh_token)
-            authStore.setUser(user)
+
+            // Convert LoginUser to User format for auth store
+            const normalizedUser = {
+                id: loginUser.user_id || loginUser.id,
+                email: loginUser.email,
+                first_name: '',
+                last_name: '',
+                full_name: loginUser.email.split('@')[0],
+                is_active: true,
+                roles: loginUser.roles.map(roleName => ({
+                    id: roleName,
+                    name: roleName.toLowerCase().replace(/\s+/g, '_'),
+                    display_name: roleName,
+                    permissions: []
+                })),
+                permissions: loginUser.permissions,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }
+            authStore.setUser(normalizedUser as any)
 
             // Redirect to dashboard
             router.push('/dashboard')

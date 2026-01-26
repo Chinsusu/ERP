@@ -199,9 +199,10 @@ services:
     container_name: erp-nginx
     volumes:
       - ./deploy/nginx/nginx-fixed.conf:/etc/nginx/nginx.conf
-    # No need to expose ports - Cloudflare Tunnel handles this
-    # ports:
-    #   - "80:80"
+    # Expose port 80 for local access (Cloudflare Tunnel also handles public traffic)
+    ports:
+      - "80:80"
+    # SSL handled by Cloudflare
     #   - "443:443"
     networks:
       - erp-network

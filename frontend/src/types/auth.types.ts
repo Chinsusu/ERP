@@ -5,12 +5,21 @@ export interface LoginRequest {
     remember_me?: boolean
 }
 
+// User data from login response (simplified)
+export interface LoginUser {
+    id: string
+    user_id: string
+    email: string
+    roles: string[]        // Backend returns string array
+    permissions: string[]  // Backend returns string array
+}
+
 export interface LoginResponse {
     access_token: string
     refresh_token: string
     expires_in: number
     token_type: string
-    user: User
+    user: LoginUser
 }
 
 export interface RefreshTokenRequest {

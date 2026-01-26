@@ -47,7 +47,11 @@ routes:
   # ============================================
   # Procurement Service
   # ============================================
-  - prefix: /api/v1/procurement
+  - prefix: /api/v1/purchase-requisitions
+    service: erp-procurement-service:8085
+    auth_required: true
+
+  - prefix: /api/v1/purchase-orders
     service: erp-procurement-service:8085
     auth_required: true
 

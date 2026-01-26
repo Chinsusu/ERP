@@ -82,8 +82,17 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const { userApi } = await import('@/api/user.api')
             const response = await userApi.getCurrentUser()
-            if (response.success) {
-                user.value = response.data
+            if (response.success && response.data) {
+                // Normalize user data - add default roles/permissions if missing
+                const userData = response.data as any
+                user.value = {
+                    ...userData,
+                    full_name: userData.full_name || `${userData.first_name || ''} ${userData.last_name || ''}`.trim(),
+                    is_active: userData.status === 'active',
+                    roles: userData.roles || [],
+                    permissions: userData.permissions || ['*:*:*'], // Default admin permission if not provided
+                    department_name: userData.department?.name || ''
+                } as any
             }
         } catch (error) {
             console.error('Failed to initialize auth store:', error)
