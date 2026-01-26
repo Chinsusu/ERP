@@ -48,6 +48,7 @@ func (r *Router) Setup() *gin.Engine {
 		// Users
 		users := v1.Group("/users")
 		{
+			users.GET("/me", r.userHandler.GetMe)
 			users.GET("", r.userHandler.ListUsers)
 			users.POST("", r.userHandler.CreateUser)
 			users.GET("/:id", r.userHandler.GetUser)

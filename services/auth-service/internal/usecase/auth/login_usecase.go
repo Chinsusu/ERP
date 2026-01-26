@@ -131,7 +131,7 @@ func (uc *LoginUseCase) Execute(ctx context.Context, req *LoginRequest) (*LoginR
 	}
 
 	// Generate access token
-	accessToken, err := uc.jwtManager.GenerateAccessToken(user.UserID.String(), user.Email, roleIDs)
+	accessToken, err := uc.jwtManager.GenerateAccessToken(user.UserID.String(), user.Email, roleIDs, roleNames, permCodes)
 	if err != nil {
 		return nil, errors.Internal(err)
 	}

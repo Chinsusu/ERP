@@ -27,10 +27,12 @@ const (
 
 // Claims represents JWT custom claims
 type Claims struct {
-	UserID  string   `json:"sub"`
-	Email   string   `json:"email"`
-	RoleIDs []string `json:"role_ids,omitempty"`
-	Type    TokenType `json:"type"`
+	UserID      string   `json:"sub"`
+	Email       string   `json:"email"`
+	RoleIDs     []string `json:"role_ids,omitempty"`
+	RoleNames   []string `json:"role_names,omitempty"`
+	Permissions []string `json:"permissions,omitempty"`
+	Type        TokenType `json:"type"`
 	jwt.RegisteredClaims
 }
 
@@ -51,23 +53,25 @@ func NewManager(secret string, accessTokenExpire, refreshTokenExpire time.Durati
 }
 
 // GenerateAccessToken creates a new access token
-func (m *Manager) GenerateAccessToken(userID, email string, roleIDs []string) (string, error) {
-	return m.generateToken(userID, email, roleIDs, AccessToken, m.accessTokenDuration)
+func (m *Manager) GenerateAccessToken(userID, email string, roleIDs []string, roleNames []string, permissions []string) (string, error) {
+	return m.generateToken(userID, email, roleIDs, roleNames, permissions, AccessToken, m.accessTokenDuration)
 }
 
 // GenerateRefreshToken creates a new refresh token
 func (m *Manager) GenerateRefreshToken(userID, email string) (string, error) {
-	return m.generateToken(userID, email, nil, RefreshToken, m.refreshTokenDuration)
+	return m.generateToken(userID, email, nil, nil, nil, RefreshToken, m.refreshTokenDuration)
 }
 
 // generateToken creates a JWT token
-func (m *Manager) generateToken(userID, email string, roleIDs []string, tokenType TokenType, duration time.Duration) (string, error) {
+func (m *Manager) generateToken(userID, email string, roleIDs []string, roleNames []string, permissions []string, tokenType TokenType, duration time.Duration) (string, error) {
 	now := time.Now()
 	claims := &Claims{
-		UserID:  userID,
-		Email:   email,
-		RoleIDs: roleIDs,
-		Type:    tokenType,
+		UserID:      userID,
+		Email:       email,
+		RoleIDs:     roleIDs,
+		RoleNames:   roleNames,
+		Permissions: permissions,
+		Type:        tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),
 			IssuedAt:  jwt.NewNumericDate(now),

@@ -95,8 +95,22 @@ func (uc *TokenUseCase) Execute(ctx context.Context, req *RefreshTokenRequest) (
 		roleIDs[i] = role.ID.String()
 	}
 
+	// Update cached permissions
+	permissions, _ := uc.permRepo.GetUserPermissions(ctx, userID)
+	uc.cacheRepo.SetUserPermissions(ctx, userID, permissions, 15*time.Minute)
+
+	permCodes := make([]string, len(permissions))
+	for i, perm := range permissions {
+		permCodes[i] = perm.Code
+	}
+
+	roleNames := make([]string, len(roles))
+	for i, role := range roles {
+		roleNames[i] = role.Name
+	}
+
 	// Generate new access token
-	newAccessToken, err := uc.jwtManager.GenerateAccessToken(userID.String(), user.Email, roleIDs)
+	newAccessToken, err := uc.jwtManager.GenerateAccessToken(userID.String(), user.Email, roleIDs, roleNames, permCodes)
 	if err != nil {
 		return nil, errors.Internal(err)
 	}
@@ -133,10 +147,6 @@ func (uc *TokenUseCase) Execute(ctx context.Context, req *RefreshTokenRequest) (
 	if err := uc.tokenRepo.CreateSession(ctx, session); err != nil {
 		return nil, errors.Internal(err)
 	}
-
-	// Update cached permissions
-	permissions, _ := uc.permRepo.GetUserPermissions(ctx, userID)
-	uc.cacheRepo.SetUserPermissions(ctx, userID, permissions, 15*time.Minute)
 
 	return &RefreshTokenResponse{
 		AccessToken:  newAccessToken,

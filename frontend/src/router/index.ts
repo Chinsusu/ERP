@@ -66,6 +66,18 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/pages/materials/MaterialFormPage.vue'),
                 meta: { title: 'Edit Material', permission: 'master_data:material:update' }
             },
+            {
+                path: 'products',
+                name: 'Products',
+                component: () => import('@/pages/products/ProductsPage.vue'),
+                meta: { title: 'Products', permission: 'master_data:product:read' }
+            },
+            {
+                path: 'categories',
+                name: 'Categories',
+                component: () => import('@/pages/placeholder/PlaceholderPage.vue'),
+                meta: { title: 'Categories', permission: 'master_data:category:read' }
+            },
 
             // Suppliers
             {
@@ -127,6 +139,12 @@ const routes: RouteRecordRaw[] = [
                         name: 'GRN',
                         component: () => import('@/pages/warehouse/GRNPage.vue'),
                         meta: { title: 'Goods Receipt', permission: 'wms:grn:read' }
+                    },
+                    {
+                        path: 'goods-issue',
+                        name: 'GoodsIssue',
+                        component: () => import('@/pages/placeholder/PlaceholderPage.vue'),
+                        meta: { title: 'Goods Issue', permission: 'wms:gi:read' }
                     }
                 ]
             },
@@ -146,6 +164,12 @@ const routes: RouteRecordRaw[] = [
                         name: 'WorkOrders',
                         component: () => import('@/pages/manufacturing/WorkOrdersPage.vue'),
                         meta: { title: 'Work Orders', permission: 'manufacturing:wo:read' }
+                    },
+                    {
+                        path: 'qc',
+                        name: 'QC',
+                        component: () => import('@/pages/placeholder/PlaceholderPage.vue'),
+                        meta: { title: 'Quality Control', permission: 'manufacturing:qc:read' }
                     }
                 ]
             },
@@ -165,6 +189,12 @@ const routes: RouteRecordRaw[] = [
                         name: 'SalesOrders',
                         component: () => import('@/pages/sales/OrdersPage.vue'),
                         meta: { title: 'Sales Orders', permission: 'sales:order:read' }
+                    },
+                    {
+                        path: 'quotations',
+                        name: 'Quotations',
+                        component: () => import('@/pages/placeholder/PlaceholderPage.vue'),
+                        meta: { title: 'Quotations', permission: 'sales:quotation:read' }
                     }
                 ]
             },
@@ -186,6 +216,12 @@ const routes: RouteRecordRaw[] = [
                         meta: { title: 'KOL Management', permission: 'marketing:kol:read' }
                     }
                 ]
+            },
+            {
+                path: 'reports',
+                name: 'Reports',
+                component: () => import('@/pages/placeholder/PlaceholderPage.vue'),
+                meta: { title: 'Reports', permission: 'report:report:read' }
             },
 
             // Settings

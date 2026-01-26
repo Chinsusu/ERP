@@ -36,6 +36,13 @@ type UserResponse struct {
 	AvatarURL    string `json:"avatar_url,omitempty"`
 	DepartmentID string `json:"department_id,omitempty"`
 	ManagerID    string `json:"manager_id,omitempty"`
-	Status       string `json:"status"`
-	CreatedAt    string `json:"created_at"`
+	Status       string         `json:"status"`
+	Roles        []RoleResponse `json:"roles"`
+	Permissions  []string       `json:"permissions"`
+	CreatedAt    string         `json:"created_at"`
+}
+
+// RoleResponse represents role response
+type RoleResponse struct {
+	Name string `json:"name"`
 }

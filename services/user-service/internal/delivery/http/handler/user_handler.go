@@ -1,6 +1,10 @@
 package handler
 
 import (
+	"strings"
+	"time"
+
+	"github.com/erp-cosmetics/shared/pkg/errors"
 	"github.com/erp-cosmetics/shared/pkg/response"
 	"github.com/erp-cosmetics/user-service/internal/delivery/http/dto"
 	"github.com/erp-cosmetics/user-service/internal/usecase/user"
@@ -67,6 +71,75 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	}
 
 	response.Success(c, user)
+}
+
+// GetMe returns the current logged in user
+func (h *UserHandler) GetMe(c *gin.Context) {
+	// Extract user ID from header (set by API Gateway)
+	userID := c.GetHeader("X-User-ID")
+	if userID == "" {
+		// Fallback for direct access if needed
+		val, _ := c.Get("user_id")
+		userID, _ = val.(string)
+	}
+
+	if userID == "" {
+		response.Error(c, errors.Unauthorized("User ID not found in request"))
+		return
+	}
+
+	user, err := h.getUC.Execute(c.Request.Context(), userID)
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	// Map to response DTO
+	res := dto.UserResponse{
+		ID:           user.ID.String(),
+		Email:        user.Email,
+		EmployeeCode: user.EmployeeCode,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		Phone:        user.Phone,
+		AvatarURL:    user.AvatarURL,
+		Status:       user.Status,
+		CreatedAt:    user.CreatedAt.Format(time.RFC3339),
+	}
+
+	if user.DepartmentID != nil {
+		res.DepartmentID = user.DepartmentID.String()
+	}
+	if user.ManagerID != nil {
+		res.ManagerID = user.ManagerID.String()
+	}
+
+	// Extract roles from header (set by API Gateway from JWT)
+	rolesHeader := c.GetHeader("X-User-Roles")
+	if rolesHeader != "" {
+		roleNames := strings.Split(rolesHeader, ",")
+		res.Roles = make([]dto.RoleResponse, len(roleNames))
+		for i, name := range roleNames {
+			// Convert to snake_case for frontend (e.g., "Super Admin" -> "super_admin")
+			res.Roles[i] = dto.RoleResponse{Name: toSnakeCase(name)}
+		}
+	} else {
+		res.Roles = []dto.RoleResponse{}
+	}
+
+	// Extract permissions from header (set by API Gateway from JWT)
+	permsHeader := c.GetHeader("X-User-Permissions")
+	if permsHeader != "" {
+		res.Permissions = strings.Split(permsHeader, ",")
+	} else {
+		res.Permissions = []string{}
+	}
+
+	response.Success(c, res)
+}
+
+func toSnakeCase(s string) string {
+	return strings.ToLower(strings.ReplaceAll(s, " ", "_"))
 }
 
 // ListUsers lists users with pagination

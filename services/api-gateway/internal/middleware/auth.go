@@ -110,6 +110,22 @@ func Auth(config AuthConfig) gin.HandlerFunc {
 		// Add user ID to request headers for downstream services
 		c.Request.Header.Set("X-User-ID", userID)
 
+		// Pass roles and permissions to downstream services
+		if roles, ok := claims["role_names"].([]interface{}); ok {
+			roleStrings := make([]string, len(roles))
+			for i, r := range roles {
+				roleStrings[i] = fmt.Sprint(r)
+			}
+			c.Request.Header.Set("X-User-Roles", strings.Join(roleStrings, ","))
+		}
+		if perms, ok := claims["permissions"].([]interface{}); ok {
+			permStrings := make([]string, len(perms))
+			for i, p := range perms {
+				permStrings[i] = fmt.Sprint(p)
+			}
+			c.Request.Header.Set("X-User-Permissions", strings.Join(permStrings, ","))
+		}
+
 		c.Next()
 	}
 }
